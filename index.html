@@ -194,7 +194,125 @@
     font-style: normal;
   }
 
-  /* Confirm modal — editorial dialog */
+  /* ==================== SIDE ADS ==================== */
+  .ads-side {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    z-index: 40;
+    display: none;
+    pointer-events: none;
+  }
+  .ads-side.left  { left: 20px; }
+  .ads-side.right { right: 20px; }
+  @media (min-width: 1320px) {
+    .ads-side { display: block; }
+  }
+
+  .ad-slot { position: relative; pointer-events: auto; }
+  .ad {
+    position: relative;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    padding: 14px 14px 12px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .35s ease, transform .35s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 200px;
+    font-family: 'Inter', sans-serif;
+  }
+  .ad.show { opacity: 1; transform: translateY(0); }
+
+  .ad-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ad-eyebrow::before {
+    content: "ANZEIGE";
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .ad-eyebrow .sep { color: var(--rule-soft); }
+  .ad-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.05;
+    color: var(--ink);
+    letter-spacing: -.01em;
+  }
+  .ad-body {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+  .ad-foot {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ad-mark {
+    color: var(--accent);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+
+  /* ---- Per-ad variants ---- */
+  .ad--paypal .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 0; line-height: 1.35; text-transform: uppercase; }
+  .ad--paypal .ad-body  { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .03em; word-break: break-all; background: var(--paper-2); padding: 8px 10px; border: 1px dashed var(--rule-soft); color: var(--ink); }
+  .ad--paypal .ad-hero  { font-family: 'Fraunces', serif; font-style: italic; font-size: 38px; color: var(--accent); line-height: 1; margin-bottom: 2px; }
+
+  .ad--kaffee { background: var(--paper-2); }
+  .ad--kaffee .ad-title { font-style: italic; font-size: 28px; }
+  .ad--kaffee .ad-hero  { font-size: 18px; letter-spacing: .35em; color: var(--muted); }
+
+  .ad--stink .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; line-height: 1.15; }
+  .ad--stink .ad-hero  { font-size: 28px; letter-spacing: .1em; }
+  .ad--stink .ad-body  { font-style: italic; font-family: 'Fraunces', serif; font-size: 13px; }
+
+  .ad--pfalz { border-width: 2px; }
+  .ad--pfalz .ad-title { font-family: 'Fraunces', serif; font-size: 20px; text-align: center; }
+  .ad--pfalz .ad-hero  { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; color: var(--accent); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 5px 0; }
+  .ad--pfalz .ad-body  { text-align: center; font-style: italic; font-family: 'Fraunces', serif; font-size: 12.5px; }
+
+  .ad--kirche .ad-hero  { font-family: 'Fraunces', serif; font-size: 34px; color: var(--accent); text-align: center; line-height: 1; }
+  .ad--kirche .ad-title { font-style: italic; font-size: 20px; text-align: center; }
+  .ad--kirche .ad-body  { text-align: center; }
+
+  .ad--reise .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .ad--reise .ad-hero  { font-size: 22px; color: var(--accent); }
+  .ad--reise .ad-body  { border-top: 1px dashed var(--rule-soft); border-bottom: 1px dashed var(--rule-soft); padding: 6px 0; }
+
+  .ad--schweig .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 30px; text-align: center; margin: 8px 0 4px; }
+  .ad--schweig .ad-hero  { text-align: center; font-size: 28px; letter-spacing: .5em; color: var(--muted); line-height: 1; }
+  .ad--schweig .ad-body  { text-align: center; font-size: 10.5px; letter-spacing: .02em; }
+
+  .ad--gastro .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .4em; color: var(--paper); background: var(--accent); padding: 5px 10px; display: inline-block; align-self: flex-start; }
+  .ad--gastro .ad-title { font-family: 'Fraunces', serif; font-size: 24px; font-style: italic; }
+
+  .ad--seele { background: var(--accent-soft); }
+  .ad--seele .ad-hero  { font-family: 'Fraunces', serif; font-size: 32px; color: var(--accent); font-style: italic; text-align: center; line-height: 1; }
+  .ad--seele .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; text-align: center; }
+  .ad--seele .ad-body  { text-align: center; }
+
+    /* Confirm modal — editorial dialog */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -882,6 +1000,10 @@
     </div>
   </div>
 </div>
+
+<!-- ==================== SIDE ADS ==================== -->
+<aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
+<aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
 
 <script>
 /* =========================================================
@@ -1868,8 +1990,143 @@ function setTopicMode(mode) {
 /* =========================================================
    INIT
 ========================================================= */
+
+/* =========================================================
+   SIDE ADS — rotating pseudo-classified ads
+========================================================= */
+const ADS = [
+  {
+    cls: "paypal",
+    eyebrow: "UNTERSTÜTZUNG",
+    hero: "☕",
+    title: "Ein Kaffee für Maiko?",
+    body: "maiko.mllr1@gmail.com",
+    foot: "PayPal · Danke",
+    mark: "♡"
+  },
+  {
+    cls: "kaffee",
+    eyebrow: "CAMPUS",
+    hero: "· · ·",
+    title: "Linas Kaffee",
+    body: "Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.",
+    foot: "Mo–Fr · ab 07:30",
+    mark: "L"
+  },
+  {
+    cls: "stink",
+    eyebrow: "DIENSTLEISTUNG",
+    hero: "☁ ☁ ☁",
+    title: "Pauls Stinke\u00adservice",
+    body: "„Wir liefern Duft. Meistens den falschen.",
+    foot: "Auf Anfrage",
+    mark: "P"
+  },
+  {
+    cls: "pfalz",
+    eyebrow: "SEIT '74",
+    hero: "GETRÄNKE · MARKT",
+    title: "Pfalzgraf",
+    body: "Vom Fass bis zur Flasche — regional, ehrlich, kalt.",
+    foot: "Landau · Pfalz",
+    mark: "✦"
+  },
+  {
+    cls: "kirche",
+    eyebrow: "SONNTAGS · 10 UHR",
+    hero: "✝",
+    title: "Kians Gottesdienst",
+    body: "Predigt, Musik, Kaffee danach. Kommt zahlreich.",
+    foot: "Eintritt frei",
+    mark: "K"
+  },
+  {
+    cls: "reise",
+    eyebrow: "REISEBÜRO",
+    hero: "✈",
+    title: "Konsis Reiseplaner",
+    body: "Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.",
+    foot: "Buchung · 24/7",
+    mark: "→"
+  },
+  {
+    cls: "schweig",
+    eyebrow: "PREMIUM STILLE",
+    hero: ". . .",
+    title: "Schweigen.",
+    body: "Katalinas Schweigeservice. Wir sagen nichts. Garantiert.",
+    foot: "Diskretion inklusive",
+    mark: "—"
+  },
+  {
+    cls: "gastro",
+    eyebrow: "CATERING",
+    hero: "G · I · G",
+    title: "Mats Gastro",
+    body: "Für Events, Meetings und den echten Hunger nach der Vorlesung.",
+    foot: "Anfrage per DM",
+    mark: "M"
+  },
+  {
+    cls: "seele",
+    eyebrow: "ANONYM · 24/7",
+    hero: "♡",
+    title: "Selinas Seelsorge",
+    body: "Wenn's zu viel wird — Selina hört zu. Ohne Wertung, ohne Uhr.",
+    foot: "Vertraulich",
+    mark: "S"
+  }
+];
+
+function renderAd(slotEl, ad) {
+  slotEl.innerHTML = `
+    <div class="ad ad--${ad.cls}">
+      <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
+      ${ad.hero ? `<div class="ad-hero">${ad.hero}</div>` : ``}
+      <div class="ad-title">${ad.title}</div>
+      <div class="ad-body">${ad.body}</div>
+      <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
+    </div>`;
+  // trigger fade-in on next frame
+  requestAnimationFrame(() => {
+    const el = slotEl.querySelector('.ad');
+    if (el) el.classList.add('show');
+  });
+}
+
+function swapAd(slotEl, ad) {
+  const current = slotEl.querySelector('.ad');
+  if (!current) { renderAd(slotEl, ad); return; }
+  current.classList.remove('show');
+  setTimeout(() => renderAd(slotEl, ad), 380);
+}
+
+let adTick = 0;
+function cycleAds() {
+  const leftSlot  = document.getElementById('adSlotLeft');
+  const rightSlot = document.getElementById('adSlotRight');
+  if (!leftSlot || !rightSlot) return;
+  const n = ADS.length;
+  const leftAd  = ADS[adTick % n];
+  const rightAd = ADS[(adTick + 1) % n];
+  swapAd(leftSlot, leftAd);
+  swapAd(rightSlot, rightAd);
+  adTick += 2;
+}
+function initAds() {
+  // initial render (no swap-delay)
+  const leftSlot  = document.getElementById('adSlotLeft');
+  const rightSlot = document.getElementById('adSlotRight');
+  if (!leftSlot || !rightSlot) return;
+  renderAd(leftSlot,  ADS[0]);
+  renderAd(rightSlot, ADS[1]);
+  adTick = 2;
+  setInterval(cycleAds, 10000);
+}
+
 initTheme();
 renderTopics();
+initAds();
 </script>
 </body>
 </html>
