@@ -70,6 +70,7 @@
     text-transform: uppercase;
     color: var(--muted);
   }
+  .mast .edition.right { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
   .mast .edition.right { text-align: right; }
   .mast .brand {
     font-family: 'Fraunces', serif;
@@ -100,6 +101,8 @@
   .toggle .dot {
     width: 10px; height: 10px; border-radius: 50%;
     background: var(--ink);
+    border: 1px solid var(--ink);
+    box-sizing: border-box;
     display: inline-block;
   }
 
@@ -206,11 +209,16 @@
   }
   .ads-side.left  { left: 20px; }
   .ads-side.right { right: 20px; }
-  @media (min-width: 1320px) {
+  @media (min-width: 1560px) {
     .ads-side { display: block; }
   }
+  /* User can hide ads via toggle */
+  body.ads-off .ads-side { display: none !important; }
 
   .ad-slot { position: relative; pointer-events: auto; }
+  .ad-link { display: block; color: inherit; text-decoration: none; }
+  .ad-link .ad { transition: transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
+  .ad-link:hover .ad { transform: translateY(-2px); box-shadow: 3px 3px 0 var(--rule); }
   .ad {
     position: relative;
     border: 1px solid var(--rule);
@@ -275,9 +283,36 @@
   }
 
   /* ---- Per-ad variants ---- */
-  .ad--paypal .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 0; line-height: 1.35; text-transform: uppercase; }
-  .ad--paypal .ad-body  { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .03em; word-break: break-all; background: var(--paper-2); padding: 8px 10px; border: 1px dashed var(--rule-soft); color: var(--ink); }
-  .ad--paypal .ad-hero  { font-family: 'Fraunces', serif; font-style: italic; font-size: 38px; color: var(--accent); line-height: 1; margin-bottom: 2px; }
+  .ad--paypal .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; line-height: 1.15; letter-spacing: -.01em; }
+  .ad--paypal .ad-body  { font-size: 11.5px; line-height: 1.5; color: var(--ink-soft); }
+  .ad--paypal .ad-hero  { font-family: 'Fraunces', serif; font-style: italic; font-size: 42px; color: var(--accent); line-height: 1; margin-bottom: 2px; }
+  .ad--paypal .ad-cta {
+    display: block;
+    margin-top: 4px;
+    padding: 11px 12px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    font-weight: 700;
+    border: 1px solid var(--accent);
+    transition: background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .ad--paypal .ad-cta:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--accent);
+  }
+  .ad--paypal .ad-cta:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
 
   .ad--kaffee { background: var(--paper-2); }
   .ad--kaffee .ad-title { font-style: italic; font-size: 28px; }
@@ -288,7 +323,7 @@
   .ad--stink .ad-body  { font-style: italic; font-family: 'Fraunces', serif; font-size: 13px; }
 
   .ad--pfalz { border-width: 2px; }
-  .ad--pfalz .ad-title { font-family: 'Fraunces', serif; font-size: 20px; text-align: center; }
+  .ad--pfalz .ad-title { font-family: 'Fraunces', serif; font-size: 17px; text-align: center; line-height: 1.15; }
   .ad--pfalz .ad-hero  { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; color: var(--accent); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 5px 0; }
   .ad--pfalz .ad-body  { text-align: center; font-style: italic; font-family: 'Fraunces', serif; font-size: 12.5px; }
 
@@ -307,10 +342,14 @@
   .ad--gastro .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .4em; color: var(--paper); background: var(--accent); padding: 5px 10px; display: inline-block; align-self: flex-start; }
   .ad--gastro .ad-title { font-family: 'Fraunces', serif; font-size: 24px; font-style: italic; }
 
-  .ad--seele { background: var(--accent-soft); }
-  .ad--seele .ad-hero  { font-family: 'Fraunces', serif; font-size: 32px; color: var(--accent); font-style: italic; text-align: center; line-height: 1; }
-  .ad--seele .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; text-align: center; }
-  .ad--seele .ad-body  { text-align: center; }
+  .ad--minion { background: #f5d547; color: #1a1a1a; border-color: #1a1a1a; }
+  .ad--minion .ad-eyebrow { color: #1a1a1a; }
+  .ad--minion .ad-eyebrow::before { background: #1a1a1a; }
+  .ad--minion .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; letter-spacing: .22em; text-align: center; color: #1a1a1a; padding: 8px 0; border-top: 2px solid #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+  .ad--minion .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 21px; text-align: center; color: #1a1a1a; line-height: 1.15; }
+  .ad--minion .ad-body  { text-align: center; color: #1a1a1a; }
+  .ad--minion .ad-foot  { color: #1a1a1a; border-top-color: rgba(26,26,26,.3); }
+  .ad--minion .ad-mark  { color: #1a1a1a; font-style: italic; }
 
     /* Confirm modal — editorial dialog */
   .modal-backdrop {
@@ -889,6 +928,10 @@
     <div class="edition left">Vol. I · SS 2026 · Nº 03</div>
     <div class="brand">Marketing<em>&amp;</em>Sales</div>
     <div class="edition right">
+      <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus" title="Werbung ein/aus">
+        <span class="dot" id="adsDot"></span>
+        <span id="adsLabel">Ads</span>
+      </button>
       <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
         <span class="dot" id="themeDot"></span>
         <span id="themeLabel">Dark</span>
@@ -1618,6 +1661,26 @@ $("#themeToggle").addEventListener("click", () => {
 });
 
 /* =========================================================
+   ADS TOGGLE
+========================================================= */
+function setAds(on) {
+  document.body.classList.toggle("ads-off", !on);
+  localStorage.setItem("ms-ads", on ? "on" : "off");
+  const label = $("#adsLabel");
+  if (label) label.textContent = on ? "Ads" : "Ads·off";
+  const dot = $("#adsDot");
+  if (dot) dot.style.background = on ? "var(--ink)" : "transparent";
+}
+(function initAds(){
+  const stored = localStorage.getItem("ms-ads");
+  setAds(stored !== "off"); // default ON
+})();
+$("#adsToggle").addEventListener("click", () => {
+  const on = !document.body.classList.contains("ads-off");
+  setAds(!on);
+});
+
+/* =========================================================
    START SCREEN
 ========================================================= */
 function renderTopics() {
@@ -1994,16 +2057,18 @@ function setTopicMode(mode) {
 /* =========================================================
    SIDE ADS — rotating pseudo-classified ads
 ========================================================= */
+const PAYPAL_AD = {
+  cls: "paypal",
+  eyebrow: "UNTERSTÜTZUNG",
+  hero: "☕",
+  title: "Ein Kaffee für Maiko?",
+  body: "Wenn dir die App hilft — kleine Geste, große Freude.",
+  cta: { label: "paypal.me/maiggooo →", url: "https://paypal.me/maiggooo" },
+  foot: "PAYPAL · DANKE",
+  mark: "♡"
+};
+
 const ADS = [
-  {
-    cls: "paypal",
-    eyebrow: "UNTERSTÜTZUNG",
-    hero: "☕",
-    title: "Ein Kaffee für Maiko?",
-    body: "maiko.mllr1@gmail.com",
-    foot: "PayPal · Danke",
-    mark: "♡"
-  },
   {
     cls: "kaffee",
     eyebrow: "CAMPUS",
@@ -2025,11 +2090,12 @@ const ADS = [
   {
     cls: "pfalz",
     eyebrow: "SEIT '74",
-    hero: "GETRÄNKE · MARKT",
-    title: "Pfalzgraf",
-    body: "Vom Fass bis zur Flasche — regional, ehrlich, kalt.",
+    hero: "MARKT · FASS · FLASCHE",
+    title: "Getränke Pfalzgraf",
+    body: "Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.",
     foot: "Landau · Pfalz",
-    mark: "✦"
+    mark: "✦",
+    link: "http://www.getraenke-pfalzgraf.de/"
   },
   {
     cls: "kirche",
@@ -2053,8 +2119,8 @@ const ADS = [
     cls: "schweig",
     eyebrow: "PREMIUM STILLE",
     hero: ". . .",
-    title: "Schweigen.",
-    body: "Katalinas Schweigeservice. Wir sagen nichts. Garantiert.",
+    title: "Katalinas Schweigen.",
+    body: "Der Schweigeservice. Wir sagen nichts. Garantiert.",
     foot: "Diskretion inklusive",
     mark: "—"
   },
@@ -2068,25 +2134,32 @@ const ADS = [
     mark: "M"
   },
   {
-    cls: "seele",
-    eyebrow: "ANONYM · 24/7",
-    hero: "♡",
-    title: "Selinas Seelsorge",
-    body: "Wenn's zu viel wird — Selina hört zu. Ohne Wertung, ohne Uhr.",
-    foot: "Vertraulich",
+    cls: "minion",
+    eyebrow: "LIVE-PERFORMANCE",
+    hero: "BELLO!",
+    title: "Selinas Minion Impressionen",
+    body: "Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.",
+    foot: "Buchbar für Events",
     mark: "S"
   }
 ];
 
 function renderAd(slotEl, ad) {
-  slotEl.innerHTML = `
+  const ctaHTML = ad.cta
+    ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>`
+    : ``;
+  const inner = `
     <div class="ad ad--${ad.cls}">
       <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
       ${ad.hero ? `<div class="ad-hero">${ad.hero}</div>` : ``}
       <div class="ad-title">${ad.title}</div>
       <div class="ad-body">${ad.body}</div>
+      ${ctaHTML}
       <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
     </div>`;
+  slotEl.innerHTML = ad.link
+    ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>`
+    : inner;
   // trigger fade-in on next frame
   requestAnimationFrame(() => {
     const el = slotEl.querySelector('.ad');
@@ -2103,24 +2176,20 @@ function swapAd(slotEl, ad) {
 
 let adTick = 0;
 function cycleAds() {
-  const leftSlot  = document.getElementById('adSlotLeft');
   const rightSlot = document.getElementById('adSlotRight');
-  if (!leftSlot || !rightSlot) return;
+  if (!rightSlot) return;
   const n = ADS.length;
-  const leftAd  = ADS[adTick % n];
-  const rightAd = ADS[(adTick + 1) % n];
-  swapAd(leftSlot, leftAd);
-  swapAd(rightSlot, rightAd);
-  adTick += 2;
+  adTick = (adTick + 1) % n;
+  swapAd(rightSlot, ADS[adTick]);
 }
 function initAds() {
-  // initial render (no swap-delay)
+  // PayPal ad stays permanently on the left
   const leftSlot  = document.getElementById('adSlotLeft');
   const rightSlot = document.getElementById('adSlotRight');
   if (!leftSlot || !rightSlot) return;
-  renderAd(leftSlot,  ADS[0]);
-  renderAd(rightSlot, ADS[1]);
-  adTick = 2;
+  renderAd(leftSlot,  PAYPAL_AD);
+  renderAd(rightSlot, ADS[0]);
+  adTick = 0;
   setInterval(cycleAds, 10000);
 }
 
