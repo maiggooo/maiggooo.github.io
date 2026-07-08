@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vorlage — Editorial Edition</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper:       #f4efe6;
+      --paper-2:     #ebe4d6;
+      --ink:         #1a1a1a;
+      --ink-soft:    #3a3a38;
+      --muted:       #6b6b66;
+      --rule:        #1a1a1a;
+      --rule-soft:   #d4cbb6;
+      --accent:      #c8442a;
+      --accent-soft: #f2d9d1;
+      --shadow:      0 1px 0 var(--ink);
+    }
+
+    html[data-theme="dark"] {
+      --paper:       #24241d;
+      --paper-2:     #2e2e26;
+      --ink:         #efe8d8;
+      --ink-soft:    #cdc6b6;
+      --muted:       #8a857a;
+      --rule:        #efe8d8;
+      --rule-soft:   #3a3a30;
+      --accent:      #e8623f;
+      --accent-soft: #3a1f18;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 28px 48px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Masthead */
+    .mast {
+      border-top: 2px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 14px 0 10px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .mast .edition {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .mast .edition.right {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .mast .brand {
+      font-family: 'Fraunces', serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+
+    .mast .brand em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    /* Subhead */
+    .subhead {
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      gap: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .subhead a.back {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .18s ease;
+    }
+
+    .subhead a.back:hover {
+      color: var(--ink);
+    }
+
+    .subhead a.back .arrow {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: 15px;
+      letter-spacing: 0;
+      text-transform: none;
+      line-height: 1;
+      transition: transform .25s cubic-bezier(.7,0,.2,1);
+      display: inline-block;
+    }
+
+    .subhead a.back:hover .arrow {
+      transform: translateX(-3px);
+    }
+
+    /* Toggle */
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--rule);
+      padding: 6px 10px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    .toggle:hover {
+      background: var(--paper-2);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    /* Placeholder-Mitte */
+    .template-placeholder {
+      min-height: 60vh;
+      display: grid;
+      place-items: center;
+      padding: 48px 0;
+    }
+
+    .placeholder-box {
+      width: 100%;
+      max-width: 860px;
+      min-height: 320px;
+      border: 1px solid var(--rule);
+      background: color-mix(in srgb, var(--paper-2) 55%, transparent);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 32px;
+    }
+
+    .placeholder-inner h1 {
+      font-family: 'Fraunces', serif;
+      font-weight: 800;
+      font-size: clamp(36px, 7vw, 72px);
+      line-height: .95;
+      letter-spacing: -.03em;
+      margin-bottom: 16px;
+    }
+
+    .placeholder-inner p {
+      max-width: 620px;
+      margin: 0 auto;
+      color: var(--ink-soft);
+      font-size: 16px;
+    }
+
+    /* Footer */
+    .foot {
+      border-top: 1px solid var(--rule);
+      margin-top: 32px;
+      padding-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Ads */
+    .ads-side {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ads-side.left { left: 0; }
+    .ads-side.right { right: 0; }
+
+    .ad-slot {
+      width: 120px;
+      height: 600px;
+      border: 1px solid var(--rule);
+      background: var(--paper-2);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 16px;
+      pointer-events: auto;
+    }
+
+    html[data-ads="off"] .ads-side {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .ads-side {
+        display: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        padding: 18px 18px 36px;
+      }
+
+      .mast {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .mast .edition.right {
+        justify-content: center;
+      }
+
+      .subhead {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .foot {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .placeholder-box {
+        min-height: 240px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="mast">
+      <div class="edition left">Vol. I · SS 2026 · Nº 03</div>
+
+      <div class="brand">Marketing<em>&amp;</em>Sales</div>
+
+      <div class="edition right">
+        <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus">
+          <span class="dot"></span>
+          <span id="adsLabel">Ads</span>
+        </button>
+
+        <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+          <span class="dot"></span>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="subhead">
+      <a class="back" href="#" aria-label="Zurück">
+        <span class="arrow">&larr;</span>
+        <span>Zurück</span>
+      </a>
+
+      <span class="meta">Template · Editorial Edition</span>
+    </div>
+
+    <main class="template-placeholder">
+      <section class="placeholder-box">
+        <div class="placeholder-inner">
+          <h1>Dein Inhalt<br>hier.</h1>
+          <p>
+            Das ist nur ein einfacher Platzhalter für die Mitte.
+            Header, Ads, Footer und Grunddesign bleiben erhalten.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span>Strauss · Biebergemünd</span>
+      <span>© SS 2026 — Editorial edition</span>
+    </footer>
+  </div>
+
+  <aside class="ads-side left" aria-hidden="true">
+    <div class="ad-slot">Ad Space Left</div>
+  </aside>
+
+  <aside class="ads-side right" aria-hidden="true">
+    <div class="ad-slot">Ad Space Right</div>
+  </aside>
+
+  <script>
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const adsToggle = document.getElementById('adsToggle');
+    const themeLabel = document.getElementById('themeLabel');
+    const adsLabel = document.getElementById('adsLabel');
+
+    html.setAttribute('data-theme', 'light');
+    html.setAttribute('data-ads', 'on');
+
+    themeToggle.addEventListener('click', () => {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      themeLabel.textContent = isDark ? 'Dark' : 'Light';
+    });
+
+    adsToggle.addEventListener('click', () => {
+      const adsOn = html.getAttribute('data-ads') !== 'off';
+      html.setAttribute('data-ads', adsOn ? 'off' : 'on');
+      adsLabel.textContent = adsOn ? 'Ads Off' : 'Ads';
+    });
+  </script>
+</body>
+</html>
