@@ -974,4 +974,616 @@
         <div class="dep-eyebrow">Zitat des Tages</div>
         <div class="dep-body">lädt …</div>
         <div class="dep-attr">
-          <span id="depQuoteA
+          <span id="depQuoteAuthor">—</span>
+          <span class="src">Quotable</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+
+    <!-- Spalte 3: Kuriosum -->
+    <article class="dep-col dep-fact loading" id="depFact" data-source="fact" title="Klick für neuen Fakt">
+      <div class="dep-refresh">↻</div>
+      <div class="dep-content">
+        <div class="dep-eyebrow">Kuriosum</div>
+        <div class="dep-body">lädt …</div>
+        <div class="dep-attr">
+          <span>Nutzlos, aber wahr</span>
+          <span class="src">Useless Facts</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+
+    <!-- Spalte 4: Notierung (rotiert durch 5 Währungen) -->
+    <article class="dep-col dep-ticker loading" id="depTicker" data-source="ticker" title="Klick für nächste Währung">
+      <div class="dep-refresh">↻</div>
+      <div class="dep-content">
+        <div class="dep-eyebrow">Notierung</div>
+        <div class="dep-body">lädt …</div>
+        <div class="dep-attr">
+          <span id="depTickerDate">EZB · Referenz</span>
+          <span class="src">Frankfurter</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+  </section>
+
+  <!-- ————————— SECTION: KABINETT ————————— -->
+  <div class="section-label">
+    <span class="num">03</span>
+    <span>—</span>
+    <span>Kabinett</span>
+    <span class="rule"></span>
+    <span class="meta" id="tileCount">— Einträge</span>
+  </div>
+
+  <!-- ————————— GALLERY ————————— -->
+  <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie"></section>
+
+  <!-- ————————— FOOTER ————————— -->
+  <footer class="foot">
+    <div>Biebergemünd · Hessen</div>
+    <div class="colophon">Gesetzt in <em>Fraunces</em> · Mono · Inter</div>
+    <div>© <span id="year">2026</span> — Alle Rechte vorbehalten</div>
+  </footer>
+
+</div>
+
+<script>
+  /* ————————————————————————————————
+     TOOL-REGISTER
+     ———————————————————————————————— */
+  const TOOLS = [
+    { no: "I",    category: "Tool", title: "MarketingQuiz <em>Nº 01</em>",       desc: "Ein Quiz zum Fit werden in Marketing.",             path: "MarketingTeacher.html" },
+    { no: "II",   category: "Tool", title: "Schere Stein Papier <em>Nº 02</em>", desc: "Beweise dich gegen den Computer.",                  path: "RPS.html" },
+    { no: "III",  category: "Tool", title: "ZeitZähler <em>Nº 03</em>",          desc: "Wie lange musst du dich heute noch durchbeißen?.", path: "ZeitZaehler.html" },
+    { no: "IV",   category: "Tool", title: "Platzhalter <em>Nº 04</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
+    { no: "V",    category: "Tool", title: "Platzhalter <em>Nº 05</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
+    { no: "VI",   category: "Tool", title: "Platzhalter <em>Nº 06</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
+    { no: "VII",  category: "Tool", title: "Platzhalter <em>Nº 07</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
+    { no: "VIII", category: "Tool", title: "Platzhalter <em>Nº 08</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
+    { no: "IX",   category: "Tool", title: "Platzhalter <em>Nº 09</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "Tester.html" }
+  ];
+
+  const gallery = document.getElementById('gallery');
+  let liveCount = 0;
+  TOOLS.forEach((t) => {
+    const hasPath = t.path && t.path.trim().length > 0;
+    if (hasPath) liveCount++;
+    const el = document.createElement(hasPath ? 'a' : 'div');
+    el.className = 'tile' + (hasPath ? '' : ' vacant');
+    if (hasPath) {
+      el.href = t.path;
+      el.setAttribute('aria-label', t.title.replace(/<[^>]+>/g, ''));
+    }
+    el.innerHTML = `
+      <div>
+        <div class="tile-head">
+          <span class="no">${t.no}</span>
+          <span class="cat">${t.category || 'Tool'}</span>
+        </div>
+        <h2 class="tile-title">${t.title}</h2>
+        <p class="tile-desc">${t.desc || ''}</p>
+        ${!hasPath ? '<span class="vacant-stamp">— vakant —</span>' : ''}
+      </div>
+      <div class="tile-foot">
+        ${hasPath
+          ? `<span class="go">Öffnen <span class="arrow">→</span></span><span>${(t.path || '').replace(/\/$/, '')}</span>`
+          : `<span>Kein Pfad hinterlegt</span><span>—</span>`
+        }
+      </div>
+    `;
+    gallery.appendChild(el);
+  });
+  document.getElementById('tileCount').textContent =
+    String(liveCount).padStart(2, '0') + ' von ' + String(TOOLS.length).padStart(2, '0') + ' Einträgen';
+
+  /* ———— DATE ———— */
+  const now = new Date();
+  const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const dateStr = `${now.getDate()}. ${months[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('todayRight').textContent = dateStr;
+  document.getElementById('year').textContent = now.getFullYear();
+
+  /* ———— THEME TOGGLE ———— */
+  const themeBtn = document.getElementById('themeBtn');
+  const themeLabel = document.getElementById('themeLabel');
+  const root = document.documentElement;
+  function applyTheme(t) {
+    if (t === 'dark') { root.setAttribute('data-theme', 'dark'); themeLabel.textContent = 'Hell'; }
+    else { root.removeAttribute('data-theme'); themeLabel.textContent = 'Dunkel'; }
+  }
+  const storedTheme = localStorage.getItem('werkzeuge-theme');
+  applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+  themeBtn.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem('werkzeuge-theme', next);
+  });
+
+  /* ————————————————————————————————
+     WEATHER — Open-Meteo
+     ———————————————————————————————— */
+  const WEATHER_COORDS = { lat: 50.1667, lon: 9.2833 };
+  const WMO = {
+    0:["☀","klar"], 1:["☀","heiter"], 2:["⛅","teils bewölkt"], 3:["☁","bewölkt"],
+    45:["≋","neblig"], 48:["≋","Reifnebel"],
+    51:["✧","leichter Niesel"], 53:["✧","Niesel"], 55:["✧","starker Niesel"],
+    56:["❅","gefr. Niesel"], 57:["❅","gefr. Niesel"],
+    61:["☂","leichter Regen"], 63:["☂","Regen"], 65:["☂","starker Regen"],
+    66:["❅","gefr. Regen"], 67:["❅","gefr. Regen"],
+    71:["❄","leichter Schnee"], 73:["❄","Schnee"], 75:["❄","starker Schnee"], 77:["❄","Schneegriesel"],
+    80:["☂","Regenschauer"], 81:["☂","Regenschauer"], 82:["☂","heftige Schauer"],
+    85:["❄","Schneeschauer"], 86:["❄","Schneeschauer"],
+    95:["⚡","Gewitter"], 96:["⚡","Gewitter · Hagel"], 99:["⚡","Gewitter · Hagel"]
+  };
+  const DOW = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+
+  const wBtn    = document.getElementById('weatherBtn');
+  const wIcon   = document.getElementById('wIcon');
+  const wTemp   = document.getElementById('wTemp');
+  const wDesc   = document.getElementById('wDesc');
+  const fcPanel = document.getElementById('forecast');
+  const fcGrid  = document.getElementById('forecastGrid');
+
+  async function loadWeather() {
+    const cached = JSON.parse(localStorage.getItem('werk-weather') || 'null');
+    if (cached && (Date.now() - cached.t) < 30 * 60 * 1000) {
+      renderWeather(cached.data);
+      return;
+    }
+    const url = `https://api.open-meteo.com/v1/forecast`
+      + `?latitude=${WEATHER_COORDS.lat}&longitude=${WEATHER_COORDS.lon}`
+      + `&current=temperature_2m,weather_code`
+      + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
+      + `&forecast_days=5&timezone=Europe%2FBerlin`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('weather');
+      const data = await res.json();
+      const payload = {
+        current: { temp: Math.round(data.current.temperature_2m), code: data.current.weather_code },
+        daily: data.daily.time.slice(1, 5).map((iso, i) => ({
+          date: iso,
+          code: data.daily.weather_code[i + 1],
+          tmin: Math.round(data.daily.temperature_2m_min[i + 1]),
+          tmax: Math.round(data.daily.temperature_2m_max[i + 1]),
+          pop:  data.daily.precipitation_probability_max[i + 1] ?? 0
+        }))
+      };
+      localStorage.setItem('werk-weather', JSON.stringify({ t: Date.now(), data: payload }));
+      renderWeather(payload);
+    } catch (err) {
+      console.warn('Weather:', err);
+      const wrap = wBtn.closest('.weather-wrap');
+      if (wrap) wrap.style.display = 'none';
+    }
+  }
+
+  function renderWeather({ current, daily }) {
+    wBtn.classList.remove('loading');
+    const [icon, desc] = WMO[current.code] || ['·', ''];
+    wIcon.textContent = icon;
+    wTemp.textContent = `${current.temp}°C`;
+    wDesc.textContent = desc;
+    fcGrid.innerHTML = daily.map(d => {
+      const [fIcon] = WMO[d.code] || ['·', ''];
+      const dow = DOW[new Date(d.date).getDay()];
+      const wet = d.pop >= 40;
+      return `
+        <div class="fc-day">
+          <span class="fc-dow">${dow}</span>
+          <span class="fc-icon">${fIcon}</span>
+          <span class="fc-temp">${d.tmax}° <span class="min">/ ${d.tmin}°</span></span>
+          <span class="fc-rain ${wet ? 'wet' : ''}">☂ ${d.pop}%</span>
+        </div>`;
+    }).join('');
+  }
+
+  function closeForecast() {
+    fcPanel.classList.remove('show');
+    wBtn.classList.remove('open');
+    wBtn.setAttribute('aria-expanded', 'false');
+  }
+  wBtn.addEventListener('click', (e) => {
+    if (wBtn.classList.contains('loading')) return;
+    e.stopPropagation();
+    const isOpen = fcPanel.classList.toggle('show');
+    wBtn.classList.toggle('open', isOpen);
+    wBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.weather-wrap')) closeForecast();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeForecast(); });
+  loadWeather();
+  setInterval(loadWeather, 30 * 60 * 1000);
+
+  /* ————————————————————————————————
+     DEPESCHEN
+     ———————————————————————————————— */
+  const DEP_ROTATE_MS   = 20000;
+  const DEP_CACHE_KEY   = 'werk-depeschen';
+  const DEP_PAUSE_KEY   = 'werk-dep-paused';
+  const DEP_CACHE_HOURS = 6;
+
+  // Die 5 wichtigsten Weltwährungen (nach BIZ Triennial Survey, ohne EUR = Basiswährung)
+  const CURRENCIES = [
+    { code: 'USD', name: 'US-Dollar',        symbol: '$',   digits: 4 },
+    { code: 'GBP', name: 'Britisches Pfund', symbol: '£',   digits: 4 },
+    { code: 'JPY', name: 'Japanischer Yen',  symbol: '¥',   digits: 2 },
+    { code: 'CHF', name: 'Schweizer Franken',symbol: 'CHF', digits: 4 },
+    { code: 'CNY', name: 'Chinesischer Yuan',symbol: '¥',   digits: 4 }
+  ];
+  let tickerIdx = 0;
+
+  const depDateEl     = document.getElementById('depDate');
+  const depReloadBtn  = document.getElementById('depReload');
+  const depPauseBtn   = document.getElementById('depPause');
+  const depPauseLabel = document.getElementById('depPauseLabel');
+
+  const depMonths = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const depNow    = new Date();
+  depDateEl.textContent = `${depNow.getDate()}. ${depMonths[depNow.getMonth()]} · Tagesausgabe`;
+
+  // ——— Fetcher ———
+  async function fetchOnThisDay() {
+    const mm = String(depNow.getMonth() + 1).padStart(2, '0');
+    const dd = String(depNow.getDate()).padStart(2, '0');
+    const res = await fetch(`https://de.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`);
+    if (!res.ok) throw new Error('otd');
+    const data = await res.json();
+    const events = data.events || [];
+    const modern = events.filter(e => e.year >= 1900);
+    const pool   = modern.length ? modern : events;
+    const pick   = pool[Math.floor(Math.random() * pool.length)];
+    return {
+      year: pick.year,
+      text: pick.text,
+      link: pick.pages?.[0]?.content_urls?.desktop?.page || null
+    };
+  }
+
+  async function fetchQuote() {
+    try {
+      const res = await fetch('https://api.quotable.io/random?maxLength=180');
+      if (!res.ok) throw new Error('quote');
+      const d = await res.json();
+      return { text: d.content, author: d.author };
+    } catch {
+      const res = await fetch('https://corsproxy.io/?https://zenquotes.io/api/random');
+      const d = await res.json();
+      return { text: d[0].q, author: d[0].a };
+    }
+  }
+
+  async function fetchFact() {
+    const res = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=de');
+    if (!res.ok) throw new Error('fact');
+    const d = await res.json();
+    return { text: d.text };
+  }
+
+  // Holt ALLE 5 Kurse einmal — Rotation läuft dann lokal
+  async function fetchTickerAll() {
+    const codes = CURRENCIES.map(c => c.code).join(',');
+    const res = await fetch(`https://api.frankfurter.app/latest?from=EUR&to=${codes}`);
+    if (!res.ok) throw new Error('ticker');
+    const d = await res.json();
+    return { date: d.date, rates: d.rates };
+  }
+
+  function fadeSwap(colEl, updateFn) {
+    colEl.classList.add('fading');
+    setTimeout(() => { updateFn(); colEl.classList.remove('fading'); }, 300);
+  }
+
+  // ——— Renderer ———
+  function renderOtd(data) {
+    const col = document.getElementById('depOtd');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      col.querySelector('.dep-kicker').textContent = data.year;
+      const body = col.querySelector('.dep-body');
+      body.textContent = data.text;
+      if (data.link) {
+        body.innerHTML += ` <a href="${data.link}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);">→</a>`;
+      }
+    });
+  }
+  function renderQuote(data) {
+    const col = document.getElementById('depQuote');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      col.querySelector('.dep-body').textContent = `„${data.text}"`;
+      document.getElementById('depQuoteAuthor').textContent = `— ${data.author}`;
+    });
+  }
+  function renderFact(data) {
+    const col = document.getElementById('depFact');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      const txt = data.text.charAt(0).toUpperCase() + data.text.slice(1);
+      col.querySelector('.dep-body').textContent = txt;
+    });
+  }
+
+  // Zeigt EINE Währung groß — mit Dot-Indikatoren unten
+  let cachedTickerData = null;
+  function renderTicker(data, currencyIdx = tickerIdx) {
+    cachedTickerData = data;
+    const col = document.getElementById('depTicker');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      const cur = CURRENCIES[currencyIdx];
+      const val = data.rates[cur.code];
+      const formatted = val.toFixed(cur.digits);
+      const dots = CURRENCIES.map((_, i) =>
+        `<span class="tick-dot ${i === currencyIdx ? 'active' : ''}"></span>`
+      ).join('');
+      col.querySelector('.dep-body').innerHTML = `
+        <span class="tick-pair">1 EUR =</span>
+        <span class="tick-val">${formatted} <span class="tick-symbol">${cur.symbol}</span></span>
+        <span class="tick-name">${cur.name}</span>
+        <div class="tick-dots">${dots}</div>
+      `;
+      document.getElementById('depTickerDate').textContent = `EZB · ${data.date}`;
+    });
+  }
+
+  function renderError(colId, msg = 'Nicht verfügbar') {
+    const col = document.getElementById(colId);
+    col.classList.remove('loading');
+    col.querySelector('.dep-body').textContent = msg;
+    const kicker = col.querySelector('.dep-kicker');
+    if (kicker) kicker.textContent = '—';
+  }
+
+  const DEP_SOURCES = {
+    otd:    { fetch: fetchOnThisDay, render: renderOtd,    colId: 'depOtd'    },
+    quote:  { fetch: fetchQuote,     render: renderQuote,  colId: 'depQuote'  },
+    fact:   { fetch: fetchFact,      render: renderFact,   colId: 'depFact'   },
+    ticker: { colId: 'depTicker' } // Sonderfall — s. u.
+  };
+
+  // Rotiert nur die Währung, lädt keine neuen Daten
+  function refreshTicker() {
+    if (!cachedTickerData) return;
+    tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+    renderTicker(cachedTickerData, tickerIdx);
+  }
+
+  async function refreshOne(source) {
+    const src = DEP_SOURCES[source];
+    if (!src) return;
+    const col = document.getElementById(src.colId);
+    col.classList.add('spinning');
+    try {
+      if (source === 'ticker') {
+        // Bei Klick: neue Kurse holen + Index vorwärts
+        cachedTickerData = await fetchTickerAll();
+        tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+        renderTicker(cachedTickerData, tickerIdx);
+      } else {
+        const data = await src.fetch();
+        src.render(data);
+      }
+    } catch {
+      renderError(src.colId);
+    } finally {
+      setTimeout(() => col.classList.remove('spinning'), 500);
+    }
+  }
+
+  async function loadDepeschen(force = false) {
+    ['depOtd','depQuote','depFact','depTicker'].forEach(id =>
+      document.getElementById(id).classList.add('loading')
+    );
+
+    if (!force) {
+      const cached = JSON.parse(localStorage.getItem(DEP_CACHE_KEY) || 'null');
+      const maxAge = DEP_CACHE_HOURS * 60 * 60 * 1000;
+      const sameDay = cached && new Date(cached.t).toDateString() === depNow.toDateString();
+      if (cached && sameDay && (Date.now() - cached.t) < maxAge) {
+        if (cached.otd)    renderOtd(cached.otd);       else renderError('depOtd');
+        if (cached.quote)  renderQuote(cached.quote);   else renderError('depQuote');
+        if (cached.fact)   renderFact(cached.fact);     else renderError('depFact');
+        if (cached.ticker) renderTicker(cached.ticker, 0); else renderError('depTicker');
+        tickerIdx = 0;
+        return;
+      }
+    }
+
+    const [otdR, quoteR, factR, tickerR] = await Promise.allSettled([
+      fetchOnThisDay(), fetchQuote(), fetchFact(), fetchTickerAll()
+    ]);
+
+    const payload = { t: Date.now() };
+    if (otdR.status    === 'fulfilled') { renderOtd(otdR.value);           payload.otd    = otdR.value;    } else renderError('depOtd');
+    if (quoteR.status  === 'fulfilled') { renderQuote(quoteR.value);       payload.quote  = quoteR.value;  } else renderError('depQuote');
+    if (factR.status   === 'fulfilled') { renderFact(factR.value);         payload.fact   = factR.value;   } else renderError('depFact');
+    if (tickerR.status === 'fulfilled') { tickerIdx = 0; renderTicker(tickerR.value, 0); payload.ticker = tickerR.value; } else renderError('depTicker');
+
+    localStorage.setItem(DEP_CACHE_KEY, JSON.stringify(payload));
+  }
+
+  // Klick auf Spalte
+  document.querySelectorAll('.dep-col').forEach(col => {
+    col.addEventListener('click', () => {
+      if (col.classList.contains('loading') || col.classList.contains('spinning')) return;
+      const source = col.dataset.source;
+      if (source === 'ticker') {
+        // Kein Reload nötig — nur nächste Währung
+        tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+        if (cachedTickerData) renderTicker(cachedTickerData, tickerIdx);
+      } else {
+        refreshOne(source);
+      }
+      resetRotation();
+    });
+  });
+
+  depReloadBtn.addEventListener('click', () => {
+    depReloadBtn.classList.add('spin');
+    loadDepeschen(true).finally(() => {
+      setTimeout(() => depReloadBtn.classList.remove('spin'), 500);
+    });
+    resetRotation();
+  });
+
+  // ——— AUTO-ROTATION ———
+  // Alle 4 Spalten rotieren — Ticker nur mit Währungswechsel (kein API-Call)
+  const ROTATE_SOURCES = ['otd', 'quote', 'fact', 'ticker'];
+  let rotateIdx = 0;
+  let rotateTimer = null;
+  let isPaused = localStorage.getItem(DEP_PAUSE_KEY) === '1';
+
+  function updateProgress() {
+    document.querySelectorAll('.dep-progress').forEach(p => {
+      p.style.transition = 'none';
+      p.style.width = '0%';
+    });
+    if (isPaused) return;
+    const nextSource = ROTATE_SOURCES[rotateIdx];
+    const col = document.getElementById(DEP_SOURCES[nextSource].colId);
+    const bar = col.querySelector('.dep-progress');
+    void bar.offsetWidth;
+    bar.style.transition = `width ${DEP_ROTATE_MS}ms linear`;
+    bar.style.width = '100%';
+  }
+
+  function tickRotation() {
+    if (isPaused) return;
+    const source = ROTATE_SOURCES[rotateIdx];
+    if (source === 'ticker') {
+      refreshTicker(); // nur lokale Rotation
+    } else {
+      refreshOne(source);
+    }
+    rotateIdx = (rotateIdx + 1) % ROTATE_SOURCES.length;
+    updateProgress();
+  }
+
+  function startRotation() {
+    stopRotation();
+    if (isPaused) return;
+    updateProgress();
+    rotateTimer = setInterval(tickRotation, DEP_ROTATE_MS);
+  }
+
+  function stopRotation() {
+    if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
+    document.querySelectorAll('.dep-progress').forEach(p => {
+      p.style.transition = 'none';
+      p.style.width = '0%';
+    });
+  }
+
+  function resetRotation() { if (!isPaused) startRotation(); }
+
+  function applyPauseUI() {
+    depPauseBtn.classList.toggle('paused', isPaused);
+    depPauseLabel.textContent = isPaused ? 'Play' : 'Pause';
+    document.querySelectorAll('.dep-col').forEach(c => c.classList.toggle('paused', isPaused));
+  }
+
+  depPauseBtn.addEventListener('click', () => {
+    isPaused = !isPaused;
+    localStorage.setItem(DEP_PAUSE_KEY, isPaused ? '1' : '0');
+    applyPauseUI();
+    if (isPaused) stopRotation(); else startRotation();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopRotation();
+    else if (!isPaused)  startRotation();
+  });
+
+  applyPauseUI();
+  loadDepeschen().then(() => { setTimeout(startRotation, 2000); });
+
+  /* ————————————————————————————————
+     SIDE ADS
+     ———————————————————————————————— */
+  const PAYPAL_AD = {
+    cls: "paypal", eyebrow: "UNTERSTÜTZUNG", hero: "☕",
+    title: "Ein Kaffee für Maiko?",
+    body: "Wenn dir die App hilft — kleine Geste, große Freude.",
+    cta: { label: "paypal.me/maiggooo →", url: "https://paypal.me/maiggooo" },
+    foot: "PAYPAL · DANKE", mark: "♡"
+  };
+  const ADS = [
+    { cls:"kaffee", eyebrow:"CAMPUS", hero:"· · ·", title:"Linas Kaffee", body:"Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot:"Mo–Fr · ab 07:30", mark:"L" },
+    { cls:"stink", eyebrow:"DIENSTLEISTUNG", hero:"☁ ☁ ☁", title:"Pauls Stinke­service", body:"„Wir liefern Duft. Meistens den falschen.", foot:"Auf Anfrage", mark:"P" },
+    { cls:"pfalz", eyebrow:"SEIT '74", hero:"MARKT · FASS · FLASCHE", title:"Getränke Pfalzgraf", body:"Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.", foot:"Landau · Pfalz", mark:"✦", link:"http://www.getraenke-pfalzgraf.de/" },
+    { cls:"kirche", eyebrow:"SONNTAGS · 10 UHR", hero:"✝", title:"Kians Gottesdienst", body:"Predigt, Musik, Kaffee danach. Kommt zahlreich.", foot:"Eintritt frei", mark:"K" },
+    { cls:"reise", eyebrow:"REISEBÜRO", hero:"✈", title:"Konsis Reiseplaner", body:"Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.", foot:"Buchung · 24/7", mark:"→" },
+    { cls:"schweig", eyebrow:"PREMIUM STILLE", hero:". . .", title:"Katalinas Schweigen.", body:"Der Schweigeservice. Wir sagen nichts. Garantiert.", foot:"Diskretion inklusive", mark:"—" },
+    { cls:"gastro", eyebrow:"CATERING", hero:"G · I · G", title:"Mats Gastro", body:"Für Events, Meetings und den echten Hunger nach der Vorlesung.", foot:"Anfrage per DM", mark:"M" },
+    { cls:"minion", eyebrow:"LIVE-PERFORMANCE", hero:"BELLO!", title:"Selinas Minion Impressionen", body:"Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.", foot:"Buchbar für Events", mark:"S" }
+  ];
+
+  function renderAd(slotEl, ad) {
+    const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
+    const inner = `
+      <div class="ad ad--${ad.cls}">
+        <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
+        ${ad.hero ? `<div class="ad-hero">${ad.hero}</div>` : ``}
+        <div class="ad-title">${ad.title}</div>
+        <div class="ad-body">${ad.body}</div>
+        ${ctaHTML}
+        <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
+      </div>`;
+    slotEl.innerHTML = ad.link ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>` : inner;
+    requestAnimationFrame(() => {
+      const el = slotEl.querySelector('.ad');
+      if (el) el.classList.add('show');
+    });
+  }
+  function swapAd(slotEl, ad) {
+    const current = slotEl.querySelector('.ad');
+    if (!current) { renderAd(slotEl, ad); return; }
+    current.classList.remove('show');
+    setTimeout(() => renderAd(slotEl, ad), 380);
+  }
+  let adTick = 0;
+  function cycleAds() {
+    const rightSlot = document.getElementById('adSlotRight');
+    if (!rightSlot) return;
+    adTick = (adTick + 1) % ADS.length;
+    swapAd(rightSlot, ADS[adTick]);
+  }
+  function initAds() {
+    const leftSlot  = document.getElementById('adSlotLeft');
+    const rightSlot = document.getElementById('adSlotRight');
+    if (!leftSlot || !rightSlot) return;
+    renderAd(leftSlot,  PAYPAL_AD);
+    renderAd(rightSlot, ADS[0]);
+    adTick = 0;
+    setInterval(cycleAds, 10000);
+  }
+
+  function setAds(on) {
+    document.body.classList.toggle('ads-off', !on);
+    localStorage.setItem('werk-ads', on ? 'on' : 'off');
+    const label = document.getElementById('adsLabel');
+    if (label) label.textContent = on ? 'Ads' : 'Ads · aus';
+  }
+  (function initAdsToggle(){
+    const stored = localStorage.getItem('werk-ads');
+    setAds(stored !== 'off');
+    const btn = document.getElementById('adsBtn');
+    if (btn) btn.addEventListener('click', () => {
+      const on = !document.body.classList.contains('ads-off');
+      setAds(!on);
+    });
+  })();
+
+  initAds();
+</script>
+
+</body>
+</html>
