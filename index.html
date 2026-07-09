@@ -468,6 +468,208 @@
       letter-spacing: .08em;
     }
   }
+
+  /* =====================================================
+     MOBILE OPTIMIERUNG v2 — kompakter, weniger Scroll
+     ===================================================== */
+
+  /* --- Depeschen: 2x2 Grid mit kleineren Typos --- */
+  @media (max-width:640px) {
+    .depeschen { grid-template-columns: 1fr 1fr; }
+    .dep-col {
+      padding: 14px 14px 12px;
+      min-height: 130px;
+      border-right: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .dep-col:last-child { border-right: none; }
+    .dep-col:nth-child(2) { border-right: none; }
+    .dep-col:nth-child(3), .dep-col:nth-child(4) { border-bottom: none; }
+
+    .dep-eyebrow { font-size: 8.5px; letter-spacing: .14em; margin-bottom: 6px; gap: 5px; }
+    .dep-eyebrow::before { width: 10px; }
+
+    .dep-kicker { font-size: 22px; margin-bottom: 4px; }
+    .dep-body { font-size: 13px; line-height: 1.3; }
+    .dep-quote .dep-body { font-size: 13.5px; line-height: 1.3; }
+    .dep-quote .dep-body::first-letter { font-size: 34px; padding: 3px 6px 0 0; }
+
+    .tick-name { font-size: 11px; margin-bottom: 3px; }
+    .tick-val { font-size: 22px; gap: 4px; }
+    .tick-symbol { font-size: 11px; }
+    .tick-pair { font-size: 9px; }
+    .tick-dots { gap: 3px; margin-top: 5px; }
+    .tick-dot { width: 4px; height: 4px; }
+
+    .dep-attr { margin-top: 6px; padding-top: 5px; font-size: 8.5px; letter-spacing: .1em; gap: 4px; }
+    .dep-attr .src { font-size: 10px; }
+
+    .dep-refresh { top: 12px; right: 10px; font-size: 10px; }
+  }
+
+  /* --- Tools: kompakte Zeilenliste statt großer Kacheln --- */
+  @media (max-width:720px) {
+    .gallery {
+      grid-template-columns: 1fr;
+      border-left: none;
+      border-top: 1px solid var(--rule);
+    }
+    .tile {
+      aspect-ratio: auto;
+      min-height: 0;
+      padding: 14px 8px 14px 8px;
+      border-right: none;
+      border-left: none;
+      border-bottom: 1px solid var(--rule-soft);
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) 22px;
+      grid-template-rows: auto auto;
+      column-gap: 10px;
+      row-gap: 3px;
+      align-items: center;
+    }
+    /* Wrapper-Div: löst sich auf, sodass Kinder direkt am Grid teilnehmen */
+    .tile > div:first-child { display: contents; }
+    .tile-head { grid-column: 1; grid-row: 1 / span 2; margin: 0; display: flex; align-items: center; justify-content: center; }
+    .tile-head .cat { display: none; }
+    .tile-head .no { font-size: 26px; line-height: 1; text-align: center; }
+    .tile-title { grid-column: 2; grid-row: 1; font-size: 20px; line-height: 1.15; margin: 0; letter-spacing: -0.01em; min-width: 0; }
+    .tile-title em { display: none; }
+    .tile-desc {
+      grid-column: 2; grid-row: 2;
+      font-size: 14.5px;
+      line-height: 1.35;
+      margin: 2px 0 0;
+      color: var(--muted);
+      min-width: 0;
+    }
+    .tile-foot { grid-column: 3; grid-row: 1 / span 2; padding: 0; border: none; margin: 0; display: flex; justify-content: flex-end; align-items: center; }
+    .tile-foot .go { display: none; }
+    .tile-foot .arrow { font-size: 24px; color: var(--accent); }
+    .tile::before { height: 1px; }
+    /* Full-bleed gallery: cancel the wrap padding so tiles use the whole viewport width */
+    .wrap { padding-left: 12px; padding-right: 12px; }
+    .gallery { margin-left: -12px; margin-right: -12px; border-left: none; border-right: none; }
+  }
+
+  /* --- Platzhalter-Kacheln: immer ausblenden (Desktop + Mobile) --- */
+  .tile.placeholder { display: none !important; }
+
+  /* --- Vacant Kacheln: nur auf Mobile ausblenden --- */
+  @media (max-width: 720px) {
+    .tile.vacant { display: none; }
+  }
+
+  /* --- Sehr schmale Screens: minimalistisch (Text bleibt gut lesbar!) --- */
+  @media (max-width:400px) {
+    .dep-attr { display: none; }
+    .tick-dots { display: none; }
+    .dep-quote .dep-body::first-letter { font-size: 26px; padding: 2px 4px 0 0; }
+
+    .tile.vacant, .tile.placeholder { display: none; }
+    .tile {
+      grid-template-columns: 24px minmax(0, 1fr) 20px;
+      padding: 12px 6px 12px 6px;
+      column-gap: 8px;
+    }
+    .tile-head .no { font-size: 23px; }
+    .tile-title { font-size: 18.5px; }
+    .tile-desc { font-size: 13.5px; line-height: 1.35; }
+    .tile-foot .arrow { font-size: 22px; }
+
+    .wrap { padding-left: 8px; padding-right: 8px; }
+    .gallery { margin-left: -8px; margin-right: -8px; }
+
+    .dep-col { padding: 10px 10px 8px; min-height: 110px; }
+    .dep-kicker { font-size: 18px; }
+    .dep-body, .dep-quote .dep-body { font-size: 12px; }
+    .tick-val { font-size: 18px; }
+  }
+
+
+  /* === Mobile-only Support-Ad === */
+  .ad-mobile { display: none; }
+  @media (max-width: 720px) {
+    body:not(.ads-off) .ad-mobile {
+      display: block;
+      margin: 22px 0 10px;
+    }
+    .ad-mobile-inner {
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      padding: 14px 14px 12px;
+      position: relative;
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .ad-mobile-inner:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+    .ad-mobile-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .ad-mobile-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .ad-mobile-hero {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: 40px;
+      line-height: 1;
+      color: var(--accent);
+      text-align: center;
+    }
+    .ad-mobile-title {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: 19px;
+      line-height: 1.15;
+      letter-spacing: -.01em;
+      color: var(--ink);
+      margin-bottom: 3px;
+    }
+    .ad-mobile-body {
+      font-family: 'Fraunces', serif;
+      font-size: 12.5px;
+      line-height: 1.35;
+      color: var(--ink-soft);
+    }
+    .ad-mobile-cta {
+      display: block;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 11px 12px;
+      background: var(--paper);
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      text-decoration: none;
+      transition: transform .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
+    }
+    .ad-mobile-cta:active {
+      background: var(--ink);
+      color: var(--paper);
+      transform: translate(-1px,-1px);
+      box-shadow: 3px 3px 0 var(--accent);
+    }
+  }
+  @media (max-width: 400px) {
+    .ad-mobile-title { font-size: 17px; }
+    .ad-mobile-body { font-size: 11.5px; }
+    .ad-mobile-hero { font-size: 34px; }
+    .ad-mobile-inner { padding: 12px 12px 10px; }
+  }
+
 </style>
 </head>
 <body>
@@ -595,6 +797,21 @@
 
   <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie"></section>
 
+    <!-- Mobile-only Support-Ad -->
+  <aside class="ad-mobile" aria-label="Anzeige">
+    <div class="ad-mobile-inner">
+      <div class="ad-mobile-eyebrow">— Anzeige · Unterstützung —</div>
+      <div class="ad-mobile-row">
+        <div class="ad-mobile-hero">☕</div>
+        <div class="ad-mobile-text">
+          <div class="ad-mobile-title">Ein Kaffee für Maiko?</div>
+          <div class="ad-mobile-body">Wenn dir die Seite gefällt, freue ich mich über eine kleine Aufmerksamkeit.</div>
+        </div>
+      </div>
+      <a class="ad-mobile-cta" href="https://paypal.me/maiggooo" target="_blank" rel="noopener">paypal.me/maiggooo →</a>
+    </div>
+  </aside>
+
   <footer class="foot">
     <div>Strauss · Biebergemünd</div>
     <div class="colophon">Gesetzt in <em>Fraunces</em> · Mono · Inter</div>
@@ -614,21 +831,31 @@
     { no: "I",    category: "Tool", title: "MarketingQuiz <em>Nº 01</em>",       desc: "Ein Quiz zum Fit werden in Marketing.",             path: "MarketingTeacher.html" },
     { no: "II",   category: "Tool", title: "Schere Stein Papier <em>Nº 02</em>", desc: "Beweise dich gegen den Computer.",                  path: "RPS.html" },
     { no: "III",  category: "Tool", title: "ZeitZähler <em>Nº 03</em>",          desc: "Wie lange musst du dich heute noch durchbeißen?.", path: "ZeitZaehler.html" },
-    { no: "IV",   category: "Tool", title: "HigherLower <em>Nº 04</em>",         desc: "",              path: "HL.html" },
+    { no: "IV",   category: "Tool", title: "HigherLower <em>Nº 04</em>",         desc: "Errate, was häufiger bei Google gesucht wird — und komm so weit wie möglich.",              path: "HL.html" },
     { no: "V",    category: "Tool", title: "MarketingDuell <em>Nº 05</em>",         desc: "Beweise dich gegen deine Freunde.",              path: "quizduell.html" },
     { no: "VI",   category: "Tool", title: "Der Dümmste Fliegt <em>Nº 06</em>",         desc: "Wähle die Schwierigkeit und zeig was du drauf hast.",              path: "derduemmstefliegt.html" },
-    { no: "VII",  category: "Tool", title: "Platzhalter <em>Nº 07</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
-    { no: "VIII", category: "Tool", title: "Platzhalter <em>Nº 08</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
-    { no: "IX",   category: "Tool", title: "Platzhalter <em>Nº 09</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "Tester.html" }
+    { no: "VII",   category: "Tool", title: "Platzhalter <em>Nº 07</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "VIII",  category: "Tool", title: "Platzhalter <em>Nº 08</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "IX",    category: "Tool", title: "Platzhalter <em>Nº 09</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "X",     category: "Tool", title: "Platzhalter <em>Nº 10</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XI",    category: "Tool", title: "Platzhalter <em>Nº 11</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XII",   category: "Tool", title: "Platzhalter <em>Nº 12</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XIII",  category: "Tool", title: "Platzhalter <em>Nº 13</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XIV",   category: "Tool", title: "Platzhalter <em>Nº 14</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XV",    category: "Tool", title: "Platzhalter <em>Nº 15</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XVI",   category: "Tool", title: "Platzhalter <em>Nº 16</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XVII",  category: "Tool", title: "Platzhalter <em>Nº 17</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" },
+    { no: "XVIII", category: "Tool", title: "Platzhalter <em>Nº 18</em>", desc: "Kurze Notiz zum Zweck des Werkzeugs.", path: "" }
   ];
 
   const gallery = document.getElementById('gallery');
   let liveCount = 0;
   TOOLS.forEach((t) => {
     const hasPath = t.path && t.path.trim().length > 0;
+    const isPlaceholder = /Platzhalter/i.test(t.title);
     if (hasPath) liveCount++;
     const el = document.createElement(hasPath ? 'a' : 'div');
-    el.className = 'tile' + (hasPath ? '' : ' vacant');
+    el.className = 'tile' + (hasPath ? '' : ' vacant') + (isPlaceholder ? ' placeholder' : '');
     if (hasPath) {
       el.href = t.path;
       el.setAttribute('aria-label', t.title.replace(/<[^>]+>/g, ''));
@@ -645,7 +872,7 @@
       </div>
       <div class="tile-foot">
         ${hasPath
-          ? `<span class="go">Öffnen <span class="arrow">→</span></span><span>${(t.path || '').replace(/\/$/, '')}</span>`
+          ? `<span class="go">Öffnen <span class="arrow">→</span></span>`
           : `<span>Kein Pfad hinterlegt</span><span>—</span>`
         }
       </div>
