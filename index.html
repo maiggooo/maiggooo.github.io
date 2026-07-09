@@ -171,7 +171,6 @@
   }
   .weather.open .weather-caret { transform: rotate(180deg); }
 
-  /* Forecast popover */
   .forecast {
     position: absolute;
     top: calc(100% + 8px);
@@ -303,6 +302,257 @@
   }
   .section-label .meta { color: var(--muted); }
 
+  /* ————————————— DEPESCHEN ————————————— */
+  .depeschen {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 1fr .95fr;
+    gap: 0;
+    position: relative;
+  }
+  .dep-col {
+    padding: 22px 22px 18px;
+    border-right: 1px solid var(--rule-soft);
+    display: flex;
+    flex-direction: column;
+    min-height: 210px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color .25s ease;
+  }
+  .dep-col:last-child { border-right: none; }
+  .dep-col:hover { background: var(--paper-2); }
+  .dep-col:hover .dep-refresh { opacity: 1; }
+  .dep-col.loading { cursor: default; }
+
+  .dep-refresh {
+    position: absolute;
+    top: 20px;
+    right: 18px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity .2s ease, transform .5s ease, color .2s ease;
+    pointer-events: none;
+  }
+  .dep-col:hover .dep-refresh { color: var(--accent); }
+  .dep-col.spinning .dep-refresh {
+    opacity: 1;
+    transform: rotate(360deg);
+    color: var(--accent);
+  }
+
+  .dep-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--accent);
+    opacity: .35;
+    pointer-events: none;
+  }
+  .dep-col.paused .dep-progress { background: var(--muted); opacity: .2; }
+
+  .dep-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .dep-eyebrow::before {
+    content: "";
+    width: 18px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .dep-kicker {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+  }
+
+  .dep-body {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--ink);
+    flex: 1;
+  }
+
+  .dep-content {
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .dep-col.fading .dep-content {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  .dep-quote .dep-body {
+    font-style: italic;
+    font-size: 16.5px;
+    line-height: 1.35;
+  }
+  .dep-quote .dep-body::first-letter {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-style: normal;
+    font-size: 50px;
+    line-height: .8;
+    float: left;
+    padding: 6px 8px 0 0;
+    color: var(--accent);
+  }
+
+  /* Ticker column — big single currency display */
+  .dep-ticker .dep-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .tick-pair {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tick-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .tick-val {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 34px;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .tick-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 0;
+  }
+  .tick-dots {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  .tick-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rule-soft);
+    transition: background-color .3s ease;
+  }
+  .tick-dot.active { background: var(--accent); }
+
+  .dep-attr {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .dep-attr .src {
+    color: var(--accent);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+  }
+
+  .dep-col.loading .dep-kicker,
+  .dep-col.loading .dep-body {
+    color: transparent;
+    background: linear-gradient(90deg, var(--rule-soft) 0%, transparent 50%, var(--rule-soft) 100%);
+    background-size: 200% 100%;
+    animation: dep-shimmer 1.4s infinite;
+    border-radius: 2px;
+  }
+  .dep-col.loading .dep-kicker { min-height: 30px; margin-bottom: 12px; }
+  .dep-col.loading .dep-body   { min-height: 60px; }
+  @keyframes dep-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .section-label .reload,
+  .section-label .pause {
+    background: transparent;
+    border: 1px solid var(--rule-soft);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color .18s ease, border-color .18s ease;
+  }
+  .section-label .reload:hover,
+  .section-label .pause:hover {
+    color: var(--ink);
+    border-color: var(--rule);
+  }
+  .section-label .reload .r-icon {
+    display: inline-block;
+    transition: transform .5s ease;
+  }
+  .section-label .reload.spin .r-icon { transform: rotate(360deg); }
+  .section-label .pause.paused { color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 1060px) {
+    .depeschen { grid-template-columns: 1fr 1fr; }
+    .dep-col:nth-child(2) { border-right: none; }
+    .dep-col:nth-child(1),
+    .dep-col:nth-child(2) { border-bottom: 1px solid var(--rule-soft); }
+  }
+  @media (max-width: 640px) {
+    .depeschen { grid-template-columns: 1fr; }
+    .dep-col {
+      border-right: none;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .dep-col:last-child { border-bottom: none; }
+  }
+
   /* ————————————— GALLERY GRID ————————————— */
   .gallery {
     display: grid;
@@ -412,7 +662,6 @@
   }
   .tile:hover .arrow { transform: translateX(6px); }
 
-  /* Placeholder / vacant slot */
   .tile.vacant {
     background: repeating-linear-gradient(
       135deg,
@@ -661,9 +910,7 @@
             <span>Vorhersage · 4 Tage</span>
             <span class="loc">Biebergemünd</span>
           </div>
-          <div class="forecast-grid" id="forecastGrid">
-            <!-- injected by JS -->
-          </div>
+          <div class="forecast-grid" id="forecastGrid"></div>
           <div class="forecast-foot">
             Daten · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
           </div>
@@ -688,9 +935,84 @@
     <span id="todayRight">—</span>
   </div>
 
+  <!-- ————————— SECTION: DEPESCHEN ————————— -->
+  <div class="section-label">
+    <span class="num">02</span>
+    <span>—</span>
+    <span>Depeschen</span>
+    <span class="rule"></span>
+    <span class="meta" id="depDate">— Tagesausgabe</span>
+    <button class="pause" id="depPause" aria-label="Auto-Rotation pausieren">
+      <span id="depPauseLabel">Pause</span>
+    </button>
+    <button class="reload" id="depReload" aria-label="Alle Depeschen neu laden">
+      <span class="r-icon">↻</span>
+      <span>alle</span>
+    </button>
+  </div>
+
+  <section class="depeschen" aria-label="Tagesdepeschen">
+    <!-- Spalte 1: On This Day -->
+    <article class="dep-col dep-onthisday loading" id="depOtd" data-source="otd" title="Klick für neues Ereignis">
+      <div class="dep-refresh">↻</div>
+      <div class="dep-content">
+        <div class="dep-eyebrow">Heute vor Jahren</div>
+        <div class="dep-kicker">—</div>
+        <div class="dep-body">lädt …</div>
+        <div class="dep-attr">
+          <span>Historisches Ereignis</span>
+          <span class="src">Wikipedia</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+
+    <!-- Spalte 2: Zitat des Tages -->
+    <article class="dep-col dep-quote loading" id="depQuote" data-source="quote" title="Klick für neues Zitat">
+      <div class="dep-refresh">↻</div>
+      <div class="dep-content">
+        <div class="dep-eyebrow">Zitat des Tages</div>
+        <div class="dep-body">lädt …</div>
+        <div class="dep-attr">
+          <span id="depQuoteAuthor">—</span>
+          <span class="src">Quotable</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+
+    <!-- Spalte 3: Kuriosum -->
+    <article class="dep-col dep-fact loading" id="depFact" data-source="fact" title="Klick für neuen Fakt">
+      <div class="dep-refresh">↻</div>
+      <div class="dep-content">
+        <div class="dep-eyebrow">Kuriosum</div>
+        <div class="dep-body">lädt …</div>
+        <div class="dep-attr">
+          <span>Nutzlos, aber wahr</span>
+          <span class="src">Useless Facts</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+
+    <!-- Spalte 4: Notierung (rotiert durch 5 Währungen) -->
+    <article class="dep-col dep-ticker loading" id="depTicker" data-source="ticker" title="Klick für nächste Währung">
+      <div class="dep-refresh">↻</div>
+      <div class="dep-content">
+        <div class="dep-eyebrow">Notierung</div>
+        <div class="dep-body">lädt …</div>
+        <div class="dep-attr">
+          <span id="depTickerDate">Referenz</span>
+          <span class="src" id="depTickerSrc">—</span>
+        </div>
+      </div>
+      <div class="dep-progress"></div>
+    </article>
+  </section>
+
   <!-- ————————— SECTION: KABINETT ————————— -->
   <div class="section-label">
-    <span class="num">01</span>
+    <span class="num">03</span>
     <span>—</span>
     <span>Kabinett</span>
     <span class="rule"></span>
@@ -698,9 +1020,7 @@
   </div>
 
   <!-- ————————— GALLERY ————————— -->
-  <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie">
-    <!-- injected by JS -->
-  </section>
+  <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie"></section>
 
   <!-- ————————— FOOTER ————————— -->
   <footer class="foot">
@@ -723,11 +1043,10 @@
     { no: "V",    category: "Tool", title: "Platzhalter <em>Nº 05</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
     { no: "VI",   category: "Tool", title: "Platzhalter <em>Nº 06</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
     { no: "VII",  category: "Tool", title: "Platzhalter <em>Nº 07</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
-    { no: "VIII", category: "Tool", title: "Platzhalter <em>Nº 08</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "test2.html" },
+    { no: "VIII", category: "Tool", title: "Platzhalter <em>Nº 08</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
     { no: "IX",   category: "Tool", title: "Platzhalter <em>Nº 09</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "Tester.html" }
   ];
 
-  /* ———— RENDER GALLERY ———— */
   const gallery = document.getElementById('gallery');
   let liveCount = 0;
   TOOLS.forEach((t) => {
@@ -786,8 +1105,7 @@
   });
 
   /* ————————————————————————————————
-     WEATHER — Open-Meteo (kein API-Key)
-     Biebergemünd: 50.1667° N, 9.2833° E
+     WEATHER — Open-Meteo
      ———————————————————————————————— */
   const WEATHER_COORDS = { lat: 50.1667, lon: 9.2833 };
   const WMO = {
@@ -804,37 +1122,30 @@
   };
   const DOW = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 
-  const wBtn      = document.getElementById('weatherBtn');
-  const wIcon     = document.getElementById('wIcon');
-  const wTemp     = document.getElementById('wTemp');
-  const wDesc     = document.getElementById('wDesc');
-  const fcPanel   = document.getElementById('forecast');
-  const fcGrid    = document.getElementById('forecastGrid');
+  const wBtn    = document.getElementById('weatherBtn');
+  const wIcon   = document.getElementById('wIcon');
+  const wTemp   = document.getElementById('wTemp');
+  const wDesc   = document.getElementById('wDesc');
+  const fcPanel = document.getElementById('forecast');
+  const fcGrid  = document.getElementById('forecastGrid');
 
   async function loadWeather() {
-    // Cache 30 Min in localStorage
     const cached = JSON.parse(localStorage.getItem('werk-weather') || 'null');
     if (cached && (Date.now() - cached.t) < 30 * 60 * 1000) {
       renderWeather(cached.data);
       return;
     }
     const url = `https://api.open-meteo.com/v1/forecast`
-      + `?latitude=${WEATHER_COORDS.lat}`
-      + `&longitude=${WEATHER_COORDS.lon}`
+      + `?latitude=${WEATHER_COORDS.lat}&longitude=${WEATHER_COORDS.lon}`
       + `&current=temperature_2m,weather_code`
       + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
-      + `&forecast_days=5`
-      + `&timezone=Europe%2FBerlin`;
+      + `&forecast_days=5&timezone=Europe%2FBerlin`;
     try {
       const res = await fetch(url);
-      if (!res.ok) throw new Error('weather fetch failed');
+      if (!res.ok) throw new Error('weather');
       const data = await res.json();
       const payload = {
-        current: {
-          temp: Math.round(data.current.temperature_2m),
-          code: data.current.weather_code
-        },
-        // heute überspringen (index 0), Tage 1–4 anzeigen
+        current: { temp: Math.round(data.current.temperature_2m), code: data.current.weather_code },
         daily: data.daily.time.slice(1, 5).map((iso, i) => ({
           date: iso,
           code: data.daily.weather_code[i + 1],
@@ -847,7 +1158,6 @@
       renderWeather(payload);
     } catch (err) {
       console.warn('Weather:', err);
-      // widget dezent ausblenden bei Fehler
       const wrap = wBtn.closest('.weather-wrap');
       if (wrap) wrap.style.display = 'none';
     }
@@ -859,7 +1169,6 @@
     wIcon.textContent = icon;
     wTemp.textContent = `${current.temp}°C`;
     wDesc.textContent = desc;
-
     fcGrid.innerHTML = daily.map(d => {
       const [fIcon] = WMO[d.code] || ['·', ''];
       const dow = DOW[new Date(d.date).getDay()];
@@ -870,12 +1179,10 @@
           <span class="fc-icon">${fIcon}</span>
           <span class="fc-temp">${d.tmax}° <span class="min">/ ${d.tmin}°</span></span>
           <span class="fc-rain ${wet ? 'wet' : ''}">☂ ${d.pop}%</span>
-        </div>
-      `;
+        </div>`;
     }).join('');
   }
 
-  /* Toggle forecast panel */
   function closeForecast() {
     fcPanel.classList.remove('show');
     wBtn.classList.remove('open');
@@ -891,12 +1198,354 @@
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.weather-wrap')) closeForecast();
   });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeForecast();
-  });
-
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeForecast(); });
   loadWeather();
   setInterval(loadWeather, 30 * 60 * 1000);
+
+  /* ————————————————————————————————
+     DEPESCHEN
+     ———————————————————————————————— */
+  const DEP_ROTATE_MS   = 20000;
+  const DEP_CACHE_KEY   = 'werk-depeschen-v3'; // v3 = neue Ticker-API
+  const DEP_PAUSE_KEY   = 'werk-dep-paused';
+  const DEP_CACHE_HOURS = 6;
+
+  // Die 5 wichtigsten Weltwährungen
+  const CURRENCIES = [
+    { code: 'USD', name: 'US-Dollar',         symbol: '$',   digits: 4 },
+    { code: 'GBP', name: 'Britisches Pfund',  symbol: '£',   digits: 4 },
+    { code: 'JPY', name: 'Japanischer Yen',   symbol: '¥',   digits: 2 },
+    { code: 'CHF', name: 'Schweizer Franken', symbol: 'CHF', digits: 4 },
+    { code: 'CNY', name: 'Chinesischer Yuan', symbol: '¥',   digits: 4 }
+  ];
+  let tickerIdx = 0;
+
+  const depDateEl     = document.getElementById('depDate');
+  const depReloadBtn  = document.getElementById('depReload');
+  const depPauseBtn   = document.getElementById('depPause');
+  const depPauseLabel = document.getElementById('depPauseLabel');
+
+  const depMonths = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const depNow    = new Date();
+  depDateEl.textContent = `${depNow.getDate()}. ${depMonths[depNow.getMonth()]} · Tagesausgabe`;
+
+  // ——— Fetcher ———
+  async function fetchOnThisDay() {
+    const mm = String(depNow.getMonth() + 1).padStart(2, '0');
+    const dd = String(depNow.getDate()).padStart(2, '0');
+    const res = await fetch(`https://de.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`);
+    if (!res.ok) throw new Error('otd');
+    const data = await res.json();
+    const events = data.events || [];
+    const modern = events.filter(e => e.year >= 1900);
+    const pool   = modern.length ? modern : events;
+    const pick   = pool[Math.floor(Math.random() * pool.length)];
+    return {
+      year: pick.year,
+      text: pick.text,
+      link: pick.pages?.[0]?.content_urls?.desktop?.page || null
+    };
+  }
+
+  async function fetchQuote() {
+    try {
+      const res = await fetch('https://api.quotable.io/random?maxLength=180');
+      if (!res.ok) throw new Error('quote');
+      const d = await res.json();
+      return { text: d.content, author: d.author };
+    } catch {
+      const res = await fetch('https://corsproxy.io/?https://zenquotes.io/api/random');
+      const d = await res.json();
+      return { text: d[0].q, author: d[0].a };
+    }
+  }
+
+  async function fetchFact() {
+    const res = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=de');
+    if (!res.ok) throw new Error('fact');
+    const d = await res.json();
+    return { text: d.text };
+  }
+
+  // ——— Currency-Fetcher mit ZWEI unabhängigen Providern ———
+  //   Primär: @fawazahmed0/currency-api via jsDelivr CDN (extrem stabil, kein Rate-Limit)
+  //   Fallback: open.er-api.com (kostenlos, kein Key)
+  async function fetchTickerAll() {
+    // ——— PRIMÄR: fawazahmed0/currency-api ———
+    try {
+      const primaryUrls = [
+        'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
+        'https://latest.currency-api.pages.dev/v1/currencies/eur.json' // offizieller Fallback des Autors
+      ];
+      for (const url of primaryUrls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const d = await res.json();
+          if (!d.eur) continue;
+          const rates = {};
+          let ok = true;
+          for (const c of CURRENCIES) {
+            const v = d.eur[c.code.toLowerCase()];
+            if (typeof v !== 'number') { ok = false; break; }
+            rates[c.code] = v;
+          }
+          if (ok) {
+            return { date: d.date || new Date().toISOString().slice(0,10), rates, source: 'Currency-API' };
+          }
+        } catch (e) { console.warn('primary currency url failed:', url, e.message); }
+      }
+      throw new Error('primary providers failed');
+    } catch (primaryErr) {
+      console.warn('Currency primary failed, trying fallback:', primaryErr.message);
+    }
+
+    // ——— FALLBACK: open.er-api.com ———
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/EUR');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const d = await res.json();
+      if (!d.rates) throw new Error('no rates in response');
+      const rates = {};
+      for (const c of CURRENCIES) {
+        if (typeof d.rates[c.code] !== 'number') throw new Error('missing ' + c.code);
+        rates[c.code] = d.rates[c.code];
+      }
+      const date = d.time_last_update_utc
+        ? new Date(d.time_last_update_utc).toISOString().slice(0,10)
+        : new Date().toISOString().slice(0,10);
+      return { date, rates, source: 'ExchangeRate-API' };
+    } catch (fallbackErr) {
+      console.error('All currency providers failed:', fallbackErr.message);
+      throw fallbackErr;
+    }
+  }
+
+  function fadeSwap(colEl, updateFn) {
+    colEl.classList.add('fading');
+    setTimeout(() => { updateFn(); colEl.classList.remove('fading'); }, 300);
+  }
+
+  // ——— Renderer ———
+  function renderOtd(data) {
+    const col = document.getElementById('depOtd');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      col.querySelector('.dep-kicker').textContent = data.year;
+      const body = col.querySelector('.dep-body');
+      body.textContent = data.text;
+      if (data.link) {
+        body.innerHTML += ` <a href="${data.link}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);">→</a>`;
+      }
+    });
+  }
+  function renderQuote(data) {
+    const col = document.getElementById('depQuote');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      col.querySelector('.dep-body').textContent = `„${data.text}"`;
+      document.getElementById('depQuoteAuthor').textContent = `— ${data.author}`;
+    });
+  }
+  function renderFact(data) {
+    const col = document.getElementById('depFact');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      const txt = data.text.charAt(0).toUpperCase() + data.text.slice(1);
+      col.querySelector('.dep-body').textContent = txt;
+    });
+  }
+
+  let cachedTickerData = null;
+  function renderTicker(data, currencyIdx = tickerIdx) {
+    if (!data || !data.rates) { renderError('depTicker'); return; }
+    cachedTickerData = data;
+    const col = document.getElementById('depTicker');
+    col.classList.remove('loading');
+    fadeSwap(col, () => {
+      const cur = CURRENCIES[currencyIdx];
+      const val = data.rates[cur.code];
+      if (typeof val !== 'number') {
+        tickerIdx = (currencyIdx + 1) % CURRENCIES.length;
+        if (tickerIdx !== currencyIdx) renderTicker(data, tickerIdx);
+        else renderError('depTicker', 'Keine Kurse verfügbar');
+        return;
+      }
+      const formatted = val.toFixed(cur.digits);
+      const dots = CURRENCIES.map((_, i) =>
+        `<span class="tick-dot ${i === currencyIdx ? 'active' : ''}"></span>`
+      ).join('');
+      col.querySelector('.dep-body').innerHTML = `
+        <span class="tick-pair">1 EUR =</span>
+        <span class="tick-val">${formatted} <span class="tick-symbol">${cur.symbol}</span></span>
+        <span class="tick-name">${cur.name}</span>
+        <div class="tick-dots">${dots}</div>
+      `;
+      document.getElementById('depTickerDate').textContent = `Stand · ${data.date}`;
+      document.getElementById('depTickerSrc').textContent  = data.source || 'Live';
+    });
+  }
+
+  function renderError(colId, msg = 'Nicht verfügbar') {
+    const col = document.getElementById(colId);
+    col.classList.remove('loading');
+    col.querySelector('.dep-body').textContent = msg;
+    const kicker = col.querySelector('.dep-kicker');
+    if (kicker) kicker.textContent = '—';
+  }
+
+  const DEP_SOURCES = {
+    otd:    { fetch: fetchOnThisDay, render: renderOtd,    colId: 'depOtd'    },
+    quote:  { fetch: fetchQuote,     render: renderQuote,  colId: 'depQuote'  },
+    fact:   { fetch: fetchFact,      render: renderFact,   colId: 'depFact'   },
+    ticker: { colId: 'depTicker' }
+  };
+
+  function refreshTicker() {
+    if (!cachedTickerData) return;
+    tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+    renderTicker(cachedTickerData, tickerIdx);
+  }
+
+  async function refreshOne(source) {
+    const src = DEP_SOURCES[source];
+    if (!src) return;
+    const col = document.getElementById(src.colId);
+    col.classList.add('spinning');
+    try {
+      if (source === 'ticker') {
+        cachedTickerData = await fetchTickerAll();
+        tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+        renderTicker(cachedTickerData, tickerIdx);
+      } else {
+        const data = await src.fetch();
+        src.render(data);
+      }
+    } catch {
+      renderError(src.colId);
+    } finally {
+      setTimeout(() => col.classList.remove('spinning'), 500);
+    }
+  }
+
+  async function loadDepeschen(force = false) {
+    ['depOtd','depQuote','depFact','depTicker'].forEach(id =>
+      document.getElementById(id).classList.add('loading')
+    );
+
+    if (!force) {
+      const cached = JSON.parse(localStorage.getItem(DEP_CACHE_KEY) || 'null');
+      const maxAge = DEP_CACHE_HOURS * 60 * 60 * 1000;
+      const sameDay = cached && new Date(cached.t).toDateString() === depNow.toDateString();
+      if (cached && sameDay && (Date.now() - cached.t) < maxAge) {
+        if (cached.otd)    renderOtd(cached.otd);       else renderError('depOtd');
+        if (cached.quote)  renderQuote(cached.quote);   else renderError('depQuote');
+        if (cached.fact)   renderFact(cached.fact);     else renderError('depFact');
+        if (cached.ticker) { tickerIdx = 0; renderTicker(cached.ticker, 0); } else renderError('depTicker');
+        return;
+      }
+    }
+
+    const [otdR, quoteR, factR, tickerR] = await Promise.allSettled([
+      fetchOnThisDay(), fetchQuote(), fetchFact(), fetchTickerAll()
+    ]);
+
+    const payload = { t: Date.now() };
+    if (otdR.status    === 'fulfilled') { renderOtd(otdR.value);           payload.otd    = otdR.value;    } else renderError('depOtd');
+    if (quoteR.status  === 'fulfilled') { renderQuote(quoteR.value);       payload.quote  = quoteR.value;  } else renderError('depQuote');
+    if (factR.status   === 'fulfilled') { renderFact(factR.value);         payload.fact   = factR.value;   } else renderError('depFact');
+    if (tickerR.status === 'fulfilled') { tickerIdx = 0; renderTicker(tickerR.value, 0); payload.ticker = tickerR.value; } else renderError('depTicker');
+
+    localStorage.setItem(DEP_CACHE_KEY, JSON.stringify(payload));
+  }
+
+  document.querySelectorAll('.dep-col').forEach(col => {
+    col.addEventListener('click', () => {
+      if (col.classList.contains('loading') || col.classList.contains('spinning')) return;
+      const source = col.dataset.source;
+      if (source === 'ticker') {
+        tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+        if (cachedTickerData) renderTicker(cachedTickerData, tickerIdx);
+      } else {
+        refreshOne(source);
+      }
+      resetRotation();
+    });
+  });
+
+  depReloadBtn.addEventListener('click', () => {
+    depReloadBtn.classList.add('spin');
+    loadDepeschen(true).finally(() => {
+      setTimeout(() => depReloadBtn.classList.remove('spin'), 500);
+    });
+    resetRotation();
+  });
+
+  const ROTATE_SOURCES = ['otd', 'quote', 'fact', 'ticker'];
+  let rotateIdx = 0;
+  let rotateTimer = null;
+  let isPaused = localStorage.getItem(DEP_PAUSE_KEY) === '1';
+
+  function updateProgress() {
+    document.querySelectorAll('.dep-progress').forEach(p => {
+      p.style.transition = 'none';
+      p.style.width = '0%';
+    });
+    if (isPaused) return;
+    const nextSource = ROTATE_SOURCES[rotateIdx];
+    const col = document.getElementById(DEP_SOURCES[nextSource].colId);
+    const bar = col.querySelector('.dep-progress');
+    void bar.offsetWidth;
+    bar.style.transition = `width ${DEP_ROTATE_MS}ms linear`;
+    bar.style.width = '100%';
+  }
+
+  function tickRotation() {
+    if (isPaused) return;
+    const source = ROTATE_SOURCES[rotateIdx];
+    if (source === 'ticker') refreshTicker();
+    else                     refreshOne(source);
+    rotateIdx = (rotateIdx + 1) % ROTATE_SOURCES.length;
+    updateProgress();
+  }
+
+  function startRotation() {
+    stopRotation();
+    if (isPaused) return;
+    updateProgress();
+    rotateTimer = setInterval(tickRotation, DEP_ROTATE_MS);
+  }
+
+  function stopRotation() {
+    if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
+    document.querySelectorAll('.dep-progress').forEach(p => {
+      p.style.transition = 'none';
+      p.style.width = '0%';
+    });
+  }
+
+  function resetRotation() { if (!isPaused) startRotation(); }
+
+  function applyPauseUI() {
+    depPauseBtn.classList.toggle('paused', isPaused);
+    depPauseLabel.textContent = isPaused ? 'Play' : 'Pause';
+    document.querySelectorAll('.dep-col').forEach(c => c.classList.toggle('paused', isPaused));
+  }
+
+  depPauseBtn.addEventListener('click', () => {
+    isPaused = !isPaused;
+    localStorage.setItem(DEP_PAUSE_KEY, isPaused ? '1' : '0');
+    applyPauseUI();
+    if (isPaused) stopRotation(); else startRotation();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopRotation();
+    else if (!isPaused)  startRotation();
+  });
+
+  applyPauseUI();
+  loadDepeschen().then(() => { setTimeout(startRotation, 2000); });
 
   /* ————————————————————————————————
      SIDE ADS
