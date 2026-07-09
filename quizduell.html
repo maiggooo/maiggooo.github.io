@@ -1501,10 +1501,16 @@ function pickQuestions(n=10){
 function setRail(txt){ const el=$("#railStatus"); if (el) el.textContent = txt; }
 
 function show(screen){
+  const changed = show._current !== screen;
   ["screenLobby","screenWaiting","screenDuel","screenEnd"].forEach(id=>{
     $("#"+id).classList.toggle("hidden", id!==screen);
   });
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  // Nur beim tatsaechlichen Screen-Wechsel nach oben scrollen -
+  // innerhalb eines Screens (z. B. naechste Frage) bleibt die Scroll-Position erhalten.
+  if (changed && (screen === "screenLobby" || screen === "screenEnd")) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  show._current = screen;
 }
 
 /* =========================================================
