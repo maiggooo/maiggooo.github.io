@@ -1,902 +1,420 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Werkzeuge &amp; Instrumente — Editorial Index</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper:       #f4efe6;
-    --paper-2:     #ebe4d6;
-    --ink:         #1a1a1a;
-    --ink-soft:    #3a3a38;
-    --muted:       #6b6b66;
-    --rule:        #1a1a1a;
-    --rule-soft:   #d4cbb6;
-    --accent:      #c8442a;
-    --accent-soft: #f2d9d1;
-    --ok:          #2f6b3a;
-    --ok-soft:     #d6e5d3;
-    --warn:        #a8541a;
-    --shadow:      0 1px 0 var(--ink);
+    --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
+    --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
+    --accent:#c8442a; --accent-soft:#f2d9d1;
+    --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
+    --shadow:0 1px 0 var(--ink);
   }
   html[data-theme="dark"] {
-    --paper:       #24241d;
-    --paper-2:     #2e2e26;
-    --ink:         #efe8d8;
-    --ink-soft:    #cdc6b6;
-    --muted:       #8a857a;
-    --rule:        #efe8d8;
-    --rule-soft:   #3a3a30;
-    --accent:      #e8623f;
-    --accent-soft: #3a1f18;
-    --ok:          #9dc48b;
-    --ok-soft:     #24301f;
-    --warn:        #d68f4a;
+    --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
+    --muted:#8a857a; --rule:#efe8d8; --rule-soft:#3a3a30;
+    --accent:#e8623f; --accent-soft:#3a1f18;
+    --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
   }
 
-  *, *::before, *::after { box-sizing: border-box; }
+  /* ————————————— DESIGN-EFFECTS (Editorial) ————————————— */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  .mast .brand { view-transition-name: brand; }
+  ::view-transition-old(brand),
+  ::view-transition-new(brand) { animation-duration: .35s; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  /* Papier-Textur */
+  body::after {
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22; mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after { opacity: .08; mix-blend-mode: screen; }
+  /* Faserlinien */
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before { opacity: .35; mix-blend-mode: overlay; }
+
+  /* Tinten-Bleed */
+  body { text-shadow: 0 0 .32px currentColor; }
+  .mast .brand, .ad-title, .ad-hero, .tile-title, .dep-kicker {
+    text-shadow: 0 0 .45px currentColor, .18px .12px .55px rgba(0,0,0,.10);
+  }
+  .mast .brand em, .ad--paypal .ad-hero, .ad--kirche .ad-hero {
+    text-shadow: 0 0 .5px currentColor, .3px .2px .8px rgba(200,68,42,.18);
+  }
+  html[data-theme="dark"] .mast .brand,
+  html[data-theme="dark"] .ad-title,
+  html[data-theme="dark"] .ad-hero,
+  html[data-theme="dark"] .tile-title,
+  html[data-theme="dark"] .dep-kicker {
+    text-shadow: 0 0 .5px currentColor, .15px .1px .6px rgba(255,235,200,.08);
+  }
+  @media (prefers-reduced-motion: reduce) { body { text-shadow: none; } }
+
+  .wrap { position: relative; z-index: 1; }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); }
   html { transition: background-color .35s ease, color .35s ease; }
   body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    transition: background-color .35s ease, color .35s ease;
-    -webkit-font-smoothing: antialiased;
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    font-size:16px; line-height:1.5; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    transition: background .25s ease, color .25s ease;
   }
-
   ::selection { background: var(--accent); color: #fff; }
 
-  .wrap {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 24px 28px 48px;
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 28px 48px; }
+
+  /* MASTHEAD */
+  .mast {
+    border-top:2px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:14px 0 10px; display:grid;
+    grid-template-columns:1fr auto 1fr; align-items:center; gap:20px;
+  }
+  .mast .edition {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .mast .edition.right { display:flex; gap:8px; justify-content:flex-end; align-items:center; text-align:right; }
+  .mast .edition.left  { display:flex; gap:8px; align-items:center; }
+  .mast .brand {
+    font-family:'Fraunces', serif; font-weight:800; font-size:clamp(22px, 3vw, 30px);
+    letter-spacing:-.02em; white-space:nowrap; text-align:center; line-height:1;
+  }
+  .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
+
+  .toggle {
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--rule); padding:6px 10px;
+    background:transparent; color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase;
+    cursor:pointer; transition:background .15s;
+  }
+  .toggle:hover { background:var(--paper-2); }
+  .toggle .dot {
+    width:10px; height:10px; border-radius:50%;
+    background:var(--ink); border:1px solid var(--ink);
+    box-sizing:border-box; display:inline-block;
   }
 
-  /* ————————————— MASTHEAD ————————————— */
-  .masthead {
-    border-top: 2px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 24px;
-    padding: 14px 0;
-  }
-  .mast-edition,
-  .mast-tools {
-    font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase;
-    font-size: 10.5px;
-    letter-spacing: .16em;
-    color: var(--muted);
-    display: flex;
-    gap: 14px;
-    align-items: center;
-  }
-  .mast-tools { justify-content: flex-end; }
-  .mast-edition span.dot { color: var(--ink); }
-  .brand {
-    font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: clamp(22px, 3vw, 30px);
-    letter-spacing: -.02em;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-  }
-  .brand .amp {
-    font-style: italic;
-    color: var(--accent);
-    font-weight: 400;
-    margin: 0 .12em;
-  }
-
-  .icon-btn {
-    background: transparent;
-    border: 1px solid var(--rule);
-    color: var(--ink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    padding: 6px 10px;
-    cursor: pointer;
-    transition: background-color .2s ease, color .2s ease;
-  }
-  .icon-btn:hover { background: var(--ink); color: var(--paper); }
-  .icon-btn:active { transform: translateY(1px); }
-
-  /* ————————————— WEATHER WIDGET ————————————— */
+  /* WEATHER WIDGET */
   .weather-wrap { position: relative; }
   .weather {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: transparent;
-    border: 1px solid transparent;
-    padding: 5px 9px;
-    cursor: pointer;
-    transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+    background:transparent; border:1px solid transparent;
+    padding:5px 9px; cursor:pointer;
+    transition:color .2s ease, border-color .2s ease, background-color .2s ease;
   }
-  .weather:hover,
-  .weather.open {
-    color: var(--ink);
-    border-color: var(--rule);
-  }
-  .weather.loading { opacity: .5; cursor: default; }
-  .weather-icon {
-    font-family: 'Fraunces', serif;
-    font-size: 17px;
-    font-style: normal;
-    color: var(--accent);
-    line-height: 1;
-    letter-spacing: 0;
-    text-transform: none;
-    display: inline-block;
-    transform: translateY(-1px);
-  }
-  .weather-temp {
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: .06em;
-  }
-  .weather-sep { color: var(--rule-soft); }
-  .weather-desc {
-    color: var(--muted);
-    font-style: italic;
-    font-family: 'Fraunces', serif;
-    font-size: 12.5px;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-  .weather-caret {
-    font-family: 'Fraunces', serif;
-    font-size: 13px;
-    color: var(--muted);
-    text-transform: none;
-    letter-spacing: 0;
-    transition: transform .25s ease;
-  }
-  .weather.open .weather-caret { transform: rotate(180deg); }
+  .weather:hover, .weather.open { color:var(--ink); border-color:var(--rule); }
+  .weather.loading { opacity:.5; cursor:default; }
+  .weather-icon { font-family:'Fraunces', serif; font-size:17px; font-style:normal; color:var(--accent); line-height:1; letter-spacing:0; text-transform:none; display:inline-block; transform:translateY(-1px); }
+  .weather-temp { font-weight:700; color:var(--ink); letter-spacing:.06em; }
+  .weather-sep { color:var(--rule-soft); }
+  .weather-desc { color:var(--muted); font-style:italic; font-family:'Fraunces', serif; font-size:12.5px; letter-spacing:0; text-transform:none; }
+  .weather-caret { font-family:'Fraunces', serif; font-size:13px; color:var(--muted); text-transform:none; letter-spacing:0; transition:transform .25s ease; }
+  .weather.open .weather-caret { transform:rotate(180deg); }
 
   .forecast {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    z-index: 60;
-    min-width: 340px;
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    box-shadow: 4px 4px 0 var(--rule);
-    padding: 16px 18px 14px;
-    opacity: 0;
-    transform: translateY(-4px);
-    pointer-events: none;
-    transition: opacity .22s ease, transform .22s ease;
+    position:absolute; top:calc(100% + 8px); left:0; z-index:60;
+    min-width:340px; background:var(--paper); border:1px solid var(--rule);
+    box-shadow:4px 4px 0 var(--rule); padding:16px 18px 14px;
+    opacity:0; transform:translateY(-4px); pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease;
   }
-  .forecast.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
+  .forecast.show { opacity:1; transform:translateY(0); pointer-events:auto; }
   .forecast-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding-bottom: 10px;
-    margin-bottom: 12px;
-    border-bottom: 1px solid var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding-bottom:10px; margin-bottom:12px;
+    border-bottom:1px solid var(--rule-soft);
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
   }
-  .forecast-head .loc {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 15px;
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--ink);
-  }
-  .forecast-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-  }
-  .fc-day {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 4px;
-    border-right: 1px dashed var(--rule-soft);
-  }
-  .fc-day:last-child { border-right: none; }
-  .fc-dow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .fc-icon {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .fc-temp {
-    font-family: 'Fraunces', serif;
-    font-size: 15px;
-    letter-spacing: -.01em;
-    color: var(--ink);
-  }
-  .fc-temp .min { color: var(--muted); font-style: italic; font-size: 12px; }
-  .fc-rain {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .1em;
-    color: var(--muted);
-  }
-  .fc-rain.wet { color: var(--accent); }
-  .forecast-foot {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: right;
-  }
-  .forecast-foot a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
-  .forecast-foot a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  .forecast-head .loc { font-family:'Fraunces', serif; font-style:italic; font-size:15px; letter-spacing:0; text-transform:none; color:var(--ink); }
+  .forecast-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:0; }
+  .fc-day { display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 4px; border-right:1px dashed var(--rule-soft); }
+  .fc-day:last-child { border-right:none; }
+  .fc-dow { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+  .fc-icon { font-family:'Fraunces', serif; font-size:22px; color:var(--accent); line-height:1; }
+  .fc-temp { font-family:'Fraunces', serif; font-size:15px; letter-spacing:-.01em; color:var(--ink); }
+  .fc-temp .min { color:var(--muted); font-style:italic; font-size:12px; }
+  .fc-rain { font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.1em; color:var(--muted); }
+  .fc-rain.wet { color:var(--accent); }
+  .forecast-foot { margin-top:12px; padding-top:10px; border-top:1px solid var(--rule-soft); font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); text-align:right; }
+  .forecast-foot a { color:var(--muted); text-decoration:none; border-bottom:1px dotted var(--muted); }
+  .forecast-foot a:hover { color:var(--ink); border-bottom-color:var(--ink); }
 
-  /* ————————————— SUB-MASTHEAD DATE STRIP ————————————— */
-  .datestrip {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--muted);
+  /* SUB-MASTHEAD */
+  .subhead {
+    border-bottom:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; gap:20px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   }
-  .datestrip .center { color: var(--ink); }
+  .subhead .center { color: var(--ink); }
+  @media (max-width:560px) { .subhead { font-size:10px; letter-spacing:.12em; flex-direction:column; align-items:flex-start; gap:4px; } }
 
-  /* ————————————— SECTION LABEL ————————————— */
+  /* SECTION LABEL */
   .section-label {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 44px 0 22px;
-    font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: .18em;
-    color: var(--ink);
+    display:flex; align-items:center; gap:14px; margin:44px 0 22px;
+    font-family:'JetBrains Mono', monospace; text-transform:uppercase;
+    font-size:11px; letter-spacing:.14em; color:var(--ink);
   }
-  .section-label .num { color: var(--accent); }
-  .section-label .rule {
-    flex: 1;
-    height: 1px;
-    background: var(--rule);
-  }
-  .section-label .meta { color: var(--muted); }
+  .section-label .num { color:var(--accent); }
+  .section-label .rule { flex:1; height:1px; background:var(--rule); }
+  .section-label .meta { color:var(--muted); }
 
-  /* ————————————— DEPESCHEN ————————————— */
+  /* DEPESCHEN */
   .depeschen {
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    display: grid;
-    grid-template-columns: 1fr 1.1fr 1fr .95fr;
-    gap: 0;
-    position: relative;
+    border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    display:grid; grid-template-columns:1fr 1.1fr 1fr .95fr; gap:0; position:relative;
   }
   .dep-col {
-    padding: 22px 22px 18px;
-    border-right: 1px solid var(--rule-soft);
-    display: flex;
-    flex-direction: column;
-    min-height: 210px;
-    cursor: pointer;
-    position: relative;
-    transition: background-color .25s ease;
+    padding:22px 22px 18px; border-right:1px solid var(--rule-soft);
+    display:flex; flex-direction:column; min-height:210px;
+    cursor:pointer; position:relative; transition:background-color .25s ease;
   }
-  .dep-col:last-child { border-right: none; }
-  .dep-col:hover { background: var(--paper-2); }
-  .dep-col:hover .dep-refresh { opacity: 1; }
-  .dep-col.loading { cursor: default; }
+  .dep-col:last-child { border-right:none; }
+  .dep-col:hover { background:var(--paper-2); }
+  .dep-col:hover .dep-refresh { opacity:1; }
+  .dep-col.loading { cursor:default; }
 
-  .dep-refresh {
-    position: absolute;
-    top: 20px;
-    right: 18px;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 13px;
-    color: var(--muted);
-    opacity: 0;
-    transition: opacity .2s ease, transform .5s ease, color .2s ease;
-    pointer-events: none;
-  }
-  .dep-col:hover .dep-refresh { color: var(--accent); }
-  .dep-col.spinning .dep-refresh {
-    opacity: 1;
-    transform: rotate(360deg);
-    color: var(--accent);
-  }
+  .dep-refresh { position:absolute; top:20px; right:18px; font-family:'Fraunces', serif; font-style:italic; font-size:13px; color:var(--muted); opacity:0; transition:opacity .2s ease, transform .5s ease, color .2s ease; pointer-events:none; }
+  .dep-col:hover .dep-refresh { color:var(--accent); }
+  .dep-col.spinning .dep-refresh { opacity:1; transform:rotate(360deg); color:var(--accent); }
 
-  .dep-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    width: 0;
-    background: var(--accent);
-    opacity: .35;
-    pointer-events: none;
-  }
-  .dep-col.paused .dep-progress { background: var(--muted); opacity: .2; }
+  .dep-progress { position:absolute; bottom:0; left:0; height:2px; width:0; background:var(--accent); opacity:.35; pointer-events:none; }
+  .dep-col.paused .dep-progress { background:var(--muted); opacity:.2; }
 
-  .dep-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .dep-eyebrow::before {
-    content: "";
-    width: 18px;
-    height: 1px;
-    background: var(--accent);
-  }
+  .dep-eyebrow { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .dep-eyebrow::before { content:""; width:18px; height:1px; background:var(--accent); }
 
-  .dep-kicker {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 32px;
-    line-height: 1;
-    color: var(--accent);
-    letter-spacing: -.02em;
-    margin-bottom: 8px;
+  .dep-kicker { font-family:'Fraunces', serif; font-style:italic; font-size:32px; line-height:1; color:var(--accent); letter-spacing:-.02em; margin-bottom:8px; }
+  .dep-body { font-family:'Fraunces', serif; font-size:15px; line-height:1.4; color:var(--ink); flex:1; }
+  .dep-content { transition:opacity .3s ease, transform .3s ease; }
+  .dep-col.fading .dep-content { opacity:0; transform:translateY(4px); }
+
+  .dep-quote .dep-body { font-style:italic; font-size:16.5px; line-height:1.35; }
+  .dep-quote .dep-body::first-letter { font-family:'Fraunces', serif; font-weight:800; font-style:normal; font-size:50px; line-height:.8; float:left; padding:6px 8px 0 0; color:var(--accent); }
+
+  .dep-ticker .dep-body { display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:4px; }
+  .tick-pair { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+  .tick-name { font-family:'Fraunces', serif; font-style:italic; font-size:14px; color:var(--ink-soft); line-height:1; margin-bottom:6px; }
+  .tick-val { font-family:'Fraunces', serif; font-weight:800; font-size:34px; letter-spacing:-.02em; color:var(--ink); line-height:1; display:flex; align-items:baseline; gap:6px; }
+  .tick-symbol { font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:400; color:var(--accent); letter-spacing:0; }
+  .tick-dots { display:flex; gap:5px; margin-top:10px; }
+  .tick-dot { width:6px; height:6px; border-radius:50%; background:var(--rule-soft); transition:background-color .3s ease; }
+  .tick-dot.active { background:var(--accent); }
+
+  .dep-attr { margin-top:12px; padding-top:10px; border-top:1px dashed var(--rule-soft); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .dep-attr .src { color:var(--accent); font-family:'Fraunces', serif; font-style:italic; text-transform:none; letter-spacing:0; font-size:12px; }
+
+  .dep-col.loading .dep-kicker, .dep-col.loading .dep-body {
+    color:transparent;
+    background:linear-gradient(90deg, var(--rule-soft) 0%, transparent 50%, var(--rule-soft) 100%);
+    background-size:200% 100%; animation:dep-shimmer 1.4s infinite; border-radius:2px;
+  }
+  .dep-col.loading .dep-kicker { min-height:30px; margin-bottom:12px; }
+  .dep-col.loading .dep-body   { min-height:60px; }
+  @keyframes dep-shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+
+  .section-label .reload, .section-label .pause {
+    background:transparent; border:1px solid var(--rule-soft); color:var(--muted);
+    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em;
+    text-transform:uppercase; padding:4px 9px; cursor:pointer;
+    display:inline-flex; align-items:center; gap:6px;
+    transition:color .18s ease, border-color .18s ease;
+  }
+  .section-label .reload:hover, .section-label .pause:hover { color:var(--ink); border-color:var(--rule); }
+  .section-label .reload .r-icon { display:inline-block; transition:transform .5s ease; }
+  .section-label .reload.spin .r-icon { transform:rotate(360deg); }
+  .section-label .pause.paused { color:var(--accent); border-color:var(--accent); }
+
+  @media (max-width:1060px) {
+    .depeschen { grid-template-columns:1fr 1fr; }
+    .dep-col:nth-child(2) { border-right:none; }
+    .dep-col:nth-child(1), .dep-col:nth-child(2) { border-bottom:1px solid var(--rule-soft); }
+  }
+  @media (max-width:640px) {
+    .depeschen { grid-template-columns:1fr; }
+    .dep-col { border-right:none; border-bottom:1px solid var(--rule-soft); }
+    .dep-col:last-child { border-bottom:none; }
   }
 
-  .dep-body {
-    font-family: 'Fraunces', serif;
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--ink);
-    flex: 1;
-  }
-
-  .dep-content {
-    transition: opacity .3s ease, transform .3s ease;
-  }
-  .dep-col.fading .dep-content {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-
-  .dep-quote .dep-body {
-    font-style: italic;
-    font-size: 16.5px;
-    line-height: 1.35;
-  }
-  .dep-quote .dep-body::first-letter {
-    font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-style: normal;
-    font-size: 50px;
-    line-height: .8;
-    float: left;
-    padding: 6px 8px 0 0;
-    color: var(--accent);
-  }
-
-  /* Ticker column — big single currency display */
-  .dep-ticker .dep-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 4px;
-  }
-  .tick-pair {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .tick-name {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-soft);
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .tick-val {
-    font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: 34px;
-    letter-spacing: -.02em;
-    color: var(--ink);
-    line-height: 1;
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-  }
-  .tick-symbol {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    font-weight: 400;
-    color: var(--accent);
-    letter-spacing: 0;
-  }
-  .tick-dots {
-    display: flex;
-    gap: 5px;
-    margin-top: 10px;
-  }
-  .tick-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--rule-soft);
-    transition: background-color .3s ease;
-  }
-  .tick-dot.active { background: var(--accent); }
-
-  .dep-attr {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-  }
-  .dep-attr .src {
-    color: var(--accent);
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    text-transform: none;
-    letter-spacing: 0;
-    font-size: 12px;
-  }
-
-  .dep-col.loading .dep-kicker,
-  .dep-col.loading .dep-body {
-    color: transparent;
-    background: linear-gradient(90deg, var(--rule-soft) 0%, transparent 50%, var(--rule-soft) 100%);
-    background-size: 200% 100%;
-    animation: dep-shimmer 1.4s infinite;
-    border-radius: 2px;
-  }
-  .dep-col.loading .dep-kicker { min-height: 30px; margin-bottom: 12px; }
-  .dep-col.loading .dep-body   { min-height: 60px; }
-  @keyframes dep-shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  .section-label .reload,
-  .section-label .pause {
-    background: transparent;
-    border: 1px solid var(--rule-soft);
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    padding: 4px 9px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: color .18s ease, border-color .18s ease;
-  }
-  .section-label .reload:hover,
-  .section-label .pause:hover {
-    color: var(--ink);
-    border-color: var(--rule);
-  }
-  .section-label .reload .r-icon {
-    display: inline-block;
-    transition: transform .5s ease;
-  }
-  .section-label .reload.spin .r-icon { transform: rotate(360deg); }
-  .section-label .pause.paused { color: var(--accent); border-color: var(--accent); }
-
-  @media (max-width: 1060px) {
-    .depeschen { grid-template-columns: 1fr 1fr; }
-    .dep-col:nth-child(2) { border-right: none; }
-    .dep-col:nth-child(1),
-    .dep-col:nth-child(2) { border-bottom: 1px solid var(--rule-soft); }
-  }
-  @media (max-width: 640px) {
-    .depeschen { grid-template-columns: 1fr; }
-    .dep-col {
-      border-right: none;
-      border-bottom: 1px solid var(--rule-soft);
-    }
-    .dep-col:last-child { border-bottom: none; }
-  }
-
-  /* ————————————— GALLERY GRID ————————————— */
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr;
-    gap: 0;
-    border-top: 1px solid var(--rule);
-    border-left: 1px solid var(--rule);
-  }
+  /* GALLERY */
+  .gallery { display:grid; grid-template-columns:repeat(3, 1fr); grid-auto-rows:1fr; gap:0; border-top:1px solid var(--rule); border-left:1px solid var(--rule); }
   .tile {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    aspect-ratio: 1 / 1;
-    min-height: 260px;
-    padding: 22px 22px 20px;
-    border-right: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    text-decoration: none;
-    color: inherit;
-    background: var(--paper);
-    transition: background-color .3s ease;
-    overflow: hidden;
+    position:relative; display:flex; flex-direction:column; justify-content:space-between;
+    aspect-ratio:1/1; min-height:260px; padding:22px 22px 20px;
+    border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    text-decoration:none; color:inherit; background:var(--paper);
+    transition:background-color .3s ease; overflow:hidden;
   }
-  .tile::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0;
-    height: 2px;
-    width: 0;
-    background: var(--accent);
-    transition: width .4s cubic-bezier(.7,0,.2,1);
-  }
-  .tile:hover::before { width: 100%; }
-  .tile:hover { background: var(--paper-2); }
+  .tile::before { content:""; position:absolute; top:0; left:0; height:2px; width:0; background:var(--accent); transition:width .4s cubic-bezier(.7,0,.2,1); }
+  .tile:hover::before { width:100%; }
+  .tile:hover { background:var(--paper-2); }
+  .tile-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:18px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .tile-head .no { font-family:'Fraunces', serif; font-style:italic; font-size:28px; letter-spacing:-.03em; color:var(--accent); line-height:1; }
+  .tile-head .cat { color:var(--ink); }
+  .tile-title { font-family:'Fraunces', serif; font-weight:600; font-size:clamp(26px, 2.6vw, 34px); line-height:.95; letter-spacing:-.02em; margin:0 0 12px; color:var(--ink); }
+  .tile-title em { font-style:italic; color:var(--accent); font-weight:400; }
+  .tile-desc { font-family:'Fraunces', serif; font-size:15px; line-height:1.4; color:var(--ink-soft); margin:0 0 22px; }
+  .tile-foot { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--rule-soft); font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .tile-foot .go { color:var(--ink); display:inline-flex; align-items:center; gap:8px; }
+  .tile-foot .arrow { font-family:'Fraunces', serif; font-style:italic; text-transform:none; font-size:18px; color:var(--accent); transition:transform .3s ease; }
+  .tile:hover .arrow { transform:translateX(6px); }
 
-  .tile-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 18px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .tile-head .no {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 28px;
-    letter-spacing: -.03em;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .tile-head .cat { color: var(--ink); }
+  .tile.vacant { background:repeating-linear-gradient(135deg, transparent 0 12px, var(--rule-soft) 12px 13px); pointer-events:none; color:var(--muted); }
+  .tile.vacant::before { display:none; }
+  .tile.vacant .tile-title { color:var(--muted); font-style:italic; font-weight:400; }
+  .tile.vacant .tile-head .no { color:var(--muted); }
+  .tile.vacant .vacant-stamp { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); border:1px solid var(--muted); padding:4px 8px; display:inline-block; align-self:flex-start; }
 
-  .tile-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: clamp(26px, 2.6vw, 34px);
-    line-height: .95;
-    letter-spacing: -.02em;
-    margin: 0 0 12px;
-    color: var(--ink);
-  }
-  .tile-title em {
-    font-style: italic;
-    color: var(--accent);
-    font-weight: 400;
-  }
-  .tile-desc {
-    font-family: 'Fraunces', serif;
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--ink-soft);
-    margin: 0 0 22px;
-  }
-
-  .tile-foot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 12px;
-    border-top: 1px solid var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .tile-foot .go {
-    color: var(--ink);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .tile-foot .arrow {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    text-transform: none;
-    font-size: 18px;
-    color: var(--accent);
-    transition: transform .3s ease;
-  }
-  .tile:hover .arrow { transform: translateX(6px); }
-
-  .tile.vacant {
-    background: repeating-linear-gradient(
-      135deg,
-      transparent 0 12px,
-      var(--rule-soft) 12px 13px
-    );
-    pointer-events: none;
-    color: var(--muted);
-  }
-  .tile.vacant::before { display: none; }
-  .tile.vacant .tile-title {
-    color: var(--muted);
-    font-style: italic;
-    font-weight: 400;
-  }
-  .tile.vacant .tile-head .no { color: var(--muted); }
-  .tile.vacant .vacant-stamp {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border: 1px solid var(--muted);
-    padding: 4px 8px;
-    display: inline-block;
-    align-self: flex-start;
-  }
-
-  /* ————————————— FOOTER ————————————— */
+  /* FOOTER */
   .foot {
-    border-top: 2px solid var(--rule);
-    margin-top: 56px;
-    padding: 18px 0 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    text-transform: uppercase;
-    font-size: 10.5px;
-    letter-spacing: .16em;
-    color: var(--muted);
-    flex-wrap: wrap;
-    gap: 12px;
+    margin-top:60px; padding-top:20px; border-top:2px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+    flex-wrap:wrap; gap:12px;
   }
-  .foot .colophon em {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    text-transform: none;
-    color: var(--accent);
-    letter-spacing: 0;
-    font-size: 13px;
-  }
+  .foot .colophon em { font-family:'Fraunces', serif; font-style:italic; text-transform:none; color:var(--accent); letter-spacing:0; font-size:13px; }
 
-  /* ————————————— SIDE ADS (>1560px) ————————————— */
-  .ads-side {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 200px;
-    z-index: 40;
-    display: none;
-    pointer-events: none;
-  }
-  .ads-side.left  { left: 20px; }
-  .ads-side.right { right: 20px; }
-  @media (min-width: 1560px) {
-    .ads-side { display: block; }
-  }
-  body.ads-off .ads-side { display: none !important; }
-
-  .ad-slot { position: relative; pointer-events: auto; }
-  .ad-link { display: block; color: inherit; text-decoration: none; }
-  .ad-link .ad { transition: transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
-  .ad-link:hover .ad { transform: translateY(-2px); box-shadow: 3px 3px 0 var(--rule); }
+  /* ADS */
+  .ads-side { position:fixed; top:50%; transform:translateY(-50%); width:200px; z-index:40; display:none; pointer-events:none; }
+  .ads-side.left  { left:20px; }
+  .ads-side.right { right:20px; }
+  @media (min-width:1560px) { .ads-side { display:block; } }
+  body.ads-off .ads-side { display:none !important; }
+  .ad-slot { position:relative; pointer-events:auto; }
+  .ad-link { display:block; color:inherit; text-decoration:none; }
+  .ad-link .ad { transition:transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
+  .ad-link:hover .ad { transform:translateY(-2px); box-shadow:3px 3px 0 var(--rule); }
   .ad {
-    position: relative;
-    border: 1px solid var(--rule);
-    background: var(--paper);
-    padding: 14px 14px 12px;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity .35s ease, transform .35s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-height: 200px;
-    font-family: 'Inter', sans-serif;
+    position:relative; border:1px solid var(--rule); background:var(--paper);
+    padding:14px 14px 12px; opacity:0; transform:translateY(4px);
+    transition:opacity .35s ease, transform .35s ease;
+    display:flex; flex-direction:column; gap:8px;
+    min-height:200px; font-family:'Inter', sans-serif;
   }
-  .ad.show { opacity: 1; transform: translateY(0); }
+  .ad.show { opacity:1; transform:translateY(0); }
+  .ad-eyebrow { font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .ad-eyebrow::before { content:"ANZEIGE"; color:var(--accent); font-weight:600; }
+  .ad-eyebrow .sep { color:var(--rule-soft); }
+  .ad-title { font-family:'Fraunces', serif; font-size:22px; line-height:1.05; color:var(--ink); letter-spacing:-.01em; }
+  .ad-body { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad-foot { margin-top:auto; padding-top:8px; border-top:1px solid var(--rule-soft); font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:flex; justify-content:space-between; align-items:center; }
+  .ad-mark { color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
 
-  .ad-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .ad-eyebrow::before {
-    content: "ANZEIGE";
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .ad-eyebrow .sep { color: var(--rule-soft); }
-  .ad-title {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    line-height: 1.05;
-    color: var(--ink);
-    letter-spacing: -.01em;
-  }
-  .ad-body {
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: var(--ink-soft);
-  }
-  .ad-foot {
-    margin-top: auto;
-    padding-top: 8px;
-    border-top: 1px solid var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .ad-mark {
-    color: var(--accent);
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-  }
-
-  .ad--paypal .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; line-height: 1.15; letter-spacing: -.01em; }
-  .ad--paypal .ad-body  { font-size: 11.5px; line-height: 1.5; color: var(--ink-soft); }
-  .ad--paypal .ad-hero  { font-family: 'Fraunces', serif; font-style: italic; font-size: 42px; color: var(--accent); line-height: 1; margin-bottom: 2px; }
+  .ad--paypal .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:22px; line-height:1.15; letter-spacing:-.01em; }
+  .ad--paypal .ad-body  { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad--paypal .ad-hero  { font-family:'Fraunces', serif; font-style:italic; font-size:42px; color:var(--accent); line-height:1; margin-bottom:2px; }
   .ad--paypal .ad-cta {
-    display: block;
-    margin-top: 4px;
-    padding: 11px 12px;
-    background: var(--accent);
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    font-weight: 700;
-    border: 1px solid var(--accent);
-    transition: background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
-    box-shadow: 3px 3px 0 var(--ink);
+    display:block; margin-top:4px; padding:11px 12px;
+    background:var(--accent); color:#fff;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase;
+    text-decoration:none; text-align:center; font-weight:700;
+    border:1px solid var(--accent);
+    transition:background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
+    box-shadow:3px 3px 0 var(--ink);
   }
-  .ad--paypal .ad-cta:hover {
-    background: var(--ink);
-    border-color: var(--ink);
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 var(--accent);
+  .ad--paypal .ad-cta:hover { background:var(--ink); border-color:var(--ink); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .ad--paypal .ad-cta:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+
+  .ad--kaffee { background:var(--paper-2); }
+  .ad--kaffee .ad-title { font-style:italic; font-size:28px; }
+  .ad--kaffee .ad-hero  { font-size:18px; letter-spacing:.35em; color:var(--muted); }
+
+  .ad--stink .ad-title { font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1.15; }
+  .ad--stink .ad-hero  { font-size:28px; letter-spacing:.1em; }
+  .ad--stink .ad-body  { font-style:italic; font-family:'Fraunces', serif; font-size:13px; }
+
+  .ad--pfalz { border-width:2px; }
+  .ad--pfalz .ad-title { font-family:'Fraunces', serif; font-size:17px; text-align:center; line-height:1.15; }
+  .ad--pfalz .ad-hero  { text-align:center; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.3em; color:var(--accent); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:5px 0; }
+  .ad--pfalz .ad-body  { text-align:center; font-style:italic; font-family:'Fraunces', serif; font-size:12.5px; }
+
+  .ad--kirche .ad-hero  { font-family:'Fraunces', serif; font-size:34px; color:var(--accent); text-align:center; line-height:1; }
+  .ad--kirche .ad-title { font-style:italic; font-size:20px; text-align:center; }
+  .ad--kirche .ad-body  { text-align:center; }
+
+  .ad--reise .ad-title { font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .ad--reise .ad-hero  { font-size:22px; color:var(--accent); }
+  .ad--reise .ad-body  { border-top:1px dashed var(--rule-soft); border-bottom:1px dashed var(--rule-soft); padding:6px 0; }
+
+  .ad--schweig .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:30px; text-align:center; margin:8px 0 4px; }
+  .ad--schweig .ad-hero  { text-align:center; font-size:28px; letter-spacing:.5em; color:var(--muted); line-height:1; }
+  .ad--schweig .ad-body  { text-align:center; font-size:10.5px; letter-spacing:.02em; }
+
+  .ad--gastro .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.4em; color:var(--paper); background:var(--accent); padding:5px 10px; display:inline-block; align-self:flex-start; }
+  .ad--gastro .ad-title { font-family:'Fraunces', serif; font-size:24px; font-style:italic; }
+
+  .ad--minion { background:#f5d547; color:#1a1a1a; border-color:#1a1a1a; }
+  .ad--minion .ad-eyebrow { color:#1a1a1a; }
+  .ad--minion .ad-eyebrow::before { background:#1a1a1a; }
+  .ad--minion .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:700; letter-spacing:.22em; text-align:center; color:#1a1a1a; padding:8px 0; border-top:2px solid #1a1a1a; border-bottom:2px solid #1a1a1a; }
+  .ad--minion .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:21px; text-align:center; color:#1a1a1a; line-height:1.15; }
+  .ad--minion .ad-body  { text-align:center; color:#1a1a1a; }
+  .ad--minion .ad-foot  { color:#1a1a1a; border-top-color:rgba(26,26,26,.3); }
+  .ad--minion .ad-mark  { color:#1a1a1a; font-style:italic; }
+
+  /* RESPONSIVE */
+  @media (max-width:960px) { .gallery { grid-template-columns:repeat(2, 1fr); } }
+  @media (max-width:720px) {
+    .gallery { grid-template-columns:1fr; }
+    .tile { aspect-ratio:auto; min-height:240px; }
+    .mast { grid-template-columns:1fr auto; }
+    .mast .edition.left { display:none; }
+    .forecast { min-width:300px; }
   }
-  .ad--paypal .ad-cta:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 var(--ink);
-  }
-
-  .ad--kaffee { background: var(--paper-2); }
-  .ad--kaffee .ad-title { font-style: italic; font-size: 28px; }
-  .ad--kaffee .ad-hero  { font-size: 18px; letter-spacing: .35em; color: var(--muted); }
-
-  .ad--stink .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; line-height: 1.15; }
-  .ad--stink .ad-hero  { font-size: 28px; letter-spacing: .1em; }
-  .ad--stink .ad-body  { font-style: italic; font-family: 'Fraunces', serif; font-size: 13px; }
-
-  .ad--pfalz { border-width: 2px; }
-  .ad--pfalz .ad-title { font-family: 'Fraunces', serif; font-size: 17px; text-align: center; line-height: 1.15; }
-  .ad--pfalz .ad-hero  { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; color: var(--accent); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 5px 0; }
-  .ad--pfalz .ad-body  { text-align: center; font-style: italic; font-family: 'Fraunces', serif; font-size: 12.5px; }
-
-  .ad--kirche .ad-hero  { font-family: 'Fraunces', serif; font-size: 34px; color: var(--accent); text-align: center; line-height: 1; }
-  .ad--kirche .ad-title { font-style: italic; font-size: 20px; text-align: center; }
-  .ad--kirche .ad-body  { text-align: center; }
-
-  .ad--reise .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .ad--reise .ad-hero  { font-size: 22px; color: var(--accent); }
-  .ad--reise .ad-body  { border-top: 1px dashed var(--rule-soft); border-bottom: 1px dashed var(--rule-soft); padding: 6px 0; }
-
-  .ad--schweig .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 30px; text-align: center; margin: 8px 0 4px; }
-  .ad--schweig .ad-hero  { text-align: center; font-size: 28px; letter-spacing: .5em; color: var(--muted); line-height: 1; }
-  .ad--schweig .ad-body  { text-align: center; font-size: 10.5px; letter-spacing: .02em; }
-
-  .ad--gastro .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .4em; color: var(--paper); background: var(--accent); padding: 5px 10px; display: inline-block; align-self: flex-start; }
-  .ad--gastro .ad-title { font-family: 'Fraunces', serif; font-size: 24px; font-style: italic; }
-
-  .ad--minion { background: #f5d547; color: #1a1a1a; border-color: #1a1a1a; }
-  .ad--minion .ad-eyebrow { color: #1a1a1a; }
-  .ad--minion .ad-eyebrow::before { background: #1a1a1a; }
-  .ad--minion .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; letter-spacing: .22em; text-align: center; color: #1a1a1a; padding: 8px 0; border-top: 2px solid #1a1a1a; border-bottom: 2px solid #1a1a1a; }
-  .ad--minion .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 21px; text-align: center; color: #1a1a1a; line-height: 1.15; }
-  .ad--minion .ad-body  { text-align: center; color: #1a1a1a; }
-  .ad--minion .ad-foot  { color: #1a1a1a; border-top-color: rgba(26,26,26,.3); }
-  .ad--minion .ad-mark  { color: #1a1a1a; font-style: italic; }
-
-  /* ————————————— RESPONSIVE ————————————— */
-  @media (max-width: 960px) {
-    .gallery { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 720px) {
-    .gallery { grid-template-columns: 1fr; }
-    .tile { aspect-ratio: auto; min-height: 240px; }
-    .mast-edition { display: none; }
-    .masthead { grid-template-columns: 1fr auto; }
-    .forecast { min-width: 300px; }
-  }
-  @media (max-width: 560px) {
-    .wrap { padding: 20px 18px 60px; }
-    .tile { padding: 20px 18px 18px; }
-    .datestrip { flex-direction: column; align-items: flex-start; gap: 4px; }
-    .weather-desc, .weather-sep { display: none; }
+  @media (max-width:560px) {
+    .wrap { padding:20px 18px 60px; }
+    .tile { padding:20px 18px 18px; }
+    .weather-desc, .weather-sep { display:none; }
   }
 </style>
 </head>
 <body>
 
-<!-- ————————— SIDE ADS ————————— -->
-<aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
-<aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
-
 <div class="wrap">
 
-  <!-- ————————— MASTHEAD ————————— -->
-  <header class="masthead">
-    <div class="mast-edition">
+  <header class="mast">
+    <div class="edition left">
       <div class="weather-wrap">
         <button class="weather loading" id="weatherBtn" aria-label="Wetter Biebergemünd — Vorhersage" aria-expanded="false">
           <span class="weather-icon" id="wIcon">·</span>
@@ -917,25 +435,25 @@
         </div>
       </div>
     </div>
-    <div class="brand">Werkzeuge <span class="amp">&amp;</span> Instrumente</div>
-    <div class="mast-tools">
-      <button class="icon-btn" id="adsBtn" aria-label="Werbung ein/aus" title="Werbung ein/aus">
+    <div class="brand">Werkzeuge<em>&amp;</em>Instrumente</div>
+    <div class="edition right">
+      <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus" title="Werbung ein/aus">
+        <span class="dot" id="adsDot"></span>
         <span id="adsLabel">Ads</span>
       </button>
-      <button class="icon-btn" id="themeBtn" aria-label="Theme umschalten">
-        <span id="themeLabel">Dunkel</span>
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
       </button>
     </div>
   </header>
 
-  <!-- ————————— DATE STRIP ————————— -->
-  <div class="datestrip">
+  <div class="subhead">
     <span id="todayLeft">Vol. I · SS 2026 · Nº 01</span>
     <span class="center">Ein Index eigener Web-Werkzeuge</span>
     <span id="todayRight">—</span>
   </div>
 
-  <!-- ————————— SECTION: DEPESCHEN ————————— -->
   <div class="section-label">
     <span class="num">02</span>
     <span>—</span>
@@ -952,7 +470,6 @@
   </div>
 
   <section class="depeschen" aria-label="Tagesdepeschen">
-    <!-- Spalte 1: On This Day -->
     <article class="dep-col dep-onthisday loading" id="depOtd" data-source="otd" title="Klick für neues Ereignis">
       <div class="dep-refresh">↻</div>
       <div class="dep-content">
@@ -967,7 +484,6 @@
       <div class="dep-progress"></div>
     </article>
 
-    <!-- Spalte 2: Zitat des Tages -->
     <article class="dep-col dep-quote loading" id="depQuote" data-source="quote" title="Klick für neues Zitat">
       <div class="dep-refresh">↻</div>
       <div class="dep-content">
@@ -981,7 +497,6 @@
       <div class="dep-progress"></div>
     </article>
 
-    <!-- Spalte 3: Kuriosum -->
     <article class="dep-col dep-fact loading" id="depFact" data-source="fact" title="Klick für neuen Fakt">
       <div class="dep-refresh">↻</div>
       <div class="dep-content">
@@ -995,7 +510,6 @@
       <div class="dep-progress"></div>
     </article>
 
-    <!-- Spalte 4: Notierung (rotiert durch 5 Währungen) -->
     <article class="dep-col dep-ticker loading" id="depTicker" data-source="ticker" title="Klick für nächste Währung">
       <div class="dep-refresh">↻</div>
       <div class="dep-content">
@@ -1010,7 +524,6 @@
     </article>
   </section>
 
-  <!-- ————————— SECTION: KABINETT ————————— -->
   <div class="section-label">
     <span class="num">03</span>
     <span>—</span>
@@ -1019,22 +532,23 @@
     <span class="meta" id="tileCount">— Einträge</span>
   </div>
 
-  <!-- ————————— GALLERY ————————— -->
   <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie"></section>
 
-  <!-- ————————— FOOTER ————————— -->
   <footer class="foot">
-    <div>Biebergemünd · Hessen</div>
+    <div>Strauss · Biebergemünd</div>
     <div class="colophon">Gesetzt in <em>Fraunces</em> · Mono · Inter</div>
-    <div>© <span id="year">2026</span> — Alle Rechte vorbehalten</div>
+    <div>© <span id="year">2026</span> — Editorial edition</div>
   </footer>
 
 </div>
 
+<aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
+<aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
+
 <script>
-  /* ————————————————————————————————
-     TOOL-REGISTER
-     ———————————————————————————————— */
+  const $ = sel => document.querySelector(sel);
+
+  /* ———— TOOL-REGISTER ———— */
   const TOOLS = [
     { no: "I",    category: "Tool", title: "MarketingQuiz <em>Nº 01</em>",       desc: "Ein Quiz zum Fit werden in Marketing.",             path: "MarketingTeacher.html" },
     { no: "II",   category: "Tool", title: "Schere Stein Papier <em>Nº 02</em>", desc: "Beweise dich gegen den Computer.",                  path: "RPS.html" },
@@ -1083,30 +597,32 @@
   /* ———— DATE ———— */
   const now = new Date();
   const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  const dateStr = `${now.getDate()}. ${months[now.getMonth()]} ${now.getFullYear()}`;
-  document.getElementById('todayRight').textContent = dateStr;
+  document.getElementById('todayRight').textContent = `${now.getDate()}. ${months[now.getMonth()]} ${now.getFullYear()}`;
   document.getElementById('year').textContent = now.getFullYear();
 
-  /* ———— THEME TOGGLE ———— */
-  const themeBtn = document.getElementById('themeBtn');
-  const themeLabel = document.getElementById('themeLabel');
-  const root = document.documentElement;
-  function applyTheme(t) {
-    if (t === 'dark') { root.setAttribute('data-theme', 'dark'); themeLabel.textContent = 'Hell'; }
-    else { root.removeAttribute('data-theme'); themeLabel.textContent = 'Dunkel'; }
+  /* ———— THEME (View-Transition) ———— */
+  function initTheme() {
+    const saved = localStorage.getItem("ms-theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(saved || (prefersDark ? "dark" : "light"));
   }
-  const storedTheme = localStorage.getItem('werkzeuge-theme');
-  applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
-  themeBtn.addEventListener('click', () => {
-    const isDark = root.getAttribute('data-theme') === 'dark';
-    const next = isDark ? 'light' : 'dark';
-    applyTheme(next);
-    localStorage.setItem('werkzeuge-theme', next);
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("ms-theme", theme);
+    const label = $("#themeLabel");
+    if (label) label.textContent = theme === "dark" ? "Light" : "Dark";
+  }
+  initTheme();
+  $("#themeToggle").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : "dark";
+    const swap = () => setTheme(next);
+    if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.startViewTransition(swap);
+    } else { swap(); }
   });
 
-  /* ————————————————————————————————
-     WEATHER — Open-Meteo
-     ———————————————————————————————— */
+  /* ———— WEATHER — Open-Meteo ———— */
   const WEATHER_COORDS = { lat: 50.1667, lon: 9.2833 };
   const WMO = {
     0:["☀","klar"], 1:["☀","heiter"], 2:["⛅","teils bewölkt"], 3:["☁","bewölkt"],
@@ -1122,24 +638,17 @@
   };
   const DOW = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 
-  const wBtn    = document.getElementById('weatherBtn');
-  const wIcon   = document.getElementById('wIcon');
-  const wTemp   = document.getElementById('wTemp');
-  const wDesc   = document.getElementById('wDesc');
+  const wBtn = document.getElementById('weatherBtn');
+  const wIcon = document.getElementById('wIcon');
+  const wTemp = document.getElementById('wTemp');
+  const wDesc = document.getElementById('wDesc');
   const fcPanel = document.getElementById('forecast');
   const fcGrid  = document.getElementById('forecastGrid');
 
   async function loadWeather() {
     const cached = JSON.parse(localStorage.getItem('werk-weather') || 'null');
-    if (cached && (Date.now() - cached.t) < 30 * 60 * 1000) {
-      renderWeather(cached.data);
-      return;
-    }
-    const url = `https://api.open-meteo.com/v1/forecast`
-      + `?latitude=${WEATHER_COORDS.lat}&longitude=${WEATHER_COORDS.lon}`
-      + `&current=temperature_2m,weather_code`
-      + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
-      + `&forecast_days=5&timezone=Europe%2FBerlin`;
+    if (cached && (Date.now() - cached.t) < 30*60*1000) { renderWeather(cached.data); return; }
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER_COORDS.lat}&longitude=${WEATHER_COORDS.lon}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=5&timezone=Europe%2FBerlin`;
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error('weather');
@@ -1147,47 +656,36 @@
       const payload = {
         current: { temp: Math.round(data.current.temperature_2m), code: data.current.weather_code },
         daily: data.daily.time.slice(1, 5).map((iso, i) => ({
-          date: iso,
-          code: data.daily.weather_code[i + 1],
-          tmin: Math.round(data.daily.temperature_2m_min[i + 1]),
-          tmax: Math.round(data.daily.temperature_2m_max[i + 1]),
-          pop:  data.daily.precipitation_probability_max[i + 1] ?? 0
+          date: iso, code: data.daily.weather_code[i+1],
+          tmin: Math.round(data.daily.temperature_2m_min[i+1]),
+          tmax: Math.round(data.daily.temperature_2m_max[i+1]),
+          pop:  data.daily.precipitation_probability_max[i+1] ?? 0
         }))
       };
       localStorage.setItem('werk-weather', JSON.stringify({ t: Date.now(), data: payload }));
       renderWeather(payload);
     } catch (err) {
-      console.warn('Weather:', err);
       const wrap = wBtn.closest('.weather-wrap');
       if (wrap) wrap.style.display = 'none';
     }
   }
-
   function renderWeather({ current, daily }) {
     wBtn.classList.remove('loading');
     const [icon, desc] = WMO[current.code] || ['·', ''];
-    wIcon.textContent = icon;
-    wTemp.textContent = `${current.temp}°C`;
-    wDesc.textContent = desc;
+    wIcon.textContent = icon; wTemp.textContent = `${current.temp}°C`; wDesc.textContent = desc;
     fcGrid.innerHTML = daily.map(d => {
-      const [fIcon] = WMO[d.code] || ['·', ''];
+      const [fIcon] = WMO[d.code] || ['·',''];
       const dow = DOW[new Date(d.date).getDay()];
       const wet = d.pop >= 40;
-      return `
-        <div class="fc-day">
-          <span class="fc-dow">${dow}</span>
-          <span class="fc-icon">${fIcon}</span>
-          <span class="fc-temp">${d.tmax}° <span class="min">/ ${d.tmin}°</span></span>
-          <span class="fc-rain ${wet ? 'wet' : ''}">☂ ${d.pop}%</span>
-        </div>`;
+      return `<div class="fc-day">
+        <span class="fc-dow">${dow}</span>
+        <span class="fc-icon">${fIcon}</span>
+        <span class="fc-temp">${d.tmax}° <span class="min">/ ${d.tmin}°</span></span>
+        <span class="fc-rain ${wet?'wet':''}">☂ ${d.pop}%</span>
+      </div>`;
     }).join('');
   }
-
-  function closeForecast() {
-    fcPanel.classList.remove('show');
-    wBtn.classList.remove('open');
-    wBtn.setAttribute('aria-expanded', 'false');
-  }
+  function closeForecast() { fcPanel.classList.remove('show'); wBtn.classList.remove('open'); wBtn.setAttribute('aria-expanded','false'); }
   wBtn.addEventListener('click', (e) => {
     if (wBtn.classList.contains('loading')) return;
     e.stopPropagation();
@@ -1195,58 +693,47 @@
     wBtn.classList.toggle('open', isOpen);
     wBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.weather-wrap')) closeForecast();
-  });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.weather-wrap')) closeForecast(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeForecast(); });
   loadWeather();
-  setInterval(loadWeather, 30 * 60 * 1000);
+  setInterval(loadWeather, 30*60*1000);
 
-  /* ————————————————————————————————
-     DEPESCHEN
-     ———————————————————————————————— */
-  const DEP_ROTATE_MS   = 20000;
-  const DEP_CACHE_KEY   = 'werk-depeschen-v3'; // v3 = neue Ticker-API
-  const DEP_PAUSE_KEY   = 'werk-dep-paused';
+  /* ———— DEPESCHEN ———— */
+  const DEP_ROTATE_MS = 20000;
+  const DEP_CACHE_KEY = 'werk-depeschen-v3';
+  const DEP_PAUSE_KEY = 'werk-dep-paused';
   const DEP_CACHE_HOURS = 6;
 
-  // Die 5 wichtigsten Weltwährungen
   const CURRENCIES = [
-    { code: 'USD', name: 'US-Dollar',         symbol: '$',   digits: 4 },
-    { code: 'GBP', name: 'Britisches Pfund',  symbol: '£',   digits: 4 },
-    { code: 'JPY', name: 'Japanischer Yen',   symbol: '¥',   digits: 2 },
-    { code: 'CHF', name: 'Schweizer Franken', symbol: 'CHF', digits: 4 },
-    { code: 'CNY', name: 'Chinesischer Yuan', symbol: '¥',   digits: 4 }
+    { code:'USD', name:'US-Dollar',         symbol:'$',   digits:4 },
+    { code:'GBP', name:'Britisches Pfund',  symbol:'£',   digits:4 },
+    { code:'JPY', name:'Japanischer Yen',   symbol:'¥',   digits:2 },
+    { code:'CHF', name:'Schweizer Franken', symbol:'CHF', digits:4 },
+    { code:'CNY', name:'Chinesischer Yuan', symbol:'¥',   digits:4 }
   ];
   let tickerIdx = 0;
 
-  const depDateEl     = document.getElementById('depDate');
-  const depReloadBtn  = document.getElementById('depReload');
-  const depPauseBtn   = document.getElementById('depPause');
+  const depDateEl = document.getElementById('depDate');
+  const depReloadBtn = document.getElementById('depReload');
+  const depPauseBtn = document.getElementById('depPause');
   const depPauseLabel = document.getElementById('depPauseLabel');
 
   const depMonths = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  const depNow    = new Date();
+  const depNow = new Date();
   depDateEl.textContent = `${depNow.getDate()}. ${depMonths[depNow.getMonth()]} · Tagesausgabe`;
 
-  // ——— Fetcher ———
   async function fetchOnThisDay() {
-    const mm = String(depNow.getMonth() + 1).padStart(2, '0');
-    const dd = String(depNow.getDate()).padStart(2, '0');
+    const mm = String(depNow.getMonth()+1).padStart(2,'0');
+    const dd = String(depNow.getDate()).padStart(2,'0');
     const res = await fetch(`https://de.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`);
     if (!res.ok) throw new Error('otd');
     const data = await res.json();
     const events = data.events || [];
     const modern = events.filter(e => e.year >= 1900);
-    const pool   = modern.length ? modern : events;
-    const pick   = pool[Math.floor(Math.random() * pool.length)];
-    return {
-      year: pick.year,
-      text: pick.text,
-      link: pick.pages?.[0]?.content_urls?.desktop?.page || null
-    };
+    const pool = modern.length ? modern : events;
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    return { year: pick.year, text: pick.text, link: pick.pages?.[0]?.content_urls?.desktop?.page || null };
   }
-
   async function fetchQuote() {
     try {
       const res = await fetch('https://api.quotable.io/random?maxLength=180');
@@ -1259,23 +746,17 @@
       return { text: d[0].q, author: d[0].a };
     }
   }
-
   async function fetchFact() {
     const res = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=de');
     if (!res.ok) throw new Error('fact');
     const d = await res.json();
     return { text: d.text };
   }
-
-  // ——— Currency-Fetcher mit ZWEI unabhängigen Providern ———
-  //   Primär: @fawazahmed0/currency-api via jsDelivr CDN (extrem stabil, kein Rate-Limit)
-  //   Fallback: open.er-api.com (kostenlos, kein Key)
   async function fetchTickerAll() {
-    // ——— PRIMÄR: fawazahmed0/currency-api ———
     try {
       const primaryUrls = [
         'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
-        'https://latest.currency-api.pages.dev/v1/currencies/eur.json' // offizieller Fallback des Autors
+        'https://latest.currency-api.pages.dev/v1/currencies/eur.json'
       ];
       for (const url of primaryUrls) {
         try {
@@ -1283,50 +764,34 @@
           if (!res.ok) continue;
           const d = await res.json();
           if (!d.eur) continue;
-          const rates = {};
-          let ok = true;
+          const rates = {}; let ok = true;
           for (const c of CURRENCIES) {
             const v = d.eur[c.code.toLowerCase()];
             if (typeof v !== 'number') { ok = false; break; }
             rates[c.code] = v;
           }
-          if (ok) {
-            return { date: d.date || new Date().toISOString().slice(0,10), rates, source: 'Currency-API' };
-          }
-        } catch (e) { console.warn('primary currency url failed:', url, e.message); }
+          if (ok) return { date: d.date || new Date().toISOString().slice(0,10), rates, source:'Currency-API' };
+        } catch {}
       }
-      throw new Error('primary providers failed');
-    } catch (primaryErr) {
-      console.warn('Currency primary failed, trying fallback:', primaryErr.message);
+      throw new Error('primary failed');
+    } catch {}
+    const res = await fetch('https://open.er-api.com/v6/latest/EUR');
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const d = await res.json();
+    if (!d.rates) throw new Error('no rates');
+    const rates = {};
+    for (const c of CURRENCIES) {
+      if (typeof d.rates[c.code] !== 'number') throw new Error('missing '+c.code);
+      rates[c.code] = d.rates[c.code];
     }
-
-    // ——— FALLBACK: open.er-api.com ———
-    try {
-      const res = await fetch('https://open.er-api.com/v6/latest/EUR');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const d = await res.json();
-      if (!d.rates) throw new Error('no rates in response');
-      const rates = {};
-      for (const c of CURRENCIES) {
-        if (typeof d.rates[c.code] !== 'number') throw new Error('missing ' + c.code);
-        rates[c.code] = d.rates[c.code];
-      }
-      const date = d.time_last_update_utc
-        ? new Date(d.time_last_update_utc).toISOString().slice(0,10)
-        : new Date().toISOString().slice(0,10);
-      return { date, rates, source: 'ExchangeRate-API' };
-    } catch (fallbackErr) {
-      console.error('All currency providers failed:', fallbackErr.message);
-      throw fallbackErr;
-    }
+    const date = d.time_last_update_utc ? new Date(d.time_last_update_utc).toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
+    return { date, rates, source:'ExchangeRate-API' };
   }
 
   function fadeSwap(colEl, updateFn) {
     colEl.classList.add('fading');
     setTimeout(() => { updateFn(); colEl.classList.remove('fading'); }, 300);
   }
-
-  // ——— Renderer ———
   function renderOtd(data) {
     const col = document.getElementById('depOtd');
     col.classList.remove('loading');
@@ -1334,9 +799,7 @@
       col.querySelector('.dep-kicker').textContent = data.year;
       const body = col.querySelector('.dep-body');
       body.textContent = data.text;
-      if (data.link) {
-        body.innerHTML += ` <a href="${data.link}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);">→</a>`;
-      }
+      if (data.link) body.innerHTML += ` <a href="${data.link}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);">→</a>`;
     });
   }
   function renderQuote(data) {
@@ -1355,7 +818,6 @@
       col.querySelector('.dep-body').textContent = txt;
     });
   }
-
   let cachedTickerData = null;
   function renderTicker(data, currencyIdx = tickerIdx) {
     if (!data || !data.rates) { renderError('depTicker'); return; }
@@ -1366,131 +828,101 @@
       const cur = CURRENCIES[currencyIdx];
       const val = data.rates[cur.code];
       if (typeof val !== 'number') {
-        tickerIdx = (currencyIdx + 1) % CURRENCIES.length;
+        tickerIdx = (currencyIdx+1) % CURRENCIES.length;
         if (tickerIdx !== currencyIdx) renderTicker(data, tickerIdx);
-        else renderError('depTicker', 'Keine Kurse verfügbar');
+        else renderError('depTicker','Keine Kurse verfügbar');
         return;
       }
       const formatted = val.toFixed(cur.digits);
-      const dots = CURRENCIES.map((_, i) =>
-        `<span class="tick-dot ${i === currencyIdx ? 'active' : ''}"></span>`
-      ).join('');
+      const dots = CURRENCIES.map((_,i) => `<span class="tick-dot ${i===currencyIdx?'active':''}"></span>`).join('');
       col.querySelector('.dep-body').innerHTML = `
         <span class="tick-pair">1 EUR =</span>
         <span class="tick-val">${formatted} <span class="tick-symbol">${cur.symbol}</span></span>
         <span class="tick-name">${cur.name}</span>
-        <div class="tick-dots">${dots}</div>
-      `;
+        <div class="tick-dots">${dots}</div>`;
       document.getElementById('depTickerDate').textContent = `Stand · ${data.date}`;
-      document.getElementById('depTickerSrc').textContent  = data.source || 'Live';
+      document.getElementById('depTickerSrc').textContent = data.source || 'Live';
     });
   }
-
-  function renderError(colId, msg = 'Nicht verfügbar') {
+  function renderError(colId, msg='Nicht verfügbar') {
     const col = document.getElementById(colId);
     col.classList.remove('loading');
     col.querySelector('.dep-body').textContent = msg;
     const kicker = col.querySelector('.dep-kicker');
     if (kicker) kicker.textContent = '—';
   }
-
   const DEP_SOURCES = {
-    otd:    { fetch: fetchOnThisDay, render: renderOtd,    colId: 'depOtd'    },
-    quote:  { fetch: fetchQuote,     render: renderQuote,  colId: 'depQuote'  },
-    fact:   { fetch: fetchFact,      render: renderFact,   colId: 'depFact'   },
-    ticker: { colId: 'depTicker' }
+    otd:{ fetch:fetchOnThisDay, render:renderOtd, colId:'depOtd' },
+    quote:{ fetch:fetchQuote, render:renderQuote, colId:'depQuote' },
+    fact:{ fetch:fetchFact, render:renderFact, colId:'depFact' },
+    ticker:{ colId:'depTicker' }
   };
-
   function refreshTicker() {
     if (!cachedTickerData) return;
-    tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+    tickerIdx = (tickerIdx+1) % CURRENCIES.length;
     renderTicker(cachedTickerData, tickerIdx);
   }
-
   async function refreshOne(source) {
-    const src = DEP_SOURCES[source];
-    if (!src) return;
+    const src = DEP_SOURCES[source]; if (!src) return;
     const col = document.getElementById(src.colId);
     col.classList.add('spinning');
     try {
       if (source === 'ticker') {
         cachedTickerData = await fetchTickerAll();
-        tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+        tickerIdx = (tickerIdx+1) % CURRENCIES.length;
         renderTicker(cachedTickerData, tickerIdx);
       } else {
         const data = await src.fetch();
         src.render(data);
       }
-    } catch {
-      renderError(src.colId);
-    } finally {
-      setTimeout(() => col.classList.remove('spinning'), 500);
-    }
+    } catch { renderError(src.colId); }
+    finally { setTimeout(() => col.classList.remove('spinning'), 500); }
   }
-
-  async function loadDepeschen(force = false) {
-    ['depOtd','depQuote','depFact','depTicker'].forEach(id =>
-      document.getElementById(id).classList.add('loading')
-    );
-
+  async function loadDepeschen(force=false) {
+    ['depOtd','depQuote','depFact','depTicker'].forEach(id => document.getElementById(id).classList.add('loading'));
     if (!force) {
       const cached = JSON.parse(localStorage.getItem(DEP_CACHE_KEY) || 'null');
-      const maxAge = DEP_CACHE_HOURS * 60 * 60 * 1000;
+      const maxAge = DEP_CACHE_HOURS*60*60*1000;
       const sameDay = cached && new Date(cached.t).toDateString() === depNow.toDateString();
       if (cached && sameDay && (Date.now() - cached.t) < maxAge) {
-        if (cached.otd)    renderOtd(cached.otd);       else renderError('depOtd');
-        if (cached.quote)  renderQuote(cached.quote);   else renderError('depQuote');
-        if (cached.fact)   renderFact(cached.fact);     else renderError('depFact');
-        if (cached.ticker) { tickerIdx = 0; renderTicker(cached.ticker, 0); } else renderError('depTicker');
+        if (cached.otd) renderOtd(cached.otd); else renderError('depOtd');
+        if (cached.quote) renderQuote(cached.quote); else renderError('depQuote');
+        if (cached.fact) renderFact(cached.fact); else renderError('depFact');
+        if (cached.ticker) { tickerIdx=0; renderTicker(cached.ticker,0); } else renderError('depTicker');
         return;
       }
     }
-
-    const [otdR, quoteR, factR, tickerR] = await Promise.allSettled([
-      fetchOnThisDay(), fetchQuote(), fetchFact(), fetchTickerAll()
-    ]);
-
+    const [otdR, quoteR, factR, tickerR] = await Promise.allSettled([fetchOnThisDay(), fetchQuote(), fetchFact(), fetchTickerAll()]);
     const payload = { t: Date.now() };
-    if (otdR.status    === 'fulfilled') { renderOtd(otdR.value);           payload.otd    = otdR.value;    } else renderError('depOtd');
-    if (quoteR.status  === 'fulfilled') { renderQuote(quoteR.value);       payload.quote  = quoteR.value;  } else renderError('depQuote');
-    if (factR.status   === 'fulfilled') { renderFact(factR.value);         payload.fact   = factR.value;   } else renderError('depFact');
-    if (tickerR.status === 'fulfilled') { tickerIdx = 0; renderTicker(tickerR.value, 0); payload.ticker = tickerR.value; } else renderError('depTicker');
-
+    if (otdR.status==='fulfilled') { renderOtd(otdR.value); payload.otd=otdR.value; } else renderError('depOtd');
+    if (quoteR.status==='fulfilled') { renderQuote(quoteR.value); payload.quote=quoteR.value; } else renderError('depQuote');
+    if (factR.status==='fulfilled') { renderFact(factR.value); payload.fact=factR.value; } else renderError('depFact');
+    if (tickerR.status==='fulfilled') { tickerIdx=0; renderTicker(tickerR.value,0); payload.ticker=tickerR.value; } else renderError('depTicker');
     localStorage.setItem(DEP_CACHE_KEY, JSON.stringify(payload));
   }
-
   document.querySelectorAll('.dep-col').forEach(col => {
     col.addEventListener('click', () => {
       if (col.classList.contains('loading') || col.classList.contains('spinning')) return;
       const source = col.dataset.source;
       if (source === 'ticker') {
-        tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
+        tickerIdx = (tickerIdx+1) % CURRENCIES.length;
         if (cachedTickerData) renderTicker(cachedTickerData, tickerIdx);
-      } else {
-        refreshOne(source);
-      }
+      } else refreshOne(source);
       resetRotation();
     });
   });
-
   depReloadBtn.addEventListener('click', () => {
     depReloadBtn.classList.add('spin');
-    loadDepeschen(true).finally(() => {
-      setTimeout(() => depReloadBtn.classList.remove('spin'), 500);
-    });
+    loadDepeschen(true).finally(() => setTimeout(() => depReloadBtn.classList.remove('spin'), 500));
     resetRotation();
   });
 
-  const ROTATE_SOURCES = ['otd', 'quote', 'fact', 'ticker'];
-  let rotateIdx = 0;
-  let rotateTimer = null;
+  const ROTATE_SOURCES = ['otd','quote','fact','ticker'];
+  let rotateIdx = 0, rotateTimer = null;
   let isPaused = localStorage.getItem(DEP_PAUSE_KEY) === '1';
 
   function updateProgress() {
-    document.querySelectorAll('.dep-progress').forEach(p => {
-      p.style.transition = 'none';
-      p.style.width = '0%';
-    });
+    document.querySelectorAll('.dep-progress').forEach(p => { p.style.transition='none'; p.style.width='0%'; });
     if (isPaused) return;
     const nextSource = ROTATE_SOURCES[rotateIdx];
     const col = document.getElementById(DEP_SOURCES[nextSource].colId);
@@ -1499,63 +931,38 @@
     bar.style.transition = `width ${DEP_ROTATE_MS}ms linear`;
     bar.style.width = '100%';
   }
-
   function tickRotation() {
     if (isPaused) return;
     const source = ROTATE_SOURCES[rotateIdx];
-    if (source === 'ticker') refreshTicker();
-    else                     refreshOne(source);
-    rotateIdx = (rotateIdx + 1) % ROTATE_SOURCES.length;
+    if (source === 'ticker') refreshTicker(); else refreshOne(source);
+    rotateIdx = (rotateIdx+1) % ROTATE_SOURCES.length;
     updateProgress();
   }
-
-  function startRotation() {
-    stopRotation();
-    if (isPaused) return;
-    updateProgress();
-    rotateTimer = setInterval(tickRotation, DEP_ROTATE_MS);
-  }
-
-  function stopRotation() {
-    if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
-    document.querySelectorAll('.dep-progress').forEach(p => {
-      p.style.transition = 'none';
-      p.style.width = '0%';
-    });
-  }
-
+  function startRotation() { stopRotation(); if (isPaused) return; updateProgress(); rotateTimer = setInterval(tickRotation, DEP_ROTATE_MS); }
+  function stopRotation() { if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; } document.querySelectorAll('.dep-progress').forEach(p => { p.style.transition='none'; p.style.width='0%'; }); }
   function resetRotation() { if (!isPaused) startRotation(); }
-
   function applyPauseUI() {
     depPauseBtn.classList.toggle('paused', isPaused);
     depPauseLabel.textContent = isPaused ? 'Play' : 'Pause';
     document.querySelectorAll('.dep-col').forEach(c => c.classList.toggle('paused', isPaused));
   }
-
   depPauseBtn.addEventListener('click', () => {
     isPaused = !isPaused;
     localStorage.setItem(DEP_PAUSE_KEY, isPaused ? '1' : '0');
     applyPauseUI();
     if (isPaused) stopRotation(); else startRotation();
   });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopRotation();
-    else if (!isPaused)  startRotation();
-  });
-
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopRotation(); else if (!isPaused) startRotation(); });
   applyPauseUI();
-  loadDepeschen().then(() => { setTimeout(startRotation, 2000); });
+  loadDepeschen().then(() => setTimeout(startRotation, 2000));
 
-  /* ————————————————————————————————
-     SIDE ADS
-     ———————————————————————————————— */
+  /* ———— SIDE ADS ———— */
   const PAYPAL_AD = {
-    cls: "paypal", eyebrow: "UNTERSTÜTZUNG", hero: "☕",
-    title: "Ein Kaffee für Maiko?",
-    body: "Wenn dir die App hilft — kleine Geste, große Freude.",
-    cta: { label: "paypal.me/maiggooo →", url: "https://paypal.me/maiggooo" },
-    foot: "PAYPAL · DANKE", mark: "♡"
+    cls:"paypal", eyebrow:"UNTERSTÜTZUNG", hero:"☕",
+    title:"Ein Kaffee für Maiko?",
+    body:"Wenn dir die App hilft — kleine Geste, große Freude.",
+    cta:{ label:"paypal.me/maiggooo →", url:"https://paypal.me/maiggooo" },
+    foot:"PAYPAL · DANKE", mark:"♡"
   };
   const ADS = [
     { cls:"kaffee", eyebrow:"CAMPUS", hero:"· · ·", title:"Linas Kaffee", body:"Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot:"Mo–Fr · ab 07:30", mark:"L" },
@@ -1567,7 +974,6 @@
     { cls:"gastro", eyebrow:"CATERING", hero:"G · I · G", title:"Mats Gastro", body:"Für Events, Meetings und den echten Hunger nach der Vorlesung.", foot:"Anfrage per DM", mark:"M" },
     { cls:"minion", eyebrow:"LIVE-PERFORMANCE", hero:"BELLO!", title:"Selinas Minion Impressionen", body:"Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.", foot:"Buchbar für Events", mark:"S" }
   ];
-
   function renderAd(slotEl, ad) {
     const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
     const inner = `
@@ -1580,10 +986,7 @@
         <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
       </div>`;
     slotEl.innerHTML = ad.link ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>` : inner;
-    requestAnimationFrame(() => {
-      const el = slotEl.querySelector('.ad');
-      if (el) el.classList.add('show');
-    });
+    requestAnimationFrame(() => { const el = slotEl.querySelector('.ad'); if (el) el.classList.add('show'); });
   }
   function swapAd(slotEl, ad) {
     const current = slotEl.querySelector('.ad');
@@ -1593,37 +996,31 @@
   }
   let adTick = 0;
   function cycleAds() {
-    const rightSlot = document.getElementById('adSlotRight');
-    if (!rightSlot) return;
-    adTick = (adTick + 1) % ADS.length;
-    swapAd(rightSlot, ADS[adTick]);
+    const rightSlot = document.getElementById('adSlotRight'); if (!rightSlot) return;
+    adTick = (adTick+1) % ADS.length; swapAd(rightSlot, ADS[adTick]);
   }
   function initAds() {
-    const leftSlot  = document.getElementById('adSlotLeft');
+    const leftSlot = document.getElementById('adSlotLeft');
     const rightSlot = document.getElementById('adSlotRight');
     if (!leftSlot || !rightSlot) return;
-    renderAd(leftSlot,  PAYPAL_AD);
-    renderAd(rightSlot, ADS[0]);
-    adTick = 0;
+    renderAd(leftSlot, PAYPAL_AD); renderAd(rightSlot, ADS[0]); adTick = 0;
     setInterval(cycleAds, 10000);
   }
-
   function setAds(on) {
-    document.body.classList.toggle('ads-off', !on);
-    localStorage.setItem('werk-ads', on ? 'on' : 'off');
-    const label = document.getElementById('adsLabel');
-    if (label) label.textContent = on ? 'Ads' : 'Ads · aus';
+    document.body.classList.toggle("ads-off", !on);
+    localStorage.setItem("ms-ads", on ? "on" : "off");
+    const label = $("#adsLabel"); if (label) label.textContent = on ? "Ads" : "Ads·off";
+    const dot = $("#adsDot"); if (dot) dot.style.background = on ? "var(--ink)" : "transparent";
   }
   (function initAdsToggle(){
-    const stored = localStorage.getItem('werk-ads');
-    setAds(stored !== 'off');
-    const btn = document.getElementById('adsBtn');
+    const stored = localStorage.getItem("ms-ads");
+    setAds(stored !== "off");
+    const btn = document.getElementById('adsToggle');
     if (btn) btn.addEventListener('click', () => {
       const on = !document.body.classList.contains('ads-off');
       setAds(!on);
     });
   })();
-
   initAds();
 </script>
 
