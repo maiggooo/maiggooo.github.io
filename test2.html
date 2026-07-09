@@ -1002,8 +1002,8 @@
         <div class="dep-eyebrow">Notierung</div>
         <div class="dep-body">lädt …</div>
         <div class="dep-attr">
-          <span id="depTickerDate">EZB · Referenz</span>
-          <span class="src">Frankfurter</span>
+          <span id="depTickerDate">Referenz</span>
+          <span class="src" id="depTickerSrc">—</span>
         </div>
       </div>
       <div class="dep-progress"></div>
@@ -1206,17 +1206,17 @@
      DEPESCHEN
      ———————————————————————————————— */
   const DEP_ROTATE_MS   = 20000;
-  const DEP_CACHE_KEY   = 'werk-depeschen';
+  const DEP_CACHE_KEY   = 'werk-depeschen-v3'; // v3 = neue Ticker-API
   const DEP_PAUSE_KEY   = 'werk-dep-paused';
   const DEP_CACHE_HOURS = 6;
 
-  // Die 5 wichtigsten Weltwährungen (nach BIZ Triennial Survey, ohne EUR = Basiswährung)
+  // Die 5 wichtigsten Weltwährungen
   const CURRENCIES = [
-    { code: 'USD', name: 'US-Dollar',        symbol: '$',   digits: 4 },
-    { code: 'GBP', name: 'Britisches Pfund', symbol: '£',   digits: 4 },
-    { code: 'JPY', name: 'Japanischer Yen',  symbol: '¥',   digits: 2 },
-    { code: 'CHF', name: 'Schweizer Franken',symbol: 'CHF', digits: 4 },
-    { code: 'CNY', name: 'Chinesischer Yuan',symbol: '¥',   digits: 4 }
+    { code: 'USD', name: 'US-Dollar',         symbol: '$',   digits: 4 },
+    { code: 'GBP', name: 'Britisches Pfund',  symbol: '£',   digits: 4 },
+    { code: 'JPY', name: 'Japanischer Yen',   symbol: '¥',   digits: 2 },
+    { code: 'CHF', name: 'Schweizer Franken', symbol: 'CHF', digits: 4 },
+    { code: 'CNY', name: 'Chinesischer Yuan', symbol: '¥',   digits: 4 }
   ];
   let tickerIdx = 0;
 
@@ -1267,13 +1267,58 @@
     return { text: d.text };
   }
 
-  // Holt ALLE 5 Kurse einmal — Rotation läuft dann lokal
+  // ——— Currency-Fetcher mit ZWEI unabhängigen Providern ———
+  //   Primär: @fawazahmed0/currency-api via jsDelivr CDN (extrem stabil, kein Rate-Limit)
+  //   Fallback: open.er-api.com (kostenlos, kein Key)
   async function fetchTickerAll() {
-    const codes = CURRENCIES.map(c => c.code).join(',');
-    const res = await fetch(`https://api.frankfurter.app/latest?from=EUR&to=${codes}`);
-    if (!res.ok) throw new Error('ticker');
-    const d = await res.json();
-    return { date: d.date, rates: d.rates };
+    // ——— PRIMÄR: fawazahmed0/currency-api ———
+    try {
+      const primaryUrls = [
+        'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
+        'https://latest.currency-api.pages.dev/v1/currencies/eur.json' // offizieller Fallback des Autors
+      ];
+      for (const url of primaryUrls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const d = await res.json();
+          if (!d.eur) continue;
+          const rates = {};
+          let ok = true;
+          for (const c of CURRENCIES) {
+            const v = d.eur[c.code.toLowerCase()];
+            if (typeof v !== 'number') { ok = false; break; }
+            rates[c.code] = v;
+          }
+          if (ok) {
+            return { date: d.date || new Date().toISOString().slice(0,10), rates, source: 'Currency-API' };
+          }
+        } catch (e) { console.warn('primary currency url failed:', url, e.message); }
+      }
+      throw new Error('primary providers failed');
+    } catch (primaryErr) {
+      console.warn('Currency primary failed, trying fallback:', primaryErr.message);
+    }
+
+    // ——— FALLBACK: open.er-api.com ———
+    try {
+      const res = await fetch('https://open.er-api.com/v6/latest/EUR');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const d = await res.json();
+      if (!d.rates) throw new Error('no rates in response');
+      const rates = {};
+      for (const c of CURRENCIES) {
+        if (typeof d.rates[c.code] !== 'number') throw new Error('missing ' + c.code);
+        rates[c.code] = d.rates[c.code];
+      }
+      const date = d.time_last_update_utc
+        ? new Date(d.time_last_update_utc).toISOString().slice(0,10)
+        : new Date().toISOString().slice(0,10);
+      return { date, rates, source: 'ExchangeRate-API' };
+    } catch (fallbackErr) {
+      console.error('All currency providers failed:', fallbackErr.message);
+      throw fallbackErr;
+    }
   }
 
   function fadeSwap(colEl, updateFn) {
@@ -1311,15 +1356,21 @@
     });
   }
 
-  // Zeigt EINE Währung groß — mit Dot-Indikatoren unten
   let cachedTickerData = null;
   function renderTicker(data, currencyIdx = tickerIdx) {
+    if (!data || !data.rates) { renderError('depTicker'); return; }
     cachedTickerData = data;
     const col = document.getElementById('depTicker');
     col.classList.remove('loading');
     fadeSwap(col, () => {
       const cur = CURRENCIES[currencyIdx];
       const val = data.rates[cur.code];
+      if (typeof val !== 'number') {
+        tickerIdx = (currencyIdx + 1) % CURRENCIES.length;
+        if (tickerIdx !== currencyIdx) renderTicker(data, tickerIdx);
+        else renderError('depTicker', 'Keine Kurse verfügbar');
+        return;
+      }
       const formatted = val.toFixed(cur.digits);
       const dots = CURRENCIES.map((_, i) =>
         `<span class="tick-dot ${i === currencyIdx ? 'active' : ''}"></span>`
@@ -1330,7 +1381,8 @@
         <span class="tick-name">${cur.name}</span>
         <div class="tick-dots">${dots}</div>
       `;
-      document.getElementById('depTickerDate').textContent = `EZB · ${data.date}`;
+      document.getElementById('depTickerDate').textContent = `Stand · ${data.date}`;
+      document.getElementById('depTickerSrc').textContent  = data.source || 'Live';
     });
   }
 
@@ -1346,10 +1398,9 @@
     otd:    { fetch: fetchOnThisDay, render: renderOtd,    colId: 'depOtd'    },
     quote:  { fetch: fetchQuote,     render: renderQuote,  colId: 'depQuote'  },
     fact:   { fetch: fetchFact,      render: renderFact,   colId: 'depFact'   },
-    ticker: { colId: 'depTicker' } // Sonderfall — s. u.
+    ticker: { colId: 'depTicker' }
   };
 
-  // Rotiert nur die Währung, lädt keine neuen Daten
   function refreshTicker() {
     if (!cachedTickerData) return;
     tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
@@ -1363,7 +1414,6 @@
     col.classList.add('spinning');
     try {
       if (source === 'ticker') {
-        // Bei Klick: neue Kurse holen + Index vorwärts
         cachedTickerData = await fetchTickerAll();
         tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
         renderTicker(cachedTickerData, tickerIdx);
@@ -1391,8 +1441,7 @@
         if (cached.otd)    renderOtd(cached.otd);       else renderError('depOtd');
         if (cached.quote)  renderQuote(cached.quote);   else renderError('depQuote');
         if (cached.fact)   renderFact(cached.fact);     else renderError('depFact');
-        if (cached.ticker) renderTicker(cached.ticker, 0); else renderError('depTicker');
-        tickerIdx = 0;
+        if (cached.ticker) { tickerIdx = 0; renderTicker(cached.ticker, 0); } else renderError('depTicker');
         return;
       }
     }
@@ -1410,13 +1459,11 @@
     localStorage.setItem(DEP_CACHE_KEY, JSON.stringify(payload));
   }
 
-  // Klick auf Spalte
   document.querySelectorAll('.dep-col').forEach(col => {
     col.addEventListener('click', () => {
       if (col.classList.contains('loading') || col.classList.contains('spinning')) return;
       const source = col.dataset.source;
       if (source === 'ticker') {
-        // Kein Reload nötig — nur nächste Währung
         tickerIdx = (tickerIdx + 1) % CURRENCIES.length;
         if (cachedTickerData) renderTicker(cachedTickerData, tickerIdx);
       } else {
@@ -1434,8 +1481,6 @@
     resetRotation();
   });
 
-  // ——— AUTO-ROTATION ———
-  // Alle 4 Spalten rotieren — Ticker nur mit Währungswechsel (kein API-Call)
   const ROTATE_SOURCES = ['otd', 'quote', 'fact', 'ticker'];
   let rotateIdx = 0;
   let rotateTimer = null;
@@ -1458,11 +1503,8 @@
   function tickRotation() {
     if (isPaused) return;
     const source = ROTATE_SOURCES[rotateIdx];
-    if (source === 'ticker') {
-      refreshTicker(); // nur lokale Rotation
-    } else {
-      refreshOne(source);
-    }
+    if (source === 'ticker') refreshTicker();
+    else                     refreshOne(source);
     rotateIdx = (rotateIdx + 1) % ROTATE_SOURCES.length;
     updateProgress();
   }
