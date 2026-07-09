@@ -39,7 +39,93 @@
     --ok-soft:     #24301f;
     --warn:        #d68f4a;
   }
+  
+/* ————————————— DESIGN-EFFECTS (Editorial, aus Vorlage) ————————————— */
+  /* View Transitions */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  .mast .brand { view-transition-name: brand; }
+  ::view-transition-old(brand),
+  ::view-transition-new(brand) { animation-duration: .35s; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
 
+  /* Papier-Textur (SVG Noise Overlay) */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22;
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after {
+    opacity: .08;
+    mix-blend-mode: screen;
+  }
+  /* Feine Faserlinien */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before {
+    opacity: .35;
+    mix-blend-mode: overlay;
+  }
+
+  /* Tinten-Bleed */
+  body { text-shadow: 0 0 .32px currentColor; }
+  .mast .brand,
+  .ad-title,
+  .ad-hero,
+  .hero h1,
+  .qtext,
+  .result-grade,
+  .subhead a.back .arrow {
+    text-shadow:
+      0 0 .45px currentColor,
+      .18px .12px .55px rgba(0,0,0,.10);
+  }
+  .mast .brand em,
+  .hero h1 .ital,
+  .ad--paypal .ad-hero,
+  .ad--kirche .ad-hero {
+    text-shadow:
+      0 0 .5px currentColor,
+      .3px .2px .8px rgba(200,68,42,.18);
+  }
+  html[data-theme="dark"] .mast .brand,
+  html[data-theme="dark"] .ad-title,
+  html[data-theme="dark"] .ad-hero,
+  html[data-theme="dark"] .hero h1,
+  html[data-theme="dark"] .qtext,
+  html[data-theme="dark"] .result-grade {
+    text-shadow:
+      0 0 .5px currentColor,
+      .15px .1px .6px rgba(255,235,200,.08);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body { text-shadow: none; }
+  }
+  
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--paper); color: var(--ink); }
   body {
@@ -52,7 +138,7 @@
   }
 
   /* ===================== LAYOUT ===================== */
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 28px 48px; }
+  .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 24px 28px 48px; }
 
   /* Masthead — editorial newspaper vibe */
   .mast {
