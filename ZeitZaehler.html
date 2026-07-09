@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -459,7 +458,7 @@ body.dark .bar-fill { mix-blend-mode: screen; opacity: .78; }
 /* ==================== INFO STRIP ==================== */
 .info-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   border: 1px solid var(--rule);
   background: var(--paper-2);
   margin-top: 28px;
@@ -488,6 +487,12 @@ body.dark .bar-fill { mix-blend-mode: screen; opacity: .78; }
   font-variant-numeric: tabular-nums;
 }
 .info-cell .v em { font-style: italic; color: var(--accent); font-weight: 500; }
+.info-cell .sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+}
 
 /* ==================== CALLOUT ==================== */
 .callout {
@@ -544,6 +549,11 @@ body.dark .callout { background: var(--accent-soft); color: var(--ink); }
 }
 
 /* ==================== RESPONSIVE ==================== */
+@media (max-width: 980px) {
+  .info-strip { grid-template-columns: repeat(2, 1fr); }
+  .info-cell:nth-child(2n) { border-right: none; }
+  .info-cell:nth-child(-n+4) { border-bottom: 1px solid var(--rule-soft); }
+}
 @media (max-width: 820px) {
   .wrap { padding: 18px 18px 40px; }
   .masthead-grid { grid-template-columns: 1fr; text-align: center; gap: 10px; }
@@ -556,12 +566,14 @@ body.dark .callout { background: var(--accent-soft); color: var(--ink); }
   .now-date { text-align: left; }
   .progress-row { grid-template-columns: 1fr; gap: 14px; }
   .side-stat.right { text-align: left; align-items: flex-start; }
-  .info-strip { grid-template-columns: repeat(2, 1fr); }
-  .info-cell:nth-child(2) { border-right: none; }
-  .info-cell:nth-child(-n+2) { border-bottom: 1px solid var(--rule-soft); }
   .callout { flex-direction: column; align-items: flex-start; gap: 10px; }
   .callout .co-label { border-right: none; border-bottom: 1px solid var(--accent); padding-right: 0; padding-bottom: 8px; }
   .colophon { flex-direction: column; gap: 6px; text-align: center; }
+}
+@media (max-width: 620px) {
+  .info-strip { grid-template-columns: 1fr; }
+  .info-cell { border-right: none; border-bottom: 1px solid var(--rule-soft); }
+  .info-cell:last-child { border-bottom: none; }
 }
 
 /* ==================== SIDE ADS ==================== */
@@ -722,7 +734,7 @@ body.ads-off .ads-side { display: none !important; }
   <!-- ==================== HERO ==================== -->
   <section class="hero">
     <h1 class="hero-title">Wie lange noch,<br>bis <em>Feierabend?</em></h1>
-    <p class="hero-lede">Trage deine Zeiten ein — der Balken aktualisiert sich sofort. Kein Klick, keine zweite Seite. Kaffee um neun, Pause um zwölf, dann läuft der Tag.</p>
+    <p class="hero-lede">Trage deine Zeiten ein — der Balken aktualisiert sich sofort. Kein Klick, keine zweite Seite. Kaffee um neun, Pause um zwölf, dann läuft der Tag. Und unten wartet jetzt auch der nächste hessische Feiertag.</p>
   </section>
 
   <!-- ==================== 01 ZEITEN ==================== -->
@@ -810,6 +822,11 @@ body.ads-off .ads-side { display: none !important; }
     <div class="info-cell">
       <div class="k">Kaffee 09:00</div>
       <div class="v" id="infoCoffee">—</div>
+    </div>
+    <div class="info-cell">
+      <div class="k">Nächster Feiertag (HE)</div>
+      <div class="v" id="infoHoliday">lädt…</div>
+      <div class="sub" id="infoHolidaySub">Quelle: Nager.Date API</div>
     </div>
   </div>
 
@@ -899,6 +916,96 @@ function nowMinutes() {
   return n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
 }
 function pad(n){ return String(n).padStart(2,'0'); }
+function startOfDay(date){
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function diffDays(from, to){
+  const ms = startOfDay(to) - startOfDay(from);
+  return Math.round(ms / 86400000);
+}
+function formatGermanDate(dateStr){
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("de-DE", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+/* =========================================================
+   HOLIDAY API (HESSEN)
+   Quelle: https://date.nager.at
+========================================================= */
+const HESSEN_CODE = "DE-HE";
+let holidayCache = null;
+
+function isHolidayInHessen(holiday) {
+  if (holiday.global) return true;
+  return Array.isArray(holiday.counties) && holiday.counties.includes(HESSEN_CODE);
+}
+
+function findNextHolidayForDate(holidays, now = new Date()) {
+  const today = startOfDay(now);
+  return holidays
+    .filter(isHolidayInHessen)
+    .filter(h => startOfDay(new Date(h.date + "T00:00:00")) >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0] || null;
+}
+
+async function fetchHolidayYear(year) {
+  const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/DE`, {
+    headers: { "Accept": "application/json" }
+  });
+  if (!res.ok) throw new Error("Feiertage konnten nicht geladen werden.");
+  return res.json();
+}
+
+async function loadNextHessenHoliday() {
+  const valueEl = $("#infoHoliday");
+  const subEl   = $("#infoHolidaySub");
+
+  try {
+    valueEl.textContent = "lädt…";
+    subEl.textContent = "Prüfe Hessen-Feiertage…";
+
+    const now = new Date();
+    const year = now.getFullYear();
+
+    const [currentYear, nextYear] = await Promise.all([
+      fetchHolidayYear(year),
+      fetchHolidayYear(year + 1)
+    ]);
+
+    const all = [...currentYear, ...nextYear];
+    const nextHoliday = findNextHolidayForDate(all, now);
+
+    if (!nextHoliday) {
+      valueEl.textContent = "—";
+      subEl.textContent = "Kein Feiertag gefunden";
+      return;
+    }
+
+    holidayCache = nextHoliday;
+
+    const daysLeft = diffDays(now, new Date(nextHoliday.date + "T00:00:00"));
+    valueEl.textContent = nextHoliday.localName || nextHoliday.name;
+
+    if (daysLeft === 0) {
+      subEl.innerHTML = `<em>heute</em> · ${formatGermanDate(nextHoliday.date)}`;
+    } else if (daysLeft === 1) {
+      subEl.textContent = `morgen · ${formatGermanDate(nextHoliday.date)}`;
+    } else {
+      subEl.textContent = `in ${daysLeft} Tagen · ${formatGermanDate(nextHoliday.date)}`;
+    }
+  } catch (err) {
+    console.error(err);
+    valueEl.textContent = "nicht verfügbar";
+    subEl.textContent = "API aktuell nicht erreichbar";
+  }
+}
 
 /* =========================================================
    RENDER STATIC MARKERS (ticks + coffee)
@@ -935,7 +1042,6 @@ function renderStatics(arrive, leave) {
   const startHour = Math.ceil(arrive / 60);
   const endHour   = Math.floor(leave / 60);
   for (let h = startHour; h <= endHour; h++) {
-    // skip if too close to coffee
     if (Math.abs(h * 60 - COFFEE_MIN) < 15) continue;
     const t = h * 60;
     const pct = ((t - arrive) / span) * 100;
@@ -955,13 +1061,12 @@ function renderPause(arrive, leave, pauseStart) {
   const span   = leave - arrive;
   if (span <= 0) { bar.style.display = "none"; return; }
   const pauseEnd = pauseStart + PAUSE_LEN;
-  // Clip pause to the visible span
   const s = Math.max(pauseStart, arrive);
-  const e = Math.min(pauseEnd,   leave);
+  const e = Math.min(pauseEnd, leave);
   if (e <= s) { bar.style.display = "none"; return; }
   bar.style.display = "flex";
   bar.style.left  = ((s - arrive) / span * 100) + "%";
-  bar.style.width = ((e - s)      / span * 100) + "%";
+  bar.style.width = ((e - s) / span * 100) + "%";
 }
 
 /* =========================================================
@@ -977,7 +1082,6 @@ function update() {
   const leave  = parseTime(leaveStr);
   const now    = nowMinutes();
 
-  // Live clock in headline
   const n = new Date();
   $("#nowTime").innerHTML = `${pad(n.getHours())}<em>:</em>${pad(n.getMinutes())}`;
   $("#clockMeta").textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
@@ -985,7 +1089,6 @@ function update() {
   const months = ["Jan","Feb","März","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
   $("#nowDate").textContent = `${days[n.getDay()]} · ${n.getDate()}. ${months[n.getMonth()]} ${n.getFullYear()}`;
 
-  // Validate
   const totalSpan = leave - arrive;
   if (totalSpan <= 0) {
     $("#calloutText").textContent = "Feierabend muss nach der Ankunft liegen.";
@@ -1000,29 +1103,25 @@ function update() {
     return;
   }
 
-  // Render statics + pause overlay every update (cheap, ensures sync with inputs)
   renderStatics(arrive, leave);
   renderPause(arrive, leave, pause);
 
-  // Progress %
   const elapsed = now - arrive;
   const clampedElapsed = Math.max(0, Math.min(elapsed, totalSpan));
   const pct = (clampedElapsed / totalSpan) * 100;
   $("#barFill").style.width = pct + "%";
   $("#barNow").style.left   = pct + "%";
 
-  // Net working time so far (elapsed minus completed pause portion)
   const pauseEnd = pause + PAUSE_LEN;
   let pauseDone;
-  if (now < pause)       pauseDone = 0;
+  if (now < pause) pauseDone = 0;
   else if (now > pauseEnd) pauseDone = PAUSE_LEN;
-  else                   pauseDone = now - pause;
+  else pauseDone = now - pause;
 
   const grossElapsed = clampedElapsed;
   const netElapsed = Math.max(0, grossElapsed - pauseDone);
   const netTotal   = totalSpan - PAUSE_LEN;
 
-  // Left side: "Da seit"
   if (now < arrive) {
     $("#statSince").innerHTML = `<em>—</em>`;
     $("#statSinceSub").textContent = `Ankunft um ${arriveStr}`;
@@ -1034,7 +1133,6 @@ function update() {
     $("#statSinceSub").textContent = "seit Ankunft";
   }
 
-  // Right side: "Noch zu tun"
   const leftMin = leave - now;
   if (now < arrive) {
     $("#statLeft").textContent = fmtHMShort(totalSpan);
@@ -1047,19 +1145,17 @@ function update() {
     $("#statLeftSub").textContent = "bis Feierabend";
   }
 
-  // Info strip
   $("#infoPct").innerHTML  = `${pct.toFixed(1).replace('.',',')}<em>%</em>`;
   $("#infoNet").textContent = `${fmtHMShort(netElapsed)} / ${fmtHMShort(netTotal)}`;
 
-  if (now < pause)         $("#infoPause").textContent = `um ${pauseStr}`;
-  else if (now < pauseEnd) $("#infoPause").innerHTML   = `<em>läuft</em>`;
-  else                     $("#infoPause").textContent = "erledigt";
+  if (now < pause) $("#infoPause").textContent = `um ${pauseStr}`;
+  else if (now < pauseEnd) $("#infoPause").innerHTML = `<em>läuft</em>`;
+  else $("#infoPause").textContent = "erledigt";
 
-  if (now < COFFEE_MIN)               $("#infoCoffee").textContent = `in ${fmtHM(COFFEE_MIN - now)}`;
-  else if (now < COFFEE_MIN + 15)     $("#infoCoffee").innerHTML   = `<em>jetzt ☕</em>`;
-  else                                $("#infoCoffee").textContent = "genossen";
+  if (now < COFFEE_MIN) $("#infoCoffee").textContent = `in ${fmtHM(COFFEE_MIN - now)}`;
+  else if (now < COFFEE_MIN + 15) $("#infoCoffee").innerHTML = `<em>jetzt ☕</em>`;
+  else $("#infoCoffee").textContent = "genossen";
 
-  // Callout
   let msg = "";
   if (now < arrive) {
     msg = `Der Tag hat noch nicht begonnen — Ankunft geplant um ${arriveStr}.`;
@@ -1076,6 +1172,16 @@ function update() {
   } else {
     msg = "Feierabend. Bildschirm zu, Licht aus.";
   }
+
+  if (holidayCache) {
+    const dLeft = diffDays(new Date(), new Date(holidayCache.date + "T00:00:00"));
+    if (dLeft === 0) {
+      msg += ` Außerdem: Heute ist in Hessen ${holidayCache.localName || holidayCache.name}.`;
+    } else {
+      msg += ` Nächster hessischer Feiertag: ${holidayCache.localName || holidayCache.name}.`;
+    }
+  }
+
   $("#calloutText").textContent = msg;
 }
 
@@ -1088,6 +1194,10 @@ function update() {
 });
 update();
 setInterval(update, 1000);
+
+/* Feiertage beim Start laden und 1x täglich aktualisieren */
+loadNextHessenHoliday();
+setInterval(loadNextHessenHoliday, 1000 * 60 * 60 * 24);
 
 /* =========================================================
    SIDE ADS
@@ -1164,7 +1274,7 @@ function initAds() {
   const leftSlot  = document.getElementById('adSlotLeft');
   const rightSlot = document.getElementById('adSlotRight');
   if (!leftSlot || !rightSlot) return;
-  renderAd(leftSlot,  PAYPAL_AD);
+  renderAd(leftSlot, PAYPAL_AD);
   renderAd(rightSlot, ADS[0]);
   adTick = 0;
   setInterval(cycleAds, 10000);
