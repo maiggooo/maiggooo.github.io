@@ -1727,6 +1727,12 @@ function handleRoom(room){
    DUEL RENDERING
 ========================================================= */
 function renderDuel(room){
+  // Scroll-Position VOR jedem Re-Render einfrieren und danach wieder herstellen.
+  // Verhindert jedes automatische "nach oben Springen" – egal ob durch Klick,
+  // Firebase-Update, Button-Replacement oder Fokusverlust.
+  const __savedX = window.scrollX || window.pageXOffset || 0;
+  const __savedY = window.scrollY || window.pageYOffset || 0;
+
   const isNewQuestion =
     renderDuel._lastIdx   !== S.currentIdx ||
     renderDuel._lastRound !== S.round      ||
@@ -1768,6 +1774,7 @@ function renderDuel(room){
   const letters = ["A","B","C","D","E","F"];
   q.options.forEach((opt, i) => {
     const b = document.createElement("button");
+    b.type = "button";
     b.className = "opt";
     let tick = "";
     if (myAns && myAns.idx === i)  b.classList.add("selected");
@@ -1813,9 +1820,28 @@ function renderDuel(room){
     $("#qExplain").classList.add("hidden");
     $("#qExplainText").textContent = "";
   }
+
+  // Scroll-Position zwangsweise wiederherstellen (mehrfach, um alle
+  // Browser-Quirks abzudecken: sofort, nach Paint, und nach dem naechsten Frame).
+  const __restore = () => {
+    if (window.scrollX !== __savedX || window.scrollY !== __savedY) {
+      window.scrollTo(__savedX, __savedY);
+    }
+  };
+  __restore();
+  requestAnimationFrame(__restore);
+  requestAnimationFrame(() => requestAnimationFrame(__restore));
 }
 
 async function submitAnswer(idx){
+  // Scroll-Position sofort einfrieren, damit weder Fokusverlust noch
+  // ein re-render die Seite nach oben werfen kann.
+  const __sx = window.scrollX || window.pageXOffset || 0;
+  const __sy = window.scrollY || window.pageYOffset || 0;
+  const __keep = () => window.scrollTo(__sx, __sy);
+  requestAnimationFrame(__keep);
+  requestAnimationFrame(() => requestAnimationFrame(__keep));
+
   const q = S.questions[S.currentIdx];
   const key = "r" + S.round + "_q" + S.currentIdx;
   // Optimistischer UI-Freeze
