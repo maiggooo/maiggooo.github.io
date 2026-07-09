@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiz-Duell &mdash; Marketing &amp; Sales</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
+    --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
+    --accent:#c8442a; --accent-soft:#f2d9d1;
+    --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
+    --shadow:0 1px 0 var(--ink);
+  }
+  html[data-theme="dark"] {
+    --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
+    --muted:#8a857a; --rule:#efe8d8; --rule-soft:#3a3a30;
+    --accent:#e8623f; --accent-soft:#3a1f18;
+    --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
+  }
+
+  /* ————————————— DESIGN-EFFECTS (Editorial) ————————————— */
+  /* View Transitions */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  .mast .brand { view-transition-name: brand; }
+  ::view-transition-old(brand),
+  ::view-transition-new(brand) { animation-duration: .35s; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  /* Papier-Textur (SVG Noise Overlay) */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22;
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after {
+    opacity: .08;
+    mix-blend-mode: screen;
+  }
+  /* Feine Faserlinien */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before {
+    opacity: .35;
+    mix-blend-mode: overlay;
+  }
+
+  /* Tinten-Bleed */
+  body { text-shadow: 0 0 .32px currentColor; }
+  .mast .brand,
+  .ad-title,
+  .ad-hero,
+  .placeholder,
+  .subhead a.back .arrow {
+    text-shadow:
+      0 0 .45px currentColor,
+      .18px .12px .55px rgba(0,0,0,.10);
+  }
+  .mast .brand em,
+  .ad--paypal .ad-hero,
+  .ad--kirche .ad-hero {
+    text-shadow:
+      0 0 .5px currentColor,
+      .3px .2px .8px rgba(200,68,42,.18);
+  }
+  html[data-theme="dark"] .mast .brand,
+  html[data-theme="dark"] .ad-title,
+  html[data-theme="dark"] .ad-hero,
+  html[data-theme="dark"] .placeholder {
+    text-shadow:
+      0 0 .5px currentColor,
+      .15px .1px .6px rgba(255,235,200,.08);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body { text-shadow: none; }
+  }
+
+  /* Wrap über dem Overlay */
+  .wrap { position: relative; z-index: 1; }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); }
+  body {
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    font-size:16px; line-height:1.5; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    transition: background .25s ease, color .25s ease;
+  }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 28px 48px; }
+
+  .mast {
+    border-top:2px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:14px 0 10px; display:grid;
+    grid-template-columns:1fr auto 1fr; align-items:center; gap:20px;
+  }
+  .mast .edition {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .mast .edition.right { display:flex; gap:8px; justify-content:flex-end; align-items:center; text-align:right; }
+  .mast .brand {
+    font-family:'Fraunces', serif; font-weight:800; font-size:22px;
+    letter-spacing:-.02em; white-space:nowrap;
+  }
+  .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
+
+  .subhead {
+    border-bottom:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; gap:20px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .subhead a.back {
+    display:inline-flex; align-items:center; gap:10px;
+    color:var(--muted); text-decoration:none; transition:color .18s ease;
+  }
+  .subhead a.back:hover { color:var(--ink); }
+  .subhead a.back .arrow {
+    font-family:'Fraunces', serif; font-style:italic; font-size:15px;
+    letter-spacing:0; text-transform:none; line-height:1;
+    transition:transform .25s cubic-bezier(.7,0,.2,1); display:inline-block;
+  }
+  .subhead a.back:hover .arrow { transform:translateX(-3px); }
+  .subhead .meta { text-align:right; }
+  @media (max-width:560px) {
+    .subhead { font-size:10px; letter-spacing:.12em; }
+    .subhead .meta { display:none; }
+  }
+
+  .toggle {
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--rule); padding:6px 10px;
+    background:transparent; color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase;
+    cursor:pointer; transition:background .15s;
+  }
+  .toggle:hover { background:var(--paper-2); }
+  .toggle .dot {
+    width:10px; height:10px; border-radius:50%;
+    background:var(--ink); border:1px solid var(--ink);
+    box-sizing:border-box; display:inline-block;
+  }
+
+  .ads-side {
+    position:fixed; top:50%; transform:translateY(-50%);
+    width:200px; z-index:40; display:none; pointer-events:none;
+  }
+  .ads-side.left  { left:20px; }
+  .ads-side.right { right:20px; }
+  @media (min-width:1560px) { .ads-side { display:block; } }
+  body.ads-off .ads-side { display:none !important; }
+
+  .ad-slot { position:relative; pointer-events:auto; }
+  .ad-link { display:block; color:inherit; text-decoration:none; }
+  .ad-link .ad { transition:transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
+  .ad-link:hover .ad { transform:translateY(-2px); box-shadow:3px 3px 0 var(--rule); }
+  .ad {
+    position:relative; border:1px solid var(--rule); background:var(--paper);
+    padding:14px 14px 12px; opacity:0; transform:translateY(4px);
+    transition:opacity .35s ease, transform .35s ease;
+    display:flex; flex-direction:column; gap:8px;
+    min-height:200px; font-family:'Inter', sans-serif;
+  }
+  .ad.show { opacity:1; transform:translateY(0); }
+  .ad-eyebrow {
+    font-family:'JetBrains Mono', monospace; font-size:9px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .ad-eyebrow::before { content:"ANZEIGE"; color:var(--accent); font-weight:600; }
+  .ad-eyebrow .sep { color:var(--rule-soft); }
+  .ad-title { font-family:'Fraunces', serif; font-size:22px; line-height:1.05; color:var(--ink); letter-spacing:-.01em; }
+  .ad-body { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad-foot {
+    margin-top:auto; padding-top:8px; border-top:1px solid var(--rule-soft);
+    font-family:'JetBrains Mono', monospace; font-size:9.5px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ad-mark { color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
+
+  .ad--paypal .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:22px; line-height:1.15; letter-spacing:-.01em; }
+  .ad--paypal .ad-body  { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad--paypal .ad-hero  { font-family:'Fraunces', serif; font-style:italic; font-size:42px; color:var(--accent); line-height:1; margin-bottom:2px; }
+  .ad--paypal .ad-cta {
+    display:block; margin-top:4px; padding:11px 12px;
+    background:var(--accent); color:#fff;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase;
+    text-decoration:none; text-align:center; font-weight:700;
+    border:1px solid var(--accent);
+    transition:background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .ad--paypal .ad-cta:hover { background:var(--ink); border-color:var(--ink); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .ad--paypal .ad-cta:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+
+  .ad--kaffee { background:var(--paper-2); }
+  .ad--kaffee .ad-title { font-style:italic; font-size:28px; }
+  .ad--kaffee .ad-hero  { font-size:18px; letter-spacing:.35em; color:var(--muted); }
+
+  .ad--stink .ad-title { font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1.15; }
+  .ad--stink .ad-hero  { font-size:28px; letter-spacing:.1em; }
+  .ad--stink .ad-body  { font-style:italic; font-family:'Fraunces', serif; font-size:13px; }
+
+  .ad--pfalz { border-width:2px; }
+  .ad--pfalz .ad-title { font-family:'Fraunces', serif; font-size:17px; text-align:center; line-height:1.15; }
+  .ad--pfalz .ad-hero  { text-align:center; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.3em; color:var(--accent); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:5px 0; }
+  .ad--pfalz .ad-body  { text-align:center; font-style:italic; font-family:'Fraunces', serif; font-size:12.5px; }
+
+  .ad--kirche .ad-hero  { font-family:'Fraunces', serif; font-size:34px; color:var(--accent); text-align:center; line-height:1; }
+  .ad--kirche .ad-title { font-style:italic; font-size:20px; text-align:center; }
+  .ad--kirche .ad-body  { text-align:center; }
+
+  .ad--reise .ad-title { font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .ad--reise .ad-hero  { font-size:22px; color:var(--accent); }
+  .ad--reise .ad-body  { border-top:1px dashed var(--rule-soft); border-bottom:1px dashed var(--rule-soft); padding:6px 0; }
+
+  .ad--schweig .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:30px; text-align:center; margin:8px 0 4px; }
+  .ad--schweig .ad-hero  { text-align:center; font-size:28px; letter-spacing:.5em; color:var(--muted); line-height:1; }
+  .ad--schweig .ad-body  { text-align:center; font-size:10.5px; letter-spacing:.02em; }
+
+  .ad--gastro .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.4em; color:var(--paper); background:var(--accent); padding:5px 10px; display:inline-block; align-self:flex-start; }
+  .ad--gastro .ad-title { font-family:'Fraunces', serif; font-size:24px; font-style:italic; }
+
+  .ad--minion { background:#f5d547; color:#1a1a1a; border-color:#1a1a1a; }
+  .ad--minion .ad-eyebrow { color:#1a1a1a; }
+  .ad--minion .ad-eyebrow::before { background:#1a1a1a; }
+  .ad--minion .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:700; letter-spacing:.22em; text-align:center; color:#1a1a1a; padding:8px 0; border-top:2px solid #1a1a1a; border-bottom:2px solid #1a1a1a; }
+  .ad--minion .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:21px; text-align:center; color:#1a1a1a; line-height:1.15; }
+  .ad--minion .ad-body  { text-align:center; color:#1a1a1a; }
+  .ad--minion .ad-foot  { color:#1a1a1a; border-top-color:rgba(26,26,26,.3); }
+  .ad--minion .ad-mark  { color:#1a1a1a; font-style:italic; }
+
+  .foot {
+    margin-top:60px; padding-top:20px; border-top:2px solid var(--rule);
+    display:flex; justify-content:space-between;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+
+  .placeholder {
+    margin:60px 0; padding:80px 24px;
+    border:1px dashed var(--rule-soft); text-align:center;
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:20px; color:var(--muted);
+  }
+
+  @media (max-width:560px) {
+    .wrap { padding:20px 18px 60px; }
+    .mast { grid-template-columns:1fr auto; }
+    .mast .edition.left { display:none; }
+  }
+</style>
+<style>
+  /* ————— QuizDuell specific ————— */
+  .hero {
+    padding: 40px 0 26px;
+    border-bottom: 1px solid var(--rule);
+    display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: end;
+  }
+  .hero h1 {
+    font-family:'Fraunces', serif; font-weight: 800; font-size: clamp(48px, 8vw, 92px);
+    line-height: .92; letter-spacing: -.03em; color: var(--ink);
+  }
+  .hero h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .hero .lede {
+    font-family:'Fraunces', serif; font-size: 17px; line-height: 1.55; color: var(--ink-soft);
+    border-left: 2px solid var(--accent); padding-left: 14px;
+  }
+  @media (max-width: 780px) { .hero { grid-template-columns: 1fr; padding: 26px 0 18px; gap: 20px; } }
+
+  .rulerail {
+    display:flex; gap: 14px; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--muted); padding: 14px 0; border-bottom: 1px solid var(--rule);
+  }
+  .rulerail .dot { width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block; }
+  .rulerail .sep { color: var(--rule-soft); }
+
+  .section-h {
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.2em;
+    text-transform:uppercase; color: var(--muted);
+    display:flex; align-items:center; gap:10px; margin: 28px 0 14px;
+  }
+  .section-h::before { content:""; width: 20px; height:1px; background: var(--rule); display:inline-block; }
+
+  /* Lobby: create + join cards */
+  .lobby { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
+  @media (max-width: 780px) { .lobby { grid-template-columns: 1fr; } }
+
+  .card {
+    border: 1px solid var(--rule); background: var(--paper);
+    padding: 26px 24px 22px; display:flex; flex-direction:column; gap: 14px;
+    position: relative;
+  }
+  .card::before {
+    content:""; position: absolute; top:-1px; left:-1px; width: 28px; height:1px; background: var(--accent);
+  }
+  .card h2 {
+    font-family:'Fraunces', serif; font-weight: 700; font-size: 30px; line-height:1;
+    letter-spacing: -.02em;
+  }
+  .card h2 em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .card p { font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
+  .card .kicker {
+    font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.2em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.18em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .field input {
+    background: transparent; border: none; border-bottom: 1px solid var(--rule);
+    font-family:'Fraunces', serif; font-size: 22px; color: var(--ink);
+    padding: 6px 2px; letter-spacing: -.01em; outline: none;
+    transition: border-color .15s ease;
+  }
+  .field input:focus { border-bottom-color: var(--accent); }
+  .field input.code { font-family:'JetBrains Mono', monospace; font-size: 26px; letter-spacing: .35em; text-transform: uppercase; }
+
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    padding: 12px 18px; background: var(--ink); color: var(--paper);
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.18em;
+    text-transform:uppercase; font-weight: 700; border: 1px solid var(--ink);
+    text-decoration: none; cursor: pointer;
+    box-shadow: 3px 3px 0 var(--accent);
+    transition: transform .12s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--accent); }
+  .btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--accent); }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; transform: none; }
+  .btn.ghost {
+    background: transparent; color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .btn.ghost:hover { background: var(--paper-2); box-shadow: 4px 4px 0 var(--ink); }
+  .btn.accent { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 3px 3px 0 var(--ink); }
+
+  /* Waiting room */
+  .waiting {
+    border: 1px solid var(--rule); padding: 28px; display: grid; gap: 16px;
+    grid-template-columns: 1fr auto; align-items: center;
+  }
+  .code-display {
+    font-family:'Fraunces', serif; font-weight: 800; font-size: clamp(56px, 10vw, 96px);
+    letter-spacing: .18em; color: var(--accent); line-height: 1;
+  }
+  .code-hint {
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing:.18em;
+    text-transform: uppercase; color: var(--muted); margin-top: 8px;
+  }
+  .waiting .status {
+    font-family:'Fraunces', serif; font-style: italic; font-size: 18px; color: var(--muted);
+    display:flex; align-items:center; gap: 10px;
+  }
+  .pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.35;transform:scale(1)} 50%{opacity:1;transform:scale(1.35)} }
+  @media (max-width: 780px) {
+    .waiting { grid-template-columns: 1fr; text-align: left; }
+  }
+
+  /* Duel: scoreboard */
+  .board {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px;
+    align-items: center; padding: 18px 0; border-bottom: 1px solid var(--rule);
+  }
+  .board .p {
+    display:flex; flex-direction:column; gap:4px; padding: 8px 12px;
+    border: 1px solid var(--rule-soft);
+  }
+  .board .p.me { border-color: var(--accent); }
+  .board .p .who {
+    font-family:'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.18em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .board .p .name {
+    font-family:'Fraunces', serif; font-size: 20px; font-weight: 700; letter-spacing: -.01em;
+  }
+  .board .p .score {
+    font-family:'Fraunces', serif; font-size: 40px; font-weight: 800; color: var(--accent);
+    line-height: 1;
+  }
+  .board .p.right { text-align: right; align-items: flex-end; }
+  .board .vs {
+    font-family:'Fraunces', serif; font-style: italic; font-size: 24px; color: var(--muted);
+  }
+  .board .p .name .badge {
+    display:inline-block; margin-left: 6px; padding: 2px 6px; font-family:'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .16em; color: var(--paper); background: var(--accent); vertical-align: middle;
+  }
+
+  .qmeta {
+    display:flex; justify-content: space-between; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.16em;
+    text-transform: uppercase; color: var(--muted); margin: 26px 0 10px;
+  }
+  .qmeta .prog {
+    height: 3px; background: var(--rule-soft); width: 200px; position: relative; overflow: hidden;
+  }
+  .qmeta .prog i { position:absolute; inset:0; background: var(--accent); transform-origin: left; transform: scaleX(0); transition: transform .35s ease; }
+
+  .question {
+    font-family:'Fraunces', serif; font-weight: 700; font-size: clamp(24px, 3.5vw, 34px);
+    line-height: 1.2; letter-spacing: -.015em; margin: 6px 0 22px;
+  }
+
+  .options { display: grid; gap: 10px; }
+  .opt {
+    display: grid; grid-template-columns: 34px 1fr auto; align-items: center;
+    gap: 14px; padding: 14px 16px;
+    background: var(--paper); border: 1px solid var(--rule); cursor: pointer;
+    font-family:'Inter', sans-serif; font-size: 15px; color: var(--ink);
+    text-align: left; transition: background .12s ease, transform .1s ease, border-color .12s ease;
+  }
+  .opt:hover { background: var(--paper-2); }
+  .opt .idx {
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.16em;
+    color: var(--muted); border: 1px solid var(--rule-soft); padding: 4px 6px; text-align: center;
+  }
+  .opt .tick {
+    font-family:'Fraunces', serif; font-style: italic; color: var(--muted); font-size: 14px;
+    min-width: 62px; text-align: right;
+  }
+  .opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.correct { border-color: var(--ok); background: var(--ok-soft); }
+  .opt.wrong   { border-color: var(--accent); background: var(--accent-soft); }
+  .opt.locked { cursor: default; }
+  .opt[disabled] { cursor: not-allowed; opacity: .8; }
+
+  .qfoot {
+    display:flex; justify-content: space-between; align-items:center; margin-top: 16px;
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing:.16em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  .explain {
+    margin-top: 18px; padding: 16px 18px; border-left: 2px solid var(--accent);
+    background: var(--paper-2); font-size: 13.5px; line-height: 1.55; color: var(--ink-soft);
+  }
+  .explain b { color: var(--ink); font-family:'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing:.18em; text-transform: uppercase; display:block; margin-bottom: 4px; }
+
+  /* End screen */
+  .verdict {
+    text-align: center; padding: 40px 0 30px;
+    display: grid; gap: 8px; place-items: center;
+  }
+  .verdict .headline {
+    font-family:'Fraunces', serif; font-weight: 800; font-size: clamp(48px, 8vw, 92px);
+    line-height: .95; letter-spacing: -.02em;
+  }
+  .verdict .headline em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .verdict .sub {
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.2em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .final {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0 8px;
+  }
+  .final .p {
+    border: 1px solid var(--rule); padding: 20px; display:flex; flex-direction:column; gap: 6px;
+  }
+  .final .p.win { border-width: 2px; border-color: var(--accent); background: var(--accent-soft); }
+  .final .p .who { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color: var(--muted); }
+  .final .p .name { font-family:'Fraunces', serif; font-weight: 700; font-size: 24px; }
+  .final .p .big { font-family:'Fraunces', serif; font-weight: 800; font-size: 56px; color: var(--accent); line-height: 1; }
+  @media (max-width: 560px) { .final { grid-template-columns: 1fr; } }
+
+  .end-actions { display:flex; gap: 12px; justify-content:center; margin: 22px 0 10px; flex-wrap: wrap; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--paper); padding: 10px 16px;
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.16em;
+    text-transform: uppercase; box-shadow: 3px 3px 0 var(--accent);
+    opacity: 0; pointer-events:none; transition: opacity .2s ease, transform .2s ease;
+    z-index: 9999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .hidden { display: none !important; }
+
+  .banner {
+    padding: 12px 16px; border: 1px dashed var(--rule-soft); background: var(--paper-2);
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:.14em;
+    text-transform: uppercase; color: var(--muted); margin: 14px 0;
+    display:flex; justify-content:space-between; align-items:center; gap: 12px;
+  }
+  .banner .link { color: var(--accent); text-decoration: none; }
+  .banner .link:hover { text-decoration: underline; }
+
+  .code-badge {
+    font-family:'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .28em;
+    padding: 6px 10px; border: 1px solid var(--rule); background: var(--paper);
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="edition left">Vol. I · SS 2026 · Nº 04</div>
+    <div class="brand">Marketing<em>&amp;</em>Sales</div>
+    <div class="edition right">
+      <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus" title="Werbung ein/aus">
+        <span class="dot" id="adsDot"></span>
+        <span id="adsLabel">Ads</span>
+      </button>
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta">Editorial Edition · Quiz-Duell</span>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Das Quiz-<em>Duell</em>.</h1>
+    <div class="lede">
+      Zwei Spieler, zehn Fragen, ein Raum. Erstelle einen Raum, schicke deinem Gegner den Code &mdash;
+      und dann entscheidet allein, wer schneller die richtige Antwort trifft. Fragen aus dem Marketing-Trainer.
+    </div>
+  </section>
+
+  <div class="rulerail">
+    <span class="dot"></span><span>Live</span>
+    <span class="sep">·</span>
+    <span>Firebase Realtime</span>
+    <span class="sep">·</span>
+    <span>2 Spieler · 10 Runden</span>
+    <span class="sep">·</span>
+    <span id="railStatus">Bereit</span>
+  </div>
+
+  <!-- ================= SCREEN 1: LOBBY ================= -->
+  <section id="screenLobby">
+    <div class="section-h">01 Raum wählen</div>
+
+    <div class="lobby">
+      <!-- Create -->
+      <div class="card">
+        <div class="kicker">Raum erstellen</div>
+        <h2>Neuen <em>Raum</em> aufmachen.</h2>
+        <p>Du bekommst einen 5-stelligen Code. Schick ihn deinem Gegner — sobald er beitritt, geht's los.</p>
+        <div class="field">
+          <label for="hostName">Dein Name</label>
+          <input id="hostName" type="text" maxlength="24" placeholder="z. B. Maiko" autocomplete="off" />
+        </div>
+        <div style="display:flex; gap:12px; margin-top:6px;">
+          <button class="btn accent" id="btnCreate">Raum erstellen &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Join -->
+      <div class="card">
+        <div class="kicker">Raum beitreten</div>
+        <h2>Einem <em>Code</em> folgen.</h2>
+        <p>Gib den Code deines Gegners ein und wähle deinen Namen. Dann startet die erste Frage automatisch.</p>
+        <div class="field">
+          <label for="joinCode">Raum-Code</label>
+          <input id="joinCode" class="code" type="text" maxlength="5" placeholder="ABCDE" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="guestName">Dein Name</label>
+          <input id="guestName" type="text" maxlength="24" placeholder="z. B. Lina" autocomplete="off" />
+        </div>
+        <div style="display:flex; gap:12px; margin-top:6px;">
+          <button class="btn" id="btnJoin">Raum beitreten &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="banner">
+      <span>Hinweis · Firebase-Konfiguration in <code>FIREBASE_CONFIG</code> im Skript setzen.</span>
+      <a class="link" href="https://console.firebase.google.com/" target="_blank" rel="noopener">Zur Firebase Console &rarr;</a>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 2: WAITING ================= -->
+  <section id="screenWaiting" class="hidden">
+    <div class="section-h">02 Warten auf Mitspieler</div>
+    <div class="waiting">
+      <div>
+        <div class="code-hint">Raum-Code &mdash; teilen</div>
+        <div class="code-display" id="roomCodeBig">— — — — —</div>
+        <div style="display:flex; gap:10px; margin-top: 12px; align-items:center;">
+          <button class="btn ghost" id="btnCopyCode">Code kopieren</button>
+          <button class="btn ghost" id="btnCancelRoom">Raum abbrechen</button>
+        </div>
+      </div>
+      <div class="status"><span class="pulse"></span><span>Warte auf zweiten Spieler …</span></div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 3: DUEL ================= -->
+  <section id="screenDuel" class="hidden">
+    <div class="board">
+      <div class="p me" id="pMe">
+        <div class="who">Du</div>
+        <div class="name" id="meName">—</div>
+        <div class="score" id="meScore">0</div>
+      </div>
+      <div class="vs">vs.</div>
+      <div class="p right" id="pOpp">
+        <div class="who">Gegner</div>
+        <div class="name" id="oppName">—</div>
+        <div class="score" id="oppScore">0</div>
+      </div>
+    </div>
+
+    <div class="qmeta">
+      <span>Frage <span id="qNum">01</span> / 10</span>
+      <span class="prog"><i id="qProg"></i></span>
+      <span id="roomBadge" class="code-badge">RAUM —</span>
+    </div>
+
+    <div class="question" id="qText">…</div>
+    <div class="options" id="qOpts"></div>
+
+    <div class="qfoot">
+      <span id="qStatus">Wähle eine Antwort</span>
+      <span id="qTimer">·</span>
+    </div>
+
+    <div class="explain hidden" id="qExplain">
+      <b>Erklärung</b>
+      <span id="qExplainText"></span>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 4: END ================= -->
+  <section id="screenEnd" class="hidden">
+    <div class="verdict">
+      <div class="sub">Runde beendet</div>
+      <div class="headline" id="verdictText">—</div>
+    </div>
+
+    <div class="final">
+      <div class="p" id="finalMe">
+        <div class="who">Du</div>
+        <div class="name" id="finalMeName">—</div>
+        <div class="big" id="finalMeScore">0</div>
+      </div>
+      <div class="p" id="finalOpp">
+        <div class="who">Gegner</div>
+        <div class="name" id="finalOppName">—</div>
+        <div class="big" id="finalOppScore">0</div>
+      </div>
+    </div>
+
+    <div class="end-actions">
+      <button class="btn accent" id="btnRematch">Noch eine Runde &rarr;</button>
+      <button class="btn ghost" id="btnClose">Raum beenden</button>
+    </div>
+
+    <div class="qfoot" style="justify-content:center; margin-top: 6px;">
+      <span id="endStatus">&nbsp;</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Strauss · Biebergem&uuml;nd</span>
+    <span>© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
+<aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
+
+<div class="toast" id="toast">…</div>
+
+<script>
+const $ = sel => document.querySelector(sel);
+
+function initTheme() {
+  const saved = localStorage.getItem("ms-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(saved || (prefersDark ? "dark" : "light"));
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("ms-theme", theme);
+  $("#themeLabel").textContent = theme === "dark" ? "Light" : "Dark";
+}
+$("#themeToggle").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : "dark";
+  const swap = () => setTheme(next);
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(swap);
+  } else {
+    swap();
+  }
+});
+
+function setAds(on) {
+  document.body.classList.toggle("ads-off", !on);
+  localStorage.setItem("ms-ads", on ? "on" : "off");
+  const label = $("#adsLabel"); if (label) label.textContent = on ? "Ads" : "Ads·off";
+  const dot = $("#adsDot"); if (dot) dot.style.background = on ? "var(--ink)" : "transparent";
+}
+(function initAdsToggle(){
+  const stored = localStorage.getItem("ms-ads");
+  setAds(stored !== "off");
+})();
+$("#adsToggle").addEventListener("click", () => {
+  const on = !document.body.classList.contains("ads-off");
+  setAds(!on);
+});
+
+const PAYPAL_AD = {
+  cls:"paypal", eyebrow:"UNTERSTÜTZUNG", hero:"☕",
+  title:"Ein Kaffee für Maiko?",
+  body:"Wenn dir die App hilft — kleine Geste, große Freude.",
+  cta:{ label:"paypal.me/maiggooo →", url:"https://paypal.me/maiggooo" },
+  foot:"PAYPAL · DANKE", mark:"♡"
+};
+const ADS = [
+  { cls:"kaffee",  eyebrow:"CAMPUS",            hero:"· · ·",                title:"Linas Kaffee",              body:"Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot:"Mo–Fr · ab 07:30",     mark:"L" },
+  { cls:"stink",   eyebrow:"DIENSTLEISTUNG",    hero:"☁ ☁ ☁",                title:"Pauls Stinke\u00adservice", body:"„Wir liefern Duft. Meistens den falschen.“",                                           foot:"Auf Anfrage",          mark:"P" },
+  { cls:"pfalz",   eyebrow:"SEIT '74",          hero:"MARKT · FASS · FLASCHE", title:"Getränke Pfalzgraf",     body:"Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.",                          foot:"Landau · Pfalz",       mark:"✦", link:"http://www.getraenke-pfalzgraf.de/" },
+  { cls:"kirche",  eyebrow:"SONNTAGS · 10 UHR",  hero:"✝",                   title:"Kians Gottesdienst",        body:"Predigt, Musik, Kaffee danach. Kommt zahlreich.",                                      foot:"Eintritt frei",        mark:"K" },
+  { cls:"reise",   eyebrow:"REISEBÜRO",          hero:"✈",                   title:"Konsis Reiseplaner",        body:"Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.",                   foot:"Buchung · 24/7",       mark:"→" },
+  { cls:"schweig", eyebrow:"PREMIUM STILLE",     hero:". . .",               title:"Katalinas Schweigen.",      body:"Der Schweigeservice. Wir sagen nichts. Garantiert.",                                   foot:"Diskretion inklusive", mark:"—" },
+  { cls:"gastro",  eyebrow:"CATERING",           hero:"G · I · G",           title:"Mats Gastro",               body:"Für Events, Meetings und den echten Hunger nach der Vorlesung.",                       foot:"Anfrage per DM",       mark:"M" },
+  { cls:"minion",  eyebrow:"LIVE-PERFORMANCE",   hero:"BELLO!",              title:"Selinas Minion Impressionen", body:"Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.",         foot:"Buchbar für Events",   mark:"S" }
+];
+
+function renderAd(slotEl, ad) {
+  const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
+  const inner = `
+    <div class="ad ad--${ad.cls}">
+      <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
+      ${ad.hero ? `<div class="ad-hero">${ad.hero}</div>` : ``}
+      <div class="ad-title">${ad.title}</div>
+      <div class="ad-body">${ad.body}</div>
+      ${ctaHTML}
+      <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
+    </div>`;
+  slotEl.innerHTML = ad.link
+    ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>`
+    : inner;
+  requestAnimationFrame(() => {
+    const el = slotEl.querySelector('.ad');
+    if (el) el.classList.add('show');
+  });
+}
+function swapAd(slotEl, ad) {
+  const current = slotEl.querySelector('.ad');
+  if (!current) { renderAd(slotEl, ad); return; }
+  current.classList.remove('show');
+  setTimeout(() => renderAd(slotEl, ad), 380);
+}
+let adTick = 0;
+function cycleAds() {
+  const rightSlot = document.getElementById('adSlotRight');
+  if (!rightSlot) return;
+  adTick = (adTick + 1) % ADS.length;
+  swapAd(rightSlot, ADS[adTick]);
+}
+function initAds() {
+  const leftSlot  = document.getElementById('adSlotLeft');
+  const rightSlot = document.getElementById('adSlotRight');
+  if (!leftSlot || !rightSlot) return;
+  renderAd(leftSlot,  PAYPAL_AD);
+  renderAd(rightSlot, ADS[0]);
+  adTick = 0;
+  setInterval(cycleAds, 10000);
+}
+
+initTheme();
+initAds();
+</script>
+
+<!-- Firebase (compat, works via CDN in plain HTML) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+/* =========================================================
+   FIREBASE-CONFIG
+   ---------------------------------------------------------
+   Ersetze die Platzhalter mit deinen Werten aus:
+   Firebase Console → Projekteinstellungen → Deine App (Web)
+   Wichtig: Realtime Database aktivieren + Regeln setzen
+   (für Test/Prototyp z.B.:
+     { "rules": { ".read": true, ".write": true } }
+   ).
+========================================================= */
+const FIREBASE_CONFIG = {
+  apiKey:            "DEIN_API_KEY",
+  authDomain:        "DEIN_PROJECT.firebaseapp.com",
+  databaseURL:       "https://DEIN_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "DEIN_PROJECT",
+  storageBucket:     "DEIN_PROJECT.appspot.com",
+  messagingSenderId: "0000000000",
+  appId:             "1:0000000000:web:0000000000000000"
+};
+
+/* =========================================================
+   FRAGEN-POOL (aus dem Marketing-Trainer übernommen)
+========================================================= */
+const TOPICS = [
+  {
+    id: "k1", title: "Grundlagen des Marketings", desc: "Kotlers 5 Konzepte, duales Führungskonzept, 4Ps/7Ps, Marketing Myopia.",
+    questions: [
+      { q: "Welches Konzept nach Kotler betont neben Kundenzentrierung ausdrücklich auch interne Integration, Beziehungsorientierung und Performance-Messung?",
+        options: ["Marketingkonzept", "Produktkonzept", "Holistisches Marketingkonzept", "Verkaufskonzept", "Societal-Marketing-Konzept"],
+        correct: 2,
+        explain: "Das holistische Marketingkonzept vereint vier Dimensionen: internes, integriertes, beziehungsorientiertes und performance-basiertes Marketing. Das klassische Marketingkonzept beschränkt sich auf die Outside-in-Ausrichtung am Kunden." },
+      { q: "Das duale Führungskonzept des Marketings beschreibt Marketing als …",
+        options: ["Zentrale und dezentrale Organisationsform", "Denkhaltung und betriebliche Funktion", "Strategisches und operatives Marketing", "B2B- und B2C-Ausrichtung", "Analytisches und operatives CRM"],
+        correct: 1,
+        explain: "Duales Konzept: Marketing ist Denkhaltung (Marktorientierung aller Bereiche) UND Funktion (Instrumente wie 4Ps). Nur zusammen entfalten sie Wirkung." },
+      { q: "'Marketing Myopia' (Levitt) bezeichnet …",
+        options: ["Zu enges Werbebudget", "Produktfixierung statt Nutzenorientierung", "Übertriebene Marktforschung", "Fehlende Digitalisierung", "Reine Preisorientierung im Wettbewerb"],
+        correct: 1,
+        explain: "Levitt: Unternehmen scheitern, wenn sie sich über ihr Produkt statt über den gelösten Kundennutzen definieren (Bahn = Transport, nicht Schiene)." },
+      { q: "Welche Ps ergänzen die klassischen 4Ps zu den 7Ps im Dienstleistungsmarketing? (Mehrfachauswahl)",
+        options: ["People", "Process", "Physical Evidence", "Positioning", "Packaging", "Perception"],
+        correct: [0, 1, 2],
+        explain: "Booms/Bitner erweitern für Dienstleistungen um People (Mitarbeiter), Process (Serviceablauf) und Physical Evidence (sichtbare Hinweise wie Filiale, Website, Uniformen). Positioning, Packaging und Perception sind KEINE eigenständigen Ps im 7P-Modell." },
+      { q: "Ein Unternehmen in einem Markt mit Nachfrageüberhang setzt konsequent auf Kostensenkung, Massenproduktion und breite Verfügbarkeit. Welches Kotler-Konzept liegt zugrunde?",
+        options: ["Produktkonzept", "Marketingkonzept", "Verkaufskonzept", "Produktionskonzept", "Holistisches Marketingkonzept"],
+        correct: 3,
+        explain: "Produktionskonzept: Fokus auf Effizienz, niedrige Kosten und flächendeckende Verfügbarkeit. Typisch für Nachfrageüberhang und homogene Massengüter." },
+      { q: "Welche der folgenden zählen zu Kotlers fünf Grundkonzepten des Marketings? (Mehrfachauswahl)",
+        options: ["Produktionskonzept", "Produktkonzept", "Verkaufskonzept", "Marketingkonzept", "Holistisches Marketingkonzept", "Preiskonzept", "Distributionskonzept"],
+        correct: [0, 1, 2, 3, 4],
+        explain: "Kotlers fünf Konzepte: Produktion (Effizienz), Produkt (Qualität), Verkauf (aggressives Pushen), Marketing (Kundenbedürfnisse), Holistisch (integrierte Perspektive). Preis und Distribution sind Instrumente der 4Ps, keine Grundkonzepte." },
+      { q: "Ein Unternehmen ist von der überlegenen Qualität seines Produkts überzeugt und investiert vor allem in technische Weiterentwicklung. Es riskiert dabei …",
+        options: ["Skimming-Fehler", "Marketing Myopia", "Segmentierungsfalle", "Positionierungslücke", "Kanalkonflikt"],
+        correct: 1,
+        explain: "Klassisches Produktkonzept-Risiko: Fokus auf 'besseres Produkt' statt auf tatsächlich gelösten Kundennutzen → Marketing Myopia (Levitt). Der Kunde will keinen Bohrer, sondern ein Loch." },
+      { q: "Welche der vier klassischen 4Ps beschreibt am ehesten Rabattaktionen und Zahlungsbedingungen?",
+        options: ["Product", "Price", "Place", "Promotion", "People"],
+        correct: 1,
+        explain: "Price umfasst nicht nur den Listenpreis, sondern auch Rabatte, Zahlungs- und Kreditbedingungen sowie Preisdifferenzierung." },
+      { q: "Welche Aussage zum Verkaufskonzept trifft am besten zu?",
+        options: ["Es setzt am Kundenbedürfnis an", "Es funktioniert nur bei knappem Angebot", "Es setzt aggressive Verkaufs- und Werbemaßnahmen ein, um vorhandene Ware abzusetzen", "Es ist identisch mit dem Marketingkonzept", "Es basiert auf Beziehungsmarketing"],
+        correct: 2,
+        explain: "Verkaufskonzept (Inside-out): Ware ist da, Kunde soll überzeugt werden. Typisch für Überkapazitäten und wenig differenzierte Produkte. Der Blick geht vom Unternehmen zum Kunden, nicht umgekehrt." },
+      { q: "Das Societal-Marketing-Konzept ergänzt das klassische Marketingkonzept um …",
+        options: ["Kostensenkung", "Gesellschaftliches Wohlergehen und Nachhaltigkeit", "Kundendatennutzung", "Kanaldiversifikation", "Preisdifferenzierung"],
+        correct: 1,
+        explain: "Societal Marketing: neben Kundenbedürfnis und Unternehmensziel wird auch das langfristige Wohl der Gesellschaft (Umwelt, Ethik, soziale Verantwortung) einbezogen." },
+      { q: "Welche der folgenden Aussagen zur Marktorientierung als Denkhaltung ist FALSCH?",
+        options: ["Alle Bereiche des Unternehmens sollen sich am Markt ausrichten", "Marktorientierung betrifft nur die Marketingabteilung", "Sie ist Grundlage des Marketingkonzepts", "Sie erfordert Informationsflüsse über Kundenbedürfnisse", "Sie ist Voraussetzung für das duale Marketingverständnis"],
+        correct: 1,
+        explain: "Marktorientierung ist eine unternehmensweite Denkhaltung — F&E, Produktion, Vertrieb, Service. Genau darin liegt der Kern des dualen Konzepts: Marketing als Führungsphilosophie UND Funktion." },
+      { q: "Welche Reihenfolge entspricht der historischen Entwicklung der Kotler-Konzepte (grob)?",
+        options: ["Marketing → Verkauf → Produktion → Produkt → Holistisch", "Produktion → Produkt → Verkauf → Marketing → Holistisch", "Produkt → Produktion → Marketing → Verkauf → Holistisch", "Holistisch → Marketing → Verkauf → Produktion → Produkt", "Verkauf → Produktion → Marketing → Produkt → Holistisch"],
+        correct: 1,
+        explain: "Historische Evolution: Produktion (Industrialisierung) → Produkt (Qualitätsfokus) → Verkauf (Überkapazitäten) → Marketing (Kundenorientierung) → Holistisch (integriert, digital, gesellschaftlich)." },
+      { q: "Welche Kernaufgaben umfasst das operative Marketing (Marketing als Funktion)? (Mehrfachauswahl)",
+        options: ["Produktpolitik", "Preispolitik", "Distributionspolitik", "Kommunikationspolitik", "Definition der Unternehmensvision", "Bilanzierung", "Steuererklärung"],
+        correct: [0, 1, 2, 3],
+        explain: "Operatives Marketing = die 4Ps (Product, Price, Place, Promotion). Vision, Bilanz und Steuern gehören in andere Unternehmensfunktionen." }
+    ]
+  },
+  {
+    id: "k2", title: "Marktforschung & Insights", desc: "MIS-Quellen, quantitativ vs. qualitativ, Marketing Intelligence.",
+    questions: [
+      { q: "Die drei Hauptquellen des Marketing-Informationssystems (MIS) sind:",
+        options: ["Werbung, Vertrieb, Public Relations", "Interne Daten, Marketing Intelligence, Marktforschung", "CRM, ERP und Data Warehouse", "Primär-, Sekundär- und Tertiärforschung", "Kunde, Wettbewerb und Handel"],
+        correct: 1,
+        explain: "MIS = interne Daten (z.B. CRM, Absatz) + Marketing Intelligence (laufende externe Beobachtung) + gezielte Marktforschung (projektbezogene Studien)." },
+      { q: "Ein Unternehmen führt strukturierte Online-Umfragen mit 2.000 Teilnehmern durch, um die Markenbekanntheit zu messen. Welche Methodenzuordnung ist korrekt?",
+        options: ["Qualitativ, explorativ", "Quantitativ, deskriptiv", "Qualitativ, deskriptiv", "Quantitativ, kausal", "Sekundärforschung"],
+        correct: 1,
+        explain: "Große Fallzahl, standardisierter Fragebogen, Messung eines Ist-Zustandes → quantitativ und deskriptiv. Explorativ wäre eine offene Voruntersuchung, kausal ein Experiment mit Wirkungsprüfung." },
+      { q: "Was unterscheidet Marketing Intelligence am deutlichsten von klassischer Marktforschung?",
+        options: ["Höhere Erhebungskosten pro Datenpunkt", "Laufende, kontinuierliche Marktbeobachtung statt projektbezogener Studie", "Nur qualitative Methoden", "Ausschließlich interne Datenquellen", "Regulierte Panel-Methodik"],
+        correct: 1,
+        explain: "Marketing Intelligence beobachtet das Marktumfeld laufend (Wettbewerb, Trends, Handel, Medien) — Marktforschung untersucht gezielt eine konkrete Fragestellung." },
+      { q: "Ein Panel zeichnet sich aus durch:",
+        options: ["Einmalige Großbefragung", "Wiederholte Messung im gleichen Teilnehmerkreis", "Ausschließliche Laborbeobachtung", "Qualitative Gruppendiskussion", "Anonyme Online-Blitzumfrage"],
+        correct: 1,
+        explain: "Panel = stabile Teilnehmergruppe, wiederholte Messungen über die Zeit → erlaubt Trend- und Veränderungsanalysen (z.B. GfK-Haushaltspanel)." },
+      { q: "Welche der folgenden Methoden zählen zur QUALITATIVEN Marktforschung? (Mehrfachauswahl)",
+        options: ["Tiefeninterview", "Fokusgruppe / Gruppendiskussion", "Ethnografische Beobachtung", "Repräsentative Online-Umfrage", "Panel-Erhebung", "Conjoint-Analyse"],
+        correct: [0, 1, 2],
+        explain: "Qualitativ: kleine Fallzahl, offen, explorativ (Tiefeninterview, Fokusgruppe, Ethnografie). Repräsentative Umfragen, Panels und Conjoint-Analyse sind quantitativ." },
+      { q: "Ein Experiment mit Kontroll- und Testgruppe dient primär der …",
+        options: ["Deskriptiven Beschreibung", "Explorativen Voruntersuchung", "Kausalen Wirkungsprüfung", "Sekundärdatenerhebung", "Segmentierung"],
+        correct: 2,
+        explain: "Kausale Marktforschung untersucht Ursache-Wirkungs-Beziehungen (z.B. Wirkt Werbespot A stärker als B?) — nur Experimente erlauben belastbare Kausalaussagen." },
+      { q: "Sekundärforschung ist gekennzeichnet durch …",
+        options: ["Neue Erhebung im Feld", "Nutzung bereits vorhandener Daten aus internen oder externen Quellen", "Ausschließlich qualitative Methoden", "Ausschließlich B2B-Ausrichtung", "Verwendung von KI-Agenten"],
+        correct: 1,
+        explain: "Sekundärforschung: existierende Daten (Studien, Statistiken, interne Reports) werden neu ausgewertet. Günstig, schnell — aber selten passgenau. Primärforschung erhebt neu." },
+      { q: "Welche Aussage zur Repräsentativität einer Stichprobe ist korrekt?",
+        options: ["Sie wächst automatisch mit der Fallzahl", "Sie hängt von passender Struktur und zufälliger Auswahl ab", "Sie ist bei qualitativen Studien wichtiger als bei quantitativen", "Sie ist bei Panels unerheblich", "Sie wird nur bei B2C-Studien geprüft"],
+        correct: 1,
+        explain: "Repräsentativität = Stichprobenstruktur spiegelt die Grundgesamtheit + zufallsbasierte Auswahl. Nur so lassen sich Ergebnisse auf den Gesamtmarkt hochrechnen. Große Fallzahl allein reicht nicht." },
+      { q: "Welche Datenquellen zählen zu den INTERNEN Datenquellen des MIS? (Mehrfachauswahl)",
+        options: ["CRM-System", "Absatz- und Umsatzstatistiken", "Reklamationsdaten", "GfK-Haushaltspanel", "Branchenstudie eines Marktforschungsinstituts", "Reichweitendaten aus Werbeträgern"],
+        correct: [0, 1, 2],
+        explain: "Intern = im Unternehmen entstehende Daten (CRM, ERP, Absatz, Beschwerden). Panels, Branchenstudien und Reichweiten stammen aus externen Quellen (Marketing Intelligence / Marktforschung)." },
+      { q: "Ein Insight ist mehr als eine bloße Marktinformation, weil er …",
+        options: ["Ausschließlich quantitativ vorliegt", "Ein tiefer, handlungsleitender Kundenerkenntnis-Kern ist", "Eine bestätigte Hypothese aus einem Experiment ist", "Immer aus einer Panel-Studie stammt", "Nur aus KI-Analysen gewonnen werden kann"],
+        correct: 1,
+        explain: "Insight = 'Aha' — ein tieferes Verständnis eines Motivs, Konflikts oder Bedürfnisses, das Handeln (Positionierung, Produkt, Kommunikation) auslöst. Reine Zahlen sind Daten, kein Insight." },
+      { q: "Welche Vorteile bietet qualitative Marktforschung? (Mehrfachauswahl)",
+        options: ["Tiefe Motivforschung", "Explorative Ideenentwicklung", "Detaillierte Sprachbilder / Wording", "Statistische Repräsentativität", "Signifikanztests", "Präzise Marktanteilsmessung"],
+        correct: [0, 1, 2],
+        explain: "Qualitativ liefert Tiefe, Motive und Sprache der Zielgruppe. Repräsentativität, Signifikanz und exakte Marktanteile sind Stärken der quantitativen Forschung." },
+      { q: "Ein Unternehmen möchte VOR einer Produkteinführung offene Verbraucherreaktionen zu einem Konzeptprototyp sammeln. Welche Methode passt am besten?",
+        options: ["Repräsentative Online-Umfrage mit 3.000 TN", "Fokusgruppe mit 8 Zielkunden", "Panel-Auswertung der letzten 5 Jahre", "Kausalexperiment mit Kontrollgruppe", "Sekundäranalyse öffentlicher Statistiken"],
+        correct: 1,
+        explain: "Explorative Phase mit offenen Fragen und Reaktionen → qualitative Methode, klassisch Fokusgruppe. Quantitative Tests folgen später zur Absicherung." },
+      { q: "Der klassische Ablauf eines Marktforschungsprojekts umfasst grob …",
+        options: ["Auswertung → Problemdefinition → Erhebung", "Problemdefinition → Untersuchungsdesign → Erhebung → Auswertung → Präsentation", "Erhebung → Präsentation → Problemdefinition", "Segmentierung → Targeting → Positionierung", "Awareness → Consideration → Purchase"],
+        correct: 1,
+        explain: "Fünf Schritte: (1) Problem klären, (2) Design festlegen (Methoden, Stichprobe), (3) Daten erheben, (4) auswerten, (5) Ergebnisse handlungsorientiert präsentieren." }
+    ]
+  },
+  {
+    id: "k3", title: "Consumer Behavior & Buying Center", desc: "5 Rollen, B2B vs. B2C, S-O-R-Modell.",
+    questions: [
+      { q: "Welche Rollen gehören zum Buying Center nach Webster/Wind? (Mehrfachauswahl)",
+        options: ["Initiator", "Influencer", "Decider", "Buyer", "User", "Gatekeeper", "Sponsor", "Auditor"],
+        correct: [0, 1, 2, 3, 4, 5],
+        explain: "Sechs Rollen: Initiator (stößt an), Influencer (beeinflusst mit Fachwissen), Decider (entscheidet formal), Buyer (beschafft), User (nutzt), Gatekeeper (Info-Filter). Sponsor und Auditor sind KEINE Rollen des Modells." },
+      { q: "Ein Handwerksbetrieb bestellt bei Strauss Schutzhelme. Der Meister auf der Baustelle, der den Helm täglich trägt, entspricht welcher Buying-Center-Rolle?",
+        options: ["Initiator", "Influencer", "Decider", "Buyer", "User"],
+        correct: 4,
+        explain: "User = tatsächlicher Nutzer. Passform, Tragekomfort und Sichtbarkeit sind seine Kernkriterien — er beeinflusst die Auswahl indirekt stark, entscheidet aber selten formal." },
+      { q: "Welche Aussage zum Unterschied B2B vs. B2C trifft am besten zu?",
+        options: ["B2C-Entscheidungen sind multipersonaler als B2B", "B2B-Kaufprozesse sind meist multipersonal, rationaler und länger", "B2B-Entscheidungen sind stärker emotional geprägt", "B2C-Käufe erfordern längere Bewertungszyklen", "B2B verzichtet in der Regel auf Segmentierung"],
+        correct: 1,
+        explain: "B2B: multipersonale Buying Center, formalisierte Prozesse, sachlich/rational, lange Zyklen. B2C: meist individuell/dyadisch, kürzer, stärker emotional getrieben." },
+      { q: "Im S-O-R-Modell steht das 'O' für:",
+        options: ["Output", "Objekt", "Organismus", "Optimierung", "Operation"],
+        correct: 2,
+        explain: "S-O-R: Stimulus → Organismus (nicht beobachtbare innere Prozesse wie Motivation, Wahrnehmung, Einstellung — die 'Black Box') → Response. Erweiterung des reinen S-R-Modells." },
+      { q: "Welcher Faktor zählt NICHT zu den vier klassischen Einflussgruppen auf das Konsumentenverhalten nach Kotler?",
+        options: ["Kulturelle Faktoren", "Soziale Faktoren", "Persönliche Faktoren", "Psychologische Faktoren", "Geografische Faktoren"],
+        correct: 4,
+        explain: "Kotler unterscheidet vier Gruppen: kulturell, sozial, persönlich, psychologisch. Geografie ist ein Segmentierungskriterium, aber kein eigener Einflussfaktor auf das Verhalten." },
+      { q: "Die Assistentin der Einkaufsleitung leitet Angebote weiter — oder eben nicht. Welche Rolle im Buying Center ist das?",
+        options: ["Initiator", "Buyer", "Gatekeeper", "Decider", "User"],
+        correct: 2,
+        explain: "Gatekeeper filtern und steuern den Informationsfluss zum Buying Center. Vorzimmer, Assistenz, Einkaufsabteilungen können Anbieter gezielt fördern oder blockieren." },
+      { q: "Zu den PSYCHOLOGISCHEN Einflussfaktoren nach Kotler zählen: (Mehrfachauswahl)",
+        options: ["Motivation", "Wahrnehmung", "Lernen", "Einstellung", "Kultur", "Familie", "Alter"],
+        correct: [0, 1, 2, 3],
+        explain: "Psychologisch: Motivation, Wahrnehmung, Lernen, Einstellung/Überzeugung. Kultur = kulturell, Familie = sozial, Alter = persönlich." },
+      { q: "Kaufverhalten mit hohem Involvement und großen wahrgenommenen Unterschieden führt nach Kotler zu welchem Kauftyp?",
+        options: ["Habitualisiertes Kaufverhalten", "Dissonanzminderndes Kaufverhalten", "Komplexes Kaufverhalten", "Abwechslungsuchendes Kaufverhalten", "Impulsives Kaufverhalten"],
+        correct: 2,
+        explain: "Kotlers Matrix: Hohes Involvement + große Unterschiede → komplex (z.B. Auto). Hohes Involv. + wenig Unterschiede → dissonanzmindernd. Niedriges Involv. + wenig Unterschiede → habitualisiert. Niedriges Involv. + große Unterschiede → abwechslungssuchend." },
+      { q: "Der klassische Kaufentscheidungsprozess (Kotler) umfasst fünf Phasen. Welche Reihenfolge stimmt?",
+        options: ["Bedürfniserkennung → Informationssuche → Bewertung → Kaufentscheidung → Nachkaufverhalten", "Informationssuche → Bedürfniserkennung → Kauf → Bewertung → Loyalität", "Awareness → Interest → Desire → Action → Retention", "Bedürfnis → Kauf → Wiederkauf → Empfehlung → Bindung", "Motivation → Wahrnehmung → Einstellung → Handlung → Reflexion"],
+        correct: 0,
+        explain: "Fünf Phasen: (1) Bedürfnis erkennen, (2) Informationen suchen, (3) Alternativen bewerten, (4) Kaufentscheidung, (5) Nachkaufverhalten (Zufriedenheit, Dissonanz, Wiederkauf)." },
+      { q: "Welche Aussage zum Nachkaufverhalten ist korrekt?",
+        options: ["Es ist Marketing-irrelevant, weil der Kauf schon erfolgt ist", "Kognitive Dissonanz kann durch Nachkommunikation reduziert werden", "Es betrifft nur B2B-Käufe", "Es ist identisch mit der Bewertung vor dem Kauf", "Es endet automatisch nach 30 Tagen"],
+        correct: 1,
+        explain: "Nach dem Kauf zweifelt der Kunde oft ('War die Wahl richtig?'). Marken federn diese Dissonanz durch Bestätigungskommunikation, Service, Beipacktexte, Community — sichert Wiederkauf und Empfehlung." },
+      { q: "Welche der folgenden gehören zu den SOZIALEN Einflussfaktoren? (Mehrfachauswahl)",
+        options: ["Familie", "Referenzgruppen", "Rollen und Status", "Beruf", "Persönlichkeit", "Wahrnehmung"],
+        correct: [0, 1, 2],
+        explain: "Sozial: Familie, Referenzgruppen (Freunde, Kollegen, Meinungsführer), Rollen/Status. Beruf und Persönlichkeit sind persönliche, Wahrnehmung ist psychologischer Faktor." },
+      { q: "Beim habitualisierten Kaufverhalten dominiert vor allem …",
+        options: ["Umfangreiche Alternativenprüfung", "Routine und Gewohnheit bei niedrigem Involvement", "Emotionale Impulskäufe", "Ausgeprägte Informationssuche", "Multipersonale Entscheidung"],
+        correct: 1,
+        explain: "Habitualisiert: geringes Risiko, geringes Interesse, kaum Alternativenprüfung → Marken profitieren von Wiedererkennung und Verfügbarkeit (Salt, Zahnpasta, Kaffee)." },
+      { q: "Ein zentraler Unterschied zwischen B2B- und B2C-Segmentierungskriterien ist:",
+        options: ["B2B nutzt keine Segmentierung", "B2B setzt zusätzlich firmenbezogene Kriterien wie Branche, Größe, Kaufverhalten ein", "B2C nutzt firmografische Kriterien", "B2B segmentiert nur nach Preis", "B2C und B2B nutzen identische Kriterien"],
+        correct: 1,
+        explain: "B2B ergänzt die B2C-Kriterien um firmografische (Branche, Umsatz, Mitarbeiterzahl, Region) und verhaltensbezogene Merkmale (Bestellfrequenz, Kaufprozess-Reife)." }
+    ]
+  },
+  {
+    id: "k4", title: "Customer Experience & Journey", desc: "Journey-Phasen, Touchpoints, Schmitts 5 Erlebnisdimensionen.",
+    questions: [
+      { q: "Welche Phasenfolge beschreibt die erweiterte Customer Journey?",
+        options: ["Attention → Interest → Desire → Action → Satisfaction", "Awareness → Consideration → Purchase → Retention → Advocacy", "Search → Compare → Buy → Use → Recommend", "Discover → Learn → Try → Buy → Loyal", "Segment → Target → Position → Purchase → Retention"],
+        correct: 1,
+        explain: "Die Standard-Journey reicht von der ersten Wahrnehmung über Erwägung und Kauf bis zu Bindung und aktiver Weiterempfehlung. Jede Phase hat eigene Touchpoints und KPIs." },
+      { q: "Welche Dimensionen gehören zu Schmitts fünf Erlebnisdimensionen (Customer Experience)? (Mehrfachauswahl)",
+        options: ["Sense", "Feel", "Think", "Act", "Relate", "Trust", "Learn", "Buy"],
+        correct: [0, 1, 2, 3, 4],
+        explain: "Schmitt: Sense (sinnlich), Feel (emotional), Think (kognitiv), Act (verhaltensbezogen), Relate (sozial/Zugehörigkeit). Trust, Learn und Buy sind KEINE eigenständigen Dimensionen des Modells." },
+      { q: "Strauss lässt Kunden im Showroom Workwear anfassen und anprobieren. Welche Schmitt-Dimension wird primär angesprochen?",
+        options: ["Think", "Relate", "Sense", "Act", "Feel"],
+        correct: 2,
+        explain: "Sense = sinnliche Wahrnehmung (Materialhaptik, Farben, Verarbeitung). Der direkte physische Kontakt aktiviert diese Ebene am stärksten." },
+      { q: "Ein Touchpoint bezeichnet:",
+        options: ["Ausschließlich digitale Kanäle", "Jeden Kontaktpunkt Marke ↔ Kunde", "Nur den Point-of-Sale", "Ein Datenfeld im CRM-System", "Eine Bewertungsstufe im NPS"],
+        correct: 1,
+        explain: "Touchpoints umfassen alle Berührungen — Werbung, Website, Katalog, Callcenter, Rechnung, Verpackung, Empfehlung. Ganzheitliche Steuerung ist Kern der CX." },
+      { q: "Ein Strauss-Kunde postet stolz sein neues Outfit auf LinkedIn und markiert die Marke. Welche Schmitt-Dimension steht im Vordergrund?",
+        options: ["Sense", "Feel", "Think", "Act", "Relate"],
+        correct: 4,
+        explain: "Relate = soziale Identität und Zugehörigkeit zu einer Community/Gruppe. Das öffentliche Zeigen und Markieren signalisiert genau diese Zugehörigkeit." },
+      { q: "Ein Kunde ist begeistert von einer cleveren Konfigurator-Funktion, die alles einfacher macht. Welche Schmitt-Dimension wird primär angesprochen?",
+        options: ["Sense", "Feel", "Think", "Act", "Relate"],
+        correct: 2,
+        explain: "Think = kognitiv/intellektuell. Wenn der Kunde eine Lösung als klug, elegant oder problemlösend erlebt, ist die Denk-Dimension aktiviert." },
+      { q: "Welche der folgenden zählen zu den zentralen KPIs der Customer Experience? (Mehrfachauswahl)",
+        options: ["Net Promoter Score (NPS)", "Customer Satisfaction (CSAT)", "Customer Effort Score (CES)", "Cost per Click (CPC)", "Return on Ad Spend (ROAS)", "Bruttomarge"],
+        correct: [0, 1, 2],
+        explain: "CX-KPIs messen Erlebnisqualität und Loyalität: NPS (Weiterempfehlung), CSAT (Zufriedenheit), CES (Anstrengung). CPC/ROAS sind Media-KPIs, Bruttomarge ist Finanz-KPI." },
+      { q: "Ein 'Moment of Truth' ist:",
+        options: ["Der Moment, in dem eine Kampagne gestartet wird", "Ein besonders erlebnisrelevanter Kontaktpunkt, der die Beziehung prägt", "Ein Marktforschungsergebnis mit hoher Signifikanz", "Ein Preisnachlass in der Abschlussphase", "Ein KI-generierter Content-Snippet"],
+        correct: 1,
+        explain: "Moments of Truth (P&G/Google): entscheidende Erlebnisspitzen (z.B. erster Eindruck, Auspacken, erste Nutzung, Beschwerde). Diese Momente wirken überproportional auf CX und Loyalität." },
+      { q: "Was zeichnet einen guten Touchpoint-Plan aus?",
+        options: ["Er nutzt möglichst viele Kanäle gleichzeitig", "Er wählt gezielte Touchpoints je Journey-Phase mit klarer Botschaft und Wirkung", "Er ist ausschließlich digital", "Er verzichtet auf Datenintegration", "Er wird nur einmalig pro Jahr überprüft"],
+        correct: 1,
+        explain: "Guter Touchpoint-Plan: phasengerecht (Awareness ≠ Retention), botschaftskonsistent, messbar, iterativ optimiert. Reichweite allein hilft ohne Passung wenig." },
+      { q: "Der Unterschied Customer Experience vs. Customer Service liegt darin, dass CX …",
+        options: ["Nur nach dem Kauf greift", "Das gesamte Kundenerlebnis über alle Touchpoints und Phasen umfasst, nicht nur den Service", "Kein Bestandteil der Kundenbindung ist", "Ausschließlich digital ist", "Nur im B2B relevant ist"],
+        correct: 1,
+        explain: "CX = ganzheitlich: vor, während, nach dem Kauf, über alle Kanäle. Service ist EIN Baustein davon (typischerweise Support/Reklamation)." },
+      { q: "Welche Aussagen zur Customer Journey sind korrekt? (Mehrfachauswahl)",
+        options: ["Sie bildet den Kundenweg über verschiedene Touchpoints ab", "Sie hilft, Erlebnislücken (Pain Points) zu identifizieren", "Sie ist immer identisch für alle Kundensegmente", "Sie unterscheidet oft mehrere Phasen mit unterschiedlichen KPIs", "Sie ist ein rein internes Prozessdiagramm ohne Kundensicht"],
+        correct: [0, 1, 3],
+        explain: "Journey = Kundensicht auf Kontaktpunkte und Erlebnisse. Segmentspezifisch (Personas), phasenbezogen, dient Pain-Point-Analyse und Optimierung — kein internes Prozessdiagramm." },
+      { q: "Die Advocacy-Phase in der Customer Journey ist erreicht, wenn …",
+        options: ["Der Kunde die Marke erstmals wahrnimmt", "Der Kunde aktiv weiterempfiehlt und zur Marke steht", "Der Kunde erstmals kauft", "Der Kunde die Marke vergleicht", "Der Kunde die Marke verlässt"],
+        correct: 1,
+        explain: "Advocacy = aktive Fürsprache, Bewertungen, Empfehlungen. Höchste Loyalitätsstufe — Kunden werden zu Markenbotschaftern (relevant für NPS und Referral-KPIs)." }
+    ]
+  },
+  {
+    id: "k5", title: "Strategie: STP · Ansoff · Porter · BCG", desc: "Segmentierung, CLV, Wachstums- und Wettbewerbsstrategien.",
+    questions: [
+      { q: "STP steht für:",
+        options: ["Strategy · Tactics · Planning", "Segmentation · Targeting · Positioning", "Strengths · Threats · Positioning", "Sales · Trade · Promotion", "Service · Trust · Price"],
+        correct: 1,
+        explain: "STP ist das strategische Grundgerüst: Markt in Segmente teilen → Ziel-Segment(e) wählen → klare Positionierung im Kopf des Kunden verankern." },
+      { q: "Welche zählen zu den klassischen Segmentierungskriterien im B2C? (Mehrfachauswahl)",
+        options: ["Demografisch", "Geografisch", "Psychografisch", "Verhaltensbezogen", "Ideografisch", "Etymologisch"],
+        correct: [0, 1, 2, 3],
+        explain: "Die vier Standardkriterien: demografisch (Alter, Einkommen), geografisch (Region, Klima), psychografisch (Werte, Lifestyle), verhaltensbezogen (Nutzung, Loyalität). Ideografisch und etymologisch sind keine Segmentierungsdimensionen." },
+      { q: "In der Ansoff-Matrix bedeutet 'Marktentwicklung':",
+        options: ["Neues Produkt, bestehender Markt", "Bestehendes Produkt, neuer Markt", "Neues Produkt, neuer Markt", "Bestehendes Produkt, bestehender Markt", "Rückzug aus dem Markt"],
+        correct: 1,
+        explain: "Ansoff: Marktdurchdringung (alt/alt), Marktentwicklung (alt/neu — z.B. Strauss geht in neues Land), Produktentwicklung (neu/alt), Diversifikation (neu/neu)." },
+      { q: "In der BCG-Matrix ist ein 'Star' definiert als:",
+        options: ["Hoher Marktanteil, niedriges Marktwachstum", "Hoher Marktanteil, hohes Marktwachstum", "Niedriger Marktanteil, hohes Marktwachstum", "Niedriger Marktanteil, niedriges Marktwachstum", "Neu am Markt eingeführt"],
+        correct: 1,
+        explain: "Stars: hohes Wachstum + hoher relativer Marktanteil → investieren. Cash Cows finanzieren, Question Marks selektiv entwickeln, Poor Dogs abbauen." },
+      { q: "Porters drei generische Wettbewerbsstrategien lauten:",
+        options: ["Kostenführerschaft · Differenzierung · Fokus", "Skimming · Penetration · Bündelung", "Push · Pull · Profil", "Direkt · Indirekt · Hybrid", "Awareness · Interest · Action"],
+        correct: 0,
+        explain: "Porter: entweder Kostenführer, einzigartiger Anbieter (Differenzierung — Strauss-Positionierung!) oder klarer Nischen-Fokus. Wer 'stuck in the middle' ist, verliert." },
+      { q: "Der Customer Lifetime Value (CLV) misst:",
+        options: ["Umsatz des ersten Kaufs", "Abgezinster Deckungsbeitrag über die gesamte Kundenbeziehung", "Aktueller Marktanteil eines Segments", "Werbebudget pro Kunde und Jahr", "Preiselastizität eines Kundensegments"],
+        correct: 1,
+        explain: "CLV = Barwert aller künftigen Deckungsbeiträge eines Kunden. Zentrale Größe für Retention-Investitionen und Segmentbewertung." },
+      { q: "Die SWOT-Analyse verknüpft:",
+        options: ["Interne Kosten mit externen Preisen", "Interne Stärken/Schwächen mit externen Chancen/Risiken", "Externe Chancen mit externen Risiken", "Interne Prozesse mit externen Kanälen", "Vergangene mit zukünftigen Kennzahlen"],
+        correct: 1,
+        explain: "SWOT: intern (S/W) × extern (O/T). Aus der Kreuzung entstehen SO-, ST-, WO- und WT-Strategien — konkrete Handlungsempfehlungen." },
+      { q: "In der BCG-Matrix sollte man 'Cash Cows' typischerweise …",
+        options: ["Aggressiv abbauen", "Melken und für Investitionen in Stars und Question Marks nutzen", "Vollständig desinvestieren", "Zur zentralen Wachstumsstrategie machen", "In Question Marks umwandeln"],
+        correct: 1,
+        explain: "Cash Cows: hoher Marktanteil, geringes Wachstum → generieren stabile Cashflows. Diese finanzieren Investitionen in Zukunftsfelder (Stars, ausgewählte Question Marks)." },
+      { q: "Welche der folgenden Kräfte gehören zu Porters Five Forces? (Mehrfachauswahl)",
+        options: ["Verhandlungsmacht der Lieferanten", "Verhandlungsmacht der Abnehmer", "Bedrohung durch neue Wettbewerber", "Bedrohung durch Ersatzprodukte", "Rivalität unter bestehenden Wettbewerbern", "Verhandlungsmacht der Regulierungsbehörden", "Bedrohung durch Medien"],
+        correct: [0, 1, 2, 3, 4],
+        explain: "Fünf Kräfte nach Porter: Lieferantenmacht, Abnehmermacht, neue Wettbewerber, Ersatzprodukte, Wettbewerbsrivalität. Regulierung und Medien sind Umfeldfaktoren (PESTEL), nicht Teil der Five Forces." },
+      { q: "'Positionierung' bezeichnet:",
+        options: ["Die Platzierung des Produkts im Regal", "Die klare, unterscheidungsstarke Verankerung der Marke im Kopf der Zielgruppe", "Die geografische Verteilung von Filialen", "Die Reihenfolge von Kampagnenmaßnahmen", "Den Platz in Suchmaschinenrankings"],
+        correct: 1,
+        explain: "Positionierung ist eine Wahrnehmungsposition — was denkt der Kunde spontan über die Marke? Sie folgt auf Segmentierung und Targeting und wird durch Marketingmix operationalisiert." },
+      { q: "Welche der folgenden gehören zur Ansoff-Matrix? (Mehrfachauswahl)",
+        options: ["Marktdurchdringung", "Marktentwicklung", "Produktentwicklung", "Diversifikation", "Kostenführerschaft", "Differenzierung", "Fokus"],
+        correct: [0, 1, 2, 3],
+        explain: "Ansoff (Wachstumsstrategie): Marktdurchdringung, Marktentwicklung, Produktentwicklung, Diversifikation. Kostenführerschaft, Differenzierung, Fokus sind Porters Wettbewerbsstrategien." },
+      { q: "Ein Question Mark in der BCG-Matrix ist definiert als:",
+        options: ["Hoher Marktanteil, hohes Wachstum", "Niedriger Marktanteil, hohes Wachstum", "Hoher Marktanteil, niedriges Wachstum", "Niedriger Marktanteil, niedriges Wachstum", "Neu eingeführtes Konzeptprodukt"],
+        correct: 1,
+        explain: "Question Mark: niedriger relativer Marktanteil, hohes Marktwachstum → hohe Chancen, aber hoher Investitionsbedarf. Entscheidung: gezielt aufbauen (→ Star) oder abbauen (→ Dog)." },
+      { q: "Diversifikation nach Ansoff bedeutet:",
+        options: ["Bestehendes Produkt, bestehender Markt", "Bestehendes Produkt, neuer Markt", "Neues Produkt, bestehender Markt", "Neues Produkt, neuer Markt", "Rückzug in Nischen"],
+        correct: 3,
+        explain: "Diversifikation = neu/neu. Höchstes Risiko, aber auch höchstes Wachstumspotenzial. Unterschieden in horizontal (verwandt), vertikal (Wertschöpfungsstufen) und lateral (unverwandt)." },
+      { q: "Welche Voraussetzungen sollten wirksame Marktsegmente erfüllen? (Mehrfachauswahl)",
+        options: ["Messbarkeit", "Erreichbarkeit", "Substanzialität (ausreichend groß)", "Handlungsrelevanz / Differenzierbarkeit", "Preisunelastizität", "Homogenität aller Länder"],
+        correct: [0, 1, 2, 3],
+        explain: "Klassische Kriterien nach Kotler: messbar, erreichbar, substanziell, handlungsrelevant/differenzierbar. Preisunelastizität und geografische Homogenität sind keine Segmentkriterien." }
+    ]
+  },
+  {
+    id: "k6", title: "Produkt- & Markenmanagement", desc: "Produktlebenszyklus, Markenfunktionen, Line vs. Brand Extension.",
+    questions: [
+      { q: "Die vier Phasen des Produktlebenszyklus lauten:",
+        options: ["Idee · Test · Launch · Rollout", "Einführung · Wachstum · Reife · Rückgang", "Attention · Interest · Desire · Action", "Segment · Target · Position · Preis", "Awareness · Purchase · Repeat · Loyalty"],
+        correct: 1,
+        explain: "Klassisch: Einführung (Verlust, kleiner Umsatz), Wachstum (Umsatz+, Gewinn+), Reife (Peak, dann Wettbewerbsdruck), Rückgang. Jede Phase verlangt anderen Mix." },
+      { q: "Welche der folgenden sind Markenfunktionen aus Sicht des NACHFRAGERS? (Mehrfachauswahl)",
+        options: ["Orientierung / Reduktion von Suchkosten", "Qualitätssignal", "Risikoreduktion beim Kauf", "Identitäts- und Prestigefunktion", "Preispremium erzielen", "Kundenbindung sichern", "Kostenführerschaft"],
+        correct: [0, 1, 2, 3],
+        explain: "Nachfrager: Orientierung, Qualitätssignal, Risikoreduktion, Identität/Prestige. Preispremium und Kundenbindung sind ANBIETER-Funktionen. Kostenführerschaft ist gar keine Markenfunktion." },
+      { q: "Strauss bringt unter der bestehenden Marke 'e.s.motion' eine neue Farbvariante der bekannten Hose heraus. Das ist ein Beispiel für …",
+        options: ["Brand Extension", "Line Extension", "Co-Branding", "Rebranding", "Multi-Branding"],
+        correct: 1,
+        explain: "Line Extension = neue Variante (Farbe, Größe, Geschmack) in bestehender Produktkategorie unter gleicher Marke. Brand Extension = gleiche Marke in NEUER Kategorie." },
+      { q: "In welcher Phase des Produktlebenszyklus ist der Gewinn typischerweise am höchsten?",
+        options: ["Einführung", "Wachstum", "Reife", "Rückgang", "In allen Phasen ähnlich"],
+        correct: 2,
+        explain: "In der Reifephase sind Umsätze hoch und Stückkosten durch Skaleneffekte niedrig — der Gewinn erreicht sein Maximum, bevor der Wettbewerbsdruck die Margen erodiert." },
+      { q: "Eine starke Marke ermöglicht dem Anbieter vor allem:",
+        options: ["Umgehung des Kartellrechts", "Preispremium und stabile Kundenbindung", "Geringere Herstellkosten je Stück", "Automatische Marktführerschaft", "Vollständige Preisstarrheit im Handel"],
+        correct: 1,
+        explain: "Marken schaffen Präferenz, senken die Preiselastizität (Preispremium), erhöhen Loyalität und differenzieren nachhaltig. Sie beeinflussen aber weder Herstellkosten noch Marktrecht." },
+      { q: "Welche der folgenden sind Markenfunktionen aus Sicht des ANBIETERS? (Mehrfachauswahl)",
+        options: ["Preispremium erzielen", "Kundenbindung / Loyalität", "Absicherung gegen Wettbewerb / Differenzierung", "Wertsteigerung des Unternehmens (Brand Equity)", "Risikoreduktion beim Kauf", "Orientierung im Angebot"],
+        correct: [0, 1, 2, 3],
+        explain: "Anbieter-Funktionen: Preispremium, Loyalität, Differenzierung, Brand Equity als Bilanzwert. Risikoreduktion und Orientierung sind Nachfrager-Funktionen." },
+      { q: "Eine Brand Extension liegt vor, wenn …",
+        options: ["Eine bestehende Marke in eine NEUE Produktkategorie ausgedehnt wird", "Eine bestehende Produktlinie um Varianten erweitert wird", "Zwei Marken gemeinsam ein Produkt vermarkten", "Eine Marke umbenannt wird", "Eine Handelsmarke eingeführt wird"],
+        correct: 0,
+        explain: "Brand Extension = Marke in NEUE Kategorie (z.B. Nivea → Deo → Duschgel). Chance: Bekanntheitstransfer. Risiko: Markenkern verwässert, wenn Kategorie nicht passt." },
+      { q: "In welcher PLC-Phase sind die Marketingausgaben typischerweise am höchsten (relativ zum Umsatz)?",
+        options: ["Einführung", "Wachstum", "Reife", "Rückgang", "Immer gleich"],
+        correct: 0,
+        explain: "Einführungsphase: hoher Aufwand für Bekanntheit, Distribution, Trial — bei noch geringen Umsätzen. Verlustphase. Später sinkt der relative Aufwand." },
+      { q: "Welche der folgenden Elemente gehören zur Markenidentität (Aaker/Esch)? (Mehrfachauswahl)",
+        options: ["Markenkern / Werte", "Markenpersönlichkeit", "Markennutzen", "Markenattribute", "Aktueller Aktienkurs", "Werbebudget"],
+        correct: [0, 1, 2, 3],
+        explain: "Markenidentität (intern definiert): Kern/Werte, Persönlichkeit, funktionaler + symbolischer Nutzen, Attribute. Sie steuert die Kommunikation und wird durch das Image (Fremdbild) reflektiert." },
+      { q: "Der Unterschied zwischen Markenidentität und Markenimage besteht darin, dass …",
+        options: ["Beide identisch sind", "Identität = Selbstbild des Unternehmens, Image = Fremdbild beim Kunden", "Image das interne Konzept ist", "Identität nur im B2C existiert", "Image ausschließlich messbar ist"],
+        correct: 1,
+        explain: "Identität = strategisch definiertes Selbstbild (Was wollen wir sein?). Image = tatsächliche Wahrnehmung im Markt (Was sehen die Kunden?). Ziel: Deckungsgleichheit durch konsistenten Auftritt." },
+      { q: "Ein Unternehmen führt für ein Massenprodukt und ein Luxusprodukt zwei getrennte Marken ohne sichtbare Verbindung. Das ist ein Beispiel für …",
+        options: ["Line Extension", "Brand Extension", "Multi-Branding / Mehrmarken­strategie", "Co-Branding", "Ingredient Branding"],
+        correct: 2,
+        explain: "Multi-Branding: Ein Unternehmen betreibt mehrere unabhängige Marken für verschiedene Segmente (z.B. VW, Audi, Skoda, Porsche). Vermeidet Positionierungskonflikte." },
+      { q: "Ein Innovationsgrad-Rückgang während der Reifephase äußert sich typischerweise in …",
+        options: ["Preis- und Verdrängungswettbewerb", "Rapiden Marktanteilsgewinnen", "Verlusten in jeder Periode", "Vollständigem Rückzug aller Wettbewerber", "Starkem Marktwachstum"],
+        correct: 0,
+        explain: "In der Reife stagniert das Wachstum, Kapazitäten sind aufgebaut → Wettbewerb um Marktanteile, oft über Preis, Rabatte und Vertriebsintensität." },
+      { q: "Ingredient Branding bezeichnet:",
+        options: ["Die Benennung eines Rezeptbestandteils in der Lebensmittelbranche", "Die sichtbare Marke einer Komponente innerhalb eines Endprodukts (z.B. 'Intel Inside')", "Ein Werbeformat der Verkaufsförderung", "Eine Sonderform der Handelsmarke", "Die Kombination von zwei End-Marken zu einem gemeinsamen Produkt"],
+        correct: 1,
+        explain: "Ingredient Branding: Zulieferer platziert seine Marke sichtbar am Endprodukt (Intel, GORE-TEX, Bosch-Systems). Stärkt Verhandlungsmacht und schafft Kundenpräferenz für das Endprodukt." }
+    ]
+  },
+  {
+    id: "k7", title: "Preis & Elastizität (Rechenaufgabe)", desc: "Preiselastizität-Formel, Interpretation, Skimming vs. Penetration.",
+    questions: [
+      { q: "Die Formel der Preiselastizität der Nachfrage lautet:",
+        options: ["ε = Δp / Δx", "ε = (Δx / x) / (Δp / p)", "ε = Umsatz / Kosten", "ε = Preis × Menge", "ε = (p₁ − p₀) × x₀"],
+        correct: 1,
+        explain: "ε = prozentuale Mengenänderung geteilt durch prozentuale Preisänderung. |ε| > 1 = elastisch, |ε| < 1 = unelastisch, |ε| = 1 = proportional." },
+      { q: "Strauss senkt den Preis eines Sicherheitsschuhs von 50 € auf 45 €. Der Absatz steigt dadurch von 40.000 auf 44.000 Paar. Wie hoch ist |ε|?",
+        options: ["0,5", "1,0", "2,0", "0,25", "4,0"],
+        correct: 1,
+        explain: "Δx/x = 4.000 / 40.000 = +10 %. Δp/p = −5 / 50 = −10 %. ε = +10 % / −10 % = −1 → |ε| = 1. Grenzfall: proportionale Nachfrage." },
+      { q: "Bei einer unelastischen Nachfrage (|ε| < 1) führt eine Preissenkung typischerweise zu …",
+        options: ["… überproportionaler Umsatzsteigerung", "… sinkendem Umsatz", "… konstantem Umsatz", "… höherem Umsatz nur bei Luxusgütern", "… stets höherem Gewinn"],
+        correct: 1,
+        explain: "Unelastisch: Menge reagiert nur schwach. Der Preisverlust je Stück wird nicht durch die Mengensteigerung ausgeglichen → Umsatz sinkt. Eine Preiserhöhung würde den Umsatz steigern." },
+      { q: "Strauss verlangt für ein neu eingeführtes Premium-Produkt zunächst einen sehr hohen Preis und senkt ihn später schrittweise. Diese Strategie heißt:",
+        options: ["Penetrationspreis", "Skimmingpreis (Abschöpfung)", "Preisdifferenzierung", "Preisbündelung", "Kostenzuschlagskalkulation"],
+        correct: 1,
+        explain: "Skimming: hoher Startpreis schöpft zahlungsbereite Frühkäufer ab, dann schrittweise Senkung. Penetration setzt umgekehrt tief an, um schnell Marktanteil zu gewinnen." },
+      { q: "Der Deckungsbeitrag pro Stück berechnet sich als:",
+        options: ["Preis − variable Stückkosten", "Preis − Gesamtkosten", "Preis × Menge", "Fixkosten / Menge", "Preis − Selbstkostenpreis"],
+        correct: 0,
+        explain: "Stück-DB = Preis − variable Stückkosten. Er dient zur Deckung der Fixkosten; was darüber hinausgeht, ist Gewinn." },
+      { q: "Strauss verkauft 44.000 Paar Sicherheitsschuhe zu einem Preis von 45 € pro Paar. Wie hoch ist der Umsatz?",
+        options: ["1.800.000 €", "1.980.000 €", "2.000.000 €", "2.200.000 €", "990.000 €"],
+        correct: 1,
+        explain: "Umsatz = Menge × Preis = 44.000 × 45 € = 1.980.000 €. Zum Vergleich: 40.000 × 50 € = 2.000.000 € — trotz höherer Menge sinkt der Umsatz um 20.000 €, typisch für unelastische Nachfrage." },
+      { q: "Welche Aussage zur Preiselastizität ist korrekt?",
+        options: ["Elastische Nachfrage (|ε| > 1) reagiert stärker als die Preisänderung", "Bei unelastischer Nachfrage lohnt sich immer eine Preissenkung", "|ε| = 0 bedeutet unendliche Reaktion", "Ein negativer Wert der Elastizität ist ein Rechenfehler", "Luxusgüter sind grundsätzlich unelastisch"],
+        correct: 0,
+        explain: "|ε| > 1 → Menge reagiert überproportional (Preissenkung erhöht Umsatz). |ε| < 1 → schwach (Preiserhöhung erhöht Umsatz). Negativer Wert ist normal, da Preis und Menge gegensätzlich reagieren." },
+      { q: "Ein Anbieter senkt den Preis um 20 %. Der Absatz steigt um 30 %. Die Preiselastizität |ε| beträgt:",
+        options: ["0,67", "1,0", "1,5", "2,0", "6,0"],
+        correct: 2,
+        explain: "|ε| = |+30 % / −20 %| = 1,5 → elastisch. Da |ε| > 1, führt die Preissenkung zu einem Umsatzanstieg." },
+      { q: "Preisdifferenzierung bedeutet:",
+        options: ["Ein einheitlicher Preis für alle Kunden", "Unterschiedliche Preise für dasselbe/ähnliche Produkt in verschiedenen Segmenten, Zeiten oder Kanälen", "Ausschließlich Rabatte für Neukunden", "Preis genau wie beim Wettbewerber", "Preis abhängig von Wechselkurs"],
+        correct: 1,
+        explain: "Preisdifferenzierung nach Segment (Business/Privat), Zeit (Frühbucher), Ort (Ländermarkt), Menge (Staffel), Nutzung (Flat vs. Pay-per-use). Ziel: Konsumentenrente abschöpfen." },
+      { q: "Welche der folgenden gehören zu den klassischen Preisbestimmungsansätzen? (Mehrfachauswahl)",
+        options: ["Kostenorientiert", "Nachfrageorientiert", "Wettbewerbsorientiert", "Wertorientiert", "Zufallsbasiert", "Astrologisch"],
+        correct: [0, 1, 2, 3],
+        explain: "Vier klassische Ansätze: Kosten (Cost-Plus), Nachfrage (Zahlungsbereitschaft), Wettbewerb (Marktpreise), Wert (Value-based). In der Praxis oft kombiniert." },
+      { q: "Ein Penetrationspreis eignet sich besonders, wenn …",
+        options: ["Der Markt sehr preisunelastisch ist", "Schnelle Marktdurchdringung und Skaleneffekte wichtig sind", "Zahlungsbereite Frühkäufer abgeschöpft werden sollen", "Ein Luxusimage aufgebaut werden soll", "Nur kleine Nischenzielgruppen adressiert werden"],
+        correct: 1,
+        explain: "Penetration: niedriger Einstiegspreis → schnelles Volumen, Skaleneffekte, Marktanteil. Wirkt in preiselastischen Märkten und bei Skalengeschäft (z.B. Streaming, Consumer Electronics)." },
+      { q: "Ein Anbieter kombiniert zwei Produkte zu einem festen Paketpreis, der günstiger ist als beide Einzelpreise zusammen. Das ist ein Beispiel für …",
+        options: ["Preisdifferenzierung", "Preisbündelung", "Skimming", "Kostenzuschlagskalkulation", "Preis-Leistungs-Führerschaft"],
+        correct: 1,
+        explain: "Preisbündelung erhöht Absatz durch attraktives Gesamtpaket (z.B. Menü, Software-Suite). Reine Bündelung = nur als Paket. Gemischte Bündelung = Paket + Einzelverkauf." },
+      { q: "Welche Aussage zu 'Value-based Pricing' (wertorientiert) ist korrekt?",
+        options: ["Preis basiert auf den Herstellkosten plus Marge", "Preis orientiert sich am Wettbewerbspreis", "Preis basiert auf dem wahrgenommenen Nutzen für den Kunden", "Preis ist gesetzlich reguliert", "Preis ist proportional zur Werbeinvestition"],
+        correct: 2,
+        explain: "Value-based Pricing: Preis richtet sich nach dem Wert, den der Kunde erhält (Zeitersparnis, Effizienz, Status), nicht nach den Kosten. Voraussetzung: klare Differenzierung und Wertkommunikation." }
+    ]
+  },
+  {
+    id: "k8", title: "Distribution & Vertriebskanäle", desc: "Direkt/indirekt, Kanalstufen, Multi/Cross/Omni-Channel.",
+    questions: [
+      { q: "Strauss verkauft ohne Zwischenhändler über Katalog, Webshop und eigene Stores. Diese Vertriebsform heißt:",
+        options: ["Indirekter Vertrieb", "Direkter Vertrieb", "Franchise-Vertrieb", "Großhandelsvertrieb", "Kommissionsvertrieb"],
+        correct: 1,
+        explain: "Direkter Vertrieb: keine unabhängigen Zwischenhändler. Vorteile: direkter Kundenkontakt, volle Marge, volle Datenhoheit — genau das Strauss-Modell." },
+      { q: "Ein Ein-Stufen-Vertriebskanal enthält:",
+        options: ["Hersteller → Endkunde", "Hersteller → Händler → Endkunde", "Hersteller → Großhandel → Einzelhandel → Endkunde", "Zwei parallele Hersteller", "Hersteller → Marktplatz → Konsument"],
+        correct: 1,
+        explain: "Kanalstufen zählen die unabhängigen Zwischenhändler: 0 = direkt, 1 = ein Händler, 2 = Groß- + Einzelhandel. Marktplätze sind ein Sonderfall im Ein-Stufen-Modell." },
+      { q: "Was unterscheidet Omni-Channel am deutlichsten von Multi-Channel?",
+        options: ["Omni hat mehr Kanäle als Multi", "Nahtlose Integration aller Kanäle in ein Erlebnis", "Omni ist rein digital", "Multi ist der neuere Begriff", "Es gibt keinen wesentlichen Unterschied"],
+        correct: 1,
+        explain: "Multi = mehrere Kanäle parallel, oft isoliert. Cross = einige verknüpft. Omni = vollständige Integration von Daten, Prozessen und Erlebnis über alle Kanäle." },
+      { q: "Übernimmt ein Hersteller den Einzelhandel selbst (z.B. eigene Stores), spricht man von:",
+        options: ["Rückwärtsintegration", "Vorwärtsintegration", "Horizontale Integration", "Outsourcing", "Franchise"],
+        correct: 1,
+        explain: "Vorwärtsintegration = näher zum Endkunden (Hersteller → Handel). Rückwärtsintegration = näher zu Rohstoffen (Hersteller → Zulieferer)." },
+      { q: "Ein typischer Vorteil eines indirekten Vertriebs gegenüber direktem Vertrieb ist:",
+        options: ["Volle Kundendatenhoheit", "Höhere Marge pro Stück", "Schnelle Marktabdeckung durch Händler", "Vollständige Preishoheit", "Voller Prozesskontrollgrad"],
+        correct: 2,
+        explain: "Indirekter Vertrieb nutzt Reichweite und Kundenzugang bestehender Händlernetze → schnelle, breite Distribution. Kehrseite: Margenteilung, weniger Datenhoheit, weniger Kontrolle." },
+      { q: "Welche der folgenden zählen zu den Vorteilen des DIREKTEN Vertriebs? (Mehrfachauswahl)",
+        options: ["Volle Kundendatenhoheit", "Höhere Marge (keine Handelsspanne)", "Direktes Kundenfeedback", "Preishoheit", "Schnelle geografische Marktabdeckung", "Sofortige Nutzung fremder Reichweite"],
+        correct: [0, 1, 2, 3],
+        explain: "Direktvertrieb liefert Daten, Marge, Feedback und Preishoheit. Reichweite und schnelle geografische Abdeckung sind Stärken des indirekten Vertriebs über bestehende Händlernetze." },
+      { q: "Die drei klassischen Distributionsintensitäten sind:",
+        options: ["Direkt · Indirekt · Hybrid", "Intensiv · Selektiv · Exklusiv", "Push · Pull · Profil", "Multi · Cross · Omni", "Lokal · National · Global"],
+        correct: 1,
+        explain: "Intensiv (flächendeckend, Konsumgüter), selektiv (ausgewählte Händler, Marken-/Fachprodukte), exklusiv (wenige/einzige Händler, Luxus/hohe Beratungsintensität)." },
+      { q: "Ein Luxusmarkenhersteller vergibt in jeder Großstadt nur EINEN autorisierten Händler. Das entspricht welcher Distributionsintensität?",
+        options: ["Intensiv", "Selektiv", "Exklusiv", "Direkt", "Multi-Channel"],
+        correct: 2,
+        explain: "Exklusivvertrieb: sehr wenige, oft exklusive Händlerpartner → Image-Schutz, Beratungshoheit, hohe Marge. Typisch für Luxus, Hochwertautomobile, Premium-Uhren." },
+      { q: "Welche der folgenden Kanalformen zählen zum indirekten Vertrieb? (Mehrfachauswahl)",
+        options: ["Großhandel", "Einzelhandel", "Franchise-Nehmer als eigenständige Unternehmer", "Marktplätze wie Amazon", "Eigener Werksverkauf", "Eigener Online-Shop des Herstellers"],
+        correct: [0, 1, 2, 3],
+        explain: "Indirekt = mit unabhängigen Absatzmittlern. Werksverkauf und eigener Online-Shop sind direkte Kanäle (kein rechtlich unabhängiger Zwischenhändler)." },
+      { q: "Ein Kunde sieht Ware online, geht in den Store zur Anprobe, bezahlt dort und lässt sich später Ersatz nach Hause liefern — alles mit einheitlichem Kundenkonto. Das ist ein Beispiel für …",
+        options: ["Single-Channel", "Multi-Channel", "Cross-Channel", "Omni-Channel", "Franchise"],
+        correct: 3,
+        explain: "Omni-Channel: alle Kanäle vollständig integriert (Daten, Preise, Verfügbarkeit, Konten). Der Kunde erlebt EIN Unternehmen, nicht mehrere Kanäle. Cross-Channel = einige Übergänge; Omni = alle." },
+      { q: "Ein Kanalkonflikt entsteht typischerweise, wenn …",
+        options: ["Der Hersteller nur einen einzigen Kanal nutzt", "Verschiedene Kanäle um dieselben Kunden konkurrieren oder unterschiedliche Preise/Konditionen haben", "Ein Distributor exklusiv vertreibt", "Direktvertrieb ausschließlich digital erfolgt", "Ein Franchise-System eingeführt wird"],
+        correct: 1,
+        explain: "Klassischer Konflikt: eigener Online-Shop des Herstellers unterbietet den stationären Handelspartner → Frust bei Händlern. Lösung: Kanaltrennung, exklusive Sortimente, MAP-Preise, faire Provisionsmodelle." },
+      { q: "Welche der folgenden zählen zur Distributionslogistik (physische Distribution)? (Mehrfachauswahl)",
+        options: ["Lagerhaltung", "Kommissionierung", "Transport", "Retourenmanagement", "Werbespot-Buchung", "Markenpositionierung"],
+        correct: [0, 1, 2, 3],
+        explain: "Physische Distribution: Lager, Kommissionierung, Transport, Retouren, Verpackung. Werbung und Positionierung gehören zu Kommunikation bzw. Strategie." },
+      { q: "Ein Franchise-System ist gekennzeichnet durch …",
+        options: ["Vollständig eigene Filialen des Herstellers", "Selbstständige Franchise-Nehmer nutzen Markenkonzept, Prozesse und Marketing des Franchise-Gebers gegen Gebühr", "Reine Online-Direktvermarktung", "Handel ausschließlich über den Großhandel", "Kommissionsverkauf mit tageweiser Abrechnung"],
+        correct: 1,
+        explain: "Franchise: rechtlich selbstständige Unternehmer, aber einheitliches Konzept, Marke, Prozesse (McDonald's, Subway, Backwerk). Vorteile: schnelle Expansion mit fremdem Kapital + hohe Standardisierung." }
+    ]
+  },
+  {
+    id: "k9", title: "Kommunikation: AIDA · ELM · Mix", desc: "AIDA, Push/Pull, ELM, integrierte Kommunikation.",
+    questions: [
+      { q: "Das AIDA-Modell beschreibt:",
+        options: ["Vier Segmentierungsstufen", "Vier Wirkstufen der Werbung", "Vier Kanalstufen im Vertrieb", "Vier Preisstrategien", "Vier Markenwerte"],
+        correct: 1,
+        explain: "AIDA (Lewis, 1898): Attention → Interest → Desire → Action. Klassisches Stufenmodell der Werbewirkung — vereinfachend, aber didaktisch prägend." },
+      { q: "Eine Push-Strategie in der Kommunikation bedeutet:",
+        options: ["Endkunden ziehen das Produkt aktiv nach", "Hersteller drückt Ware in den Handel", "Ausschließlich Online-Kanäle nutzen", "Preissenkung als Hauptinstrument", "Reine Öffentlichkeitsarbeit betreiben"],
+        correct: 1,
+        explain: "Push: Fokus auf Absatzmittler (Rabatte, Trade-Marketing, Verkäuferschulung). Pull: Fokus auf Endkunden (Werbung, PR) → Kunden fragen nach → Handel muss listen." },
+      { q: "Nach dem Elaboration Likelihood Model (ELM) verläuft Überzeugung über welche zwei Routen?",
+        options: ["Emotionale und irrationale Route", "Zentrale und periphere Route", "Push- und Pull-Route", "Bewusste und unterbewusste Route", "Online- und Offline-Route"],
+        correct: 1,
+        explain: "ELM (Petty/Cacioppo): Hohe Involvierung → zentrale Route (Argumente prüfen). Geringe Involvierung → periphere Route (Attraktivität, Musik, Prominenz, Heuristiken)." },
+      { q: "Welche gehören zum klassischen Kommunikationsmix? (Mehrfachauswahl)",
+        options: ["Werbung", "Public Relations (PR)", "Verkaufsförderung (Sales Promotion)", "Persönlicher Verkauf", "Direktmarketing", "Rohstoffbeschaffung", "Lagerhaltung"],
+        correct: [0, 1, 2, 3, 4],
+        explain: "Klassischer Kommunikationsmix (Meffert/Kotler): Werbung, PR, Verkaufsförderung, persönlicher Verkauf, Direktmarketing. Oft ergänzt um Sponsoring/Events/digitale Kommunikation. Beschaffung und Lagerhaltung gehören zur Logistik." },
+      { q: "Integrierte Marketingkommunikation (IMK) verlangt vor allem:",
+        options: ["Ein höheres Kommunikationsbudget", "Konsistenz aller Botschaften über alle Kanäle", "Reduktion auf einen einzigen Leitkanal", "Verzicht auf digitale Kanäle", "Strikte Trennung von B2B und B2C"],
+        correct: 1,
+        explain: "IMK: alle Instrumente greifen inhaltlich (Botschaft), formal (CI/CD) und zeitlich ineinander → einheitliches Markenerlebnis mit Verstärkungseffekt." },
+      { q: "Ein bekannter Sportler wirbt für eine Uhr, ohne dass sachliche Produkteigenschaften argumentiert werden. Welche ELM-Route wird primär angesprochen?",
+        options: ["Zentrale Route", "Periphere Route", "Rationale Route", "Emotionale Route (existiert im ELM nicht als Kategorie)", "Analytische Route"],
+        correct: 1,
+        explain: "Periphere Route: Überzeugung durch Heuristiken wie Attraktivität, Prominenz, Musik, Wiederholung — greift bei geringem Involvement oder wenn sachliche Auseinandersetzung unwahrscheinlich ist." },
+      { q: "Welche der folgenden zählen zu digitalen Kommunikationsinstrumenten? (Mehrfachauswahl)",
+        options: ["Search Engine Advertising (SEA)", "Social Media Marketing", "E-Mail-Marketing / Newsletter", "Content Marketing / SEO", "TV-Spot", "Print-Anzeige in Fachzeitschrift"],
+        correct: [0, 1, 2, 3],
+        explain: "Digital: SEA, Social, E-Mail, Content/SEO, Display, Affiliate, Influencer. TV und Print sind klassische Instrumente (Above-the-Line)." },
+      { q: "Das Kommunikationsziel 'Bekanntheit steigern' wird typischerweise mit welcher Kennzahl gemessen?",
+        options: ["Conversion Rate", "Reichweite / Brand Awareness / Ad Recall", "Wiederkaufsrate", "Deckungsbeitrag", "Customer Effort Score"],
+        correct: 1,
+        explain: "Bekanntheits-KPIs: Reichweite, gestützte/ungestützte Markenbekanntheit, Ad Recall. Conversion, Wiederkauf und DB messen Wirkung tiefer im Funnel." },
+      { q: "Welche Aussage zum persönlichen Verkauf ist korrekt?",
+        options: ["Er hat die geringsten Kosten pro Kontakt", "Er ist besonders wirkungsstark bei komplexen, beratungsintensiven Produkten und B2B", "Er ist im B2B irrelevant", "Er wird ausschließlich online eingesetzt", "Er ist identisch mit Direktmarketing"],
+        correct: 1,
+        explain: "Persönlicher Verkauf: teuer pro Kontakt, aber maximale Individualisierung und Abschlussstärke — Standard im B2B und bei Investitionsgütern. Direktmarketing zielt breiter (Mailings, E-Mail, Katalog)." },
+      { q: "Ein Above-the-Line-Instrument (ATL) ist typischerweise:",
+        options: ["Direct Mail", "Verkaufsförderung am POS", "TV-Werbung", "Persönlicher Verkauf", "Sponsoring eines Straßenfests"],
+        correct: 2,
+        explain: "ATL = klassische Massenmedien mit breiter Streuung (TV, Radio, Print, Out-of-Home). BTL = zielgruppenspezifisch/direkt (Direct Mail, POS, Events, persönlicher Verkauf)." },
+      { q: "Welche der folgenden gehören zu 'Owned Media'? (Mehrfachauswahl)",
+        options: ["Eigene Website", "Eigener Newsletter", "Eigener Firmen-Blog", "Bezahlte Google-Anzeige", "Redaktioneller Artikel in einer Zeitung", "Empfehlung auf Bewertungsplattform"],
+        correct: [0, 1, 2],
+        explain: "Trias: Owned (eigene Kanäle), Paid (bezahlte Werbung), Earned (verdiente Berichte, Empfehlungen, Shares). Website, Newsletter, Blog gehören klar zu Owned Media." },
+      { q: "Der zentrale Vorteil integrierter Kommunikation liegt in …",
+        options: ["Kostensenkung durch weniger Kanäle", "Verstärkungseffekt und konsistentem Markenauftritt über alle Kontaktpunkte", "Verzicht auf Zielgruppenanalyse", "Höherer Rabatt bei Mediaagenturen", "Vermeidung digitaler Kanäle"],
+        correct: 1,
+        explain: "Integrierte Kommunikation nutzt Synergien: gleiche Kernbotschaft konsistent umgesetzt über alle Kanäle → stärkere Erinnerung, klareres Markenbild, weniger Reibungsverlust." },
+      { q: "Ein Pull-Strategie-Ansatz wirkt vor allem, weil …",
+        options: ["Der Handel zum Listen gedrängt wird", "Endkundennachfrage aufgebaut wird und den Handel zum Führen 'zieht'", "Nur der Preis kommuniziert wird", "Ausschließlich B2B-Kanäle genutzt werden", "Die Werbekosten reduziert werden"],
+        correct: 1,
+        explain: "Pull: starke Endkundenwerbung → Nachfrage entsteht → Handel MUSS listen, um verkaufsfähig zu bleiben. Typisch für starke Markenartikler mit hohem Bekanntheitsdruck." }
+    ]
+  },
+  {
+    id: "k10", title: "KI & Agentic Commerce", desc: "KI-Agenten im Marketing, ACO/GEO, delegierbare vs. menschliche Aufgaben.",
+    questions: [
+      { q: "'Agentic Commerce' beschreibt am besten:",
+        options: ["Automatisierter Kundenservice per Chatbot", "Autonome KI-Agenten handeln im Auftrag von Kunden oder Unternehmen", "Suchmaschinen-Optimierung durch KI", "Klassisches Web-Shopping mit Warenkorb", "Programmatische Ad-Auktionen in Echtzeit"],
+        correct: 1,
+        explain: "Agentic Commerce: KI-Agenten handeln autonom entlang der Journey — vergleichen, verhandeln, kaufen. Marken müssen für Agenten sichtbar und ansprechbar werden (ACO/GEO)." },
+      { q: "GEO ('Generative Engine Optimization') / AEO zielt darauf ab:",
+        options: ["Im klassischen Google-Ranking zu steigen", "In Antworten generativer KI zitiert oder empfohlen zu werden", "Nur auf Instagram besser sichtbar zu sein", "Print-Kataloge zu optimieren", "Server geografisch näher am Nutzer zu platzieren"],
+        correct: 1,
+        explain: "GEO/AEO: Strukturierte, klar zitierbare Inhalte, Autoritätssignale, Marken-Nennungen — damit Antwortmaschinen (ChatGPT, Perplexity, Gemini) die eigene Marke als Quelle einbeziehen." },
+      { q: "Welche Marketing-Aufgabe lässt sich AM WENIGSTEN sinnvoll an KI delegieren?",
+        options: ["Auswertung von A/B-Tests", "Personalisierte E-Mail-Betreffzeilen", "Kampagnen-Reporting", "Grundlegende Marken-Positionierung", "Bidding im Performance-Marketing"],
+        correct: 3,
+        explain: "Positionierung ist eine strategische, werte- und identitätsbasierte Entscheidung (Schmitts 'Relate'). KI kann Daten liefern und Varianten generieren — Sinnstiftung und Kulturbezug bleiben menschliche Führungsaufgabe." },
+      { q: "Ein zentrales Fazit zum KI-Einsatz im Marketing lautet:",
+        options: ["KI ersetzt das gesamte Marketing", "Denkhaltung bleibt menschlich, KI erweitert die Funktion", "KI macht Marketing überflüssig", "KI ist nur für Werbeausspielung relevant", "Marketing ohne KI ist heute nicht mehr möglich"],
+        correct: 1,
+        explain: "Duales Führungskonzept in neuer Form: Marktorientierung und Werteentscheidungen bleiben menschlich. KI hebt Effizienz, Personalisierung und Analysetiefe der Funktion." },
+      { q: "Welche Aufgaben lassen sich sinnvoll an KI-Systeme im Marketing delegieren? (Mehrfachauswahl)",
+        options: ["Kampagnen-Reporting und Dashboards", "Personalisierung von Content und E-Mail", "Bid-Optimierung im Performance-Marketing", "Segment-Clustering aus Verhaltensdaten", "Definition der Markenwerte", "Ethische Positionierung im Nachhaltigkeitsthema"],
+        correct: [0, 1, 2, 3],
+        explain: "Gut delegierbar: Reporting, Personalisierung, Bidding, Clustering — datengetriebene, wiederkehrende, optimierbare Aufgaben. Marken- und Wertefragen bleiben strategische Führungsaufgabe." },
+      { q: "Ein Beispiel für einen KI-Agenten in der Awareness-Phase der Journey wäre …",
+        options: ["Ein Warenwirtschaftssystem", "Eine generative Antwortmaschine, die die Marke als Empfehlung ausspielt", "Ein automatisiertes Retourenlabel", "Eine SAP-Buchung", "Ein Barcode-Scanner an der Kasse"],
+        correct: 1,
+        explain: "Awareness = erste Wahrnehmung. Antwortmaschinen (ChatGPT, Perplexity) werden zur neuen Suche → wer dort empfohlen wird, entsteht als Marke im 'Consideration Set' des Nutzers." },
+      { q: "Welche Chancen bietet KI für das Marketing? (Mehrfachauswahl)",
+        options: ["Skalierbare Personalisierung", "Prognosemodelle für Nachfrage und Churn", "Automatisierte Content-Produktion in Varianten", "Effizientere Media-Auktionen (RTB)", "Ersatz aller strategischen Entscheidungen", "Verzicht auf Marktforschung"],
+        correct: [0, 1, 2, 3],
+        explain: "KI-Chancen: Personalisierung, Prognose, Content-Skalierung, Auktions-Effizienz. Strategie und Marktforschung ergänzt KI, ersetzt sie nicht." },
+      { q: "Welche typischen Risiken bringt der Einsatz generativer KI im Marketing mit sich? (Mehrfachauswahl)",
+        options: ["Halluzinationen / falsche Fakten in generierten Inhalten", "Verlust der Markenstimme durch generische Outputs", "Datenschutz-/Compliance-Themen bei Trainings- und Prompt-Daten", "Bias in trainierten Modellen", "Verlust der Preishoheit im Handel", "Zwangsläufig sinkende Reichweite"],
+        correct: [0, 1, 2, 3],
+        explain: "Reale Risiken: Halluzinationen, Verlust der Markenstimme, Datenschutz/DSGVO, Bias. Preishoheit im Handel und Reichweite sind kanalstrategische, keine KI-inhärenten Risiken." },
+      { q: "Für eine wirksame ACO/GEO-Strategie ist besonders wichtig …",
+        options: ["Möglichst viele Keywords im Text zu platzieren", "Klare, faktenbasierte, strukturierte Inhalte mit Autoritätssignalen zu schaffen", "Ausschließlich Bildinhalte zu produzieren", "Auf Social Media zu verzichten", "Nur PDF-Formate zu verwenden"],
+        correct: 1,
+        explain: "GEO/AEO belohnt klare Struktur (Absätze, Definitionen, FAQs), belegbare Fakten, konsistente Marken-Nennungen und Autoritätssignale — damit KI-Antwortmaschinen die Inhalte sicher zitieren." },
+      { q: "Ein Chatbot beantwortet Standardfragen im Support und eskaliert komplexe Fälle an Menschen. Das ist ein Beispiel für …",
+        options: ["Vollständige Automatisierung ohne Mensch", "Hybride Assistenz / Human-in-the-Loop", "Klassisches CRM ohne KI", "Reines Ingredient Branding", "Ein Push-Kommunikationsinstrument"],
+        correct: 1,
+        explain: "Human-in-the-Loop: KI übernimmt Standardfälle, erkennt Grenzen und übergibt an Menschen. Kombination aus Skalierung und Qualitätssicherung — bewährter Weg für den KI-Einsatz im Service." },
+      { q: "Was bedeutet 'Prompt Engineering' im Marketing-Kontext?",
+        options: ["Programmieren eines eigenen KI-Modells", "Gezielte Formulierung von Eingabetexten, um verlässlich hochwertige KI-Outputs zu erzielen", "Beauftragung einer Agentur", "Erstellung eines Werbebriefings", "Konfiguration von Werbeanzeigen im Ad Manager"],
+        correct: 1,
+        explain: "Prompt Engineering: Aufgabe, Rolle, Kontext, Beispiele, Format und Constraints so klar beschreiben, dass die KI reproduzierbar nützliche Ergebnisse liefert — im Marketing zentral für Content, Analyse, Personalisierung." },
+      { q: "Welche der folgenden Marketing-Aktivitäten profitieren typischerweise von Predictive Analytics? (Mehrfachauswahl)",
+        options: ["Churn-Prognose", "Next-Best-Offer / Recommendation", "Nachfrageprognose zur Sortimentssteuerung", "Cross-Sell/Up-Sell-Modelle", "Definition der Vision", "Wahl des Firmennamens"],
+        correct: [0, 1, 2, 3],
+        explain: "Predictive Analytics glänzt bei Mustererkennung: Churn, Empfehlungen, Nachfrage, Cross-/Up-Sell. Vision und Naming sind strategisch-kreative Führungsentscheidungen." }
+    ]
+  }
+];
+
+/* Flatten: nur Single-Choice-Fragen (correct = Zahl) verwenden */
+const POOL = [];
+TOPICS.forEach(t => {
+  t.questions.forEach(q => {
+    if (typeof q.correct === "number") {
+      POOL.push({
+        topic: t.title,
+        q: q.q,
+        options: q.options,
+        correct: q.correct,
+        explain: q.explain || ""
+      });
+    }
+  });
+});
+
+/* =========================================================
+   HELFER
+========================================================= */
+const $ = s => document.querySelector(s);
+function toast(msg, ms=2200){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("show"), ms);
+}
+function makeCode(len=5){
+  const alph = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // ohne verwechselbare
+  let s = "";
+  for (let i=0;i<len;i++) s += alph[Math.floor(Math.random()*alph.length)];
+  return s;
+}
+function shuffle(a){
+  const arr = a.slice();
+  for (let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+function pickQuestions(n=10){
+  return shuffle(POOL).slice(0, n);
+}
+function setRail(txt){ const el=$("#railStatus"); if (el) el.textContent = txt; }
+
+function show(screen){
+  ["screenLobby","screenWaiting","screenDuel","screenEnd"].forEach(id=>{
+    $("#"+id).classList.toggle("hidden", id!==screen);
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* =========================================================
+   FIREBASE INIT
+========================================================= */
+let db = null;
+try {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+} catch(err) {
+  console.error("Firebase init fehlgeschlagen:", err);
+}
+function refRoom(code){ return db.ref("quizduell/rooms/"+code); }
+
+/* =========================================================
+   SPIEL-ZUSTAND (lokal)
+========================================================= */
+const S = {
+  code: null,
+  role: null,      // "host" | "guest"
+  myName: "",
+  oppName: "",
+  round: 1,
+  currentIdx: 0,
+  answered: false,
+  questions: [],
+  unsub: null,     // Firebase listener unsubscribe
+  cleanupOnExit: true
+};
+
+/* =========================================================
+   LOBBY – BUTTONS
+========================================================= */
+$("#btnCreate").addEventListener("click", async () => {
+  const name = $("#hostName").value.trim();
+  if (!name) { toast("Bitte Namen eingeben"); return; }
+  if (!db)   { toast("Firebase nicht konfiguriert"); return; }
+
+  const code = makeCode(5);
+  S.code = code; S.role = "host"; S.myName = name;
+
+  const questions = pickQuestions(10);
+  const payload = {
+    status: "waiting",
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    round: 1,
+    currentQ: 0,
+    questions,
+    host:  { name, score: 0, ready: true },
+    guest: null,
+    answers: {},       // { r1_q0: { host:{idx,ts}, guest:{idx,ts} } }
+    rematch: { host: false, guest: false },
+    lastAction: firebase.database.ServerValue.TIMESTAMP
+  };
+  try {
+    await refRoom(code).set(payload);
+    enterWaiting();
+    subscribeRoom();
+  } catch(e){
+    console.error(e); toast("Fehler beim Anlegen");
+  }
+});
+
+$("#btnJoin").addEventListener("click", async () => {
+  const code = ($("#joinCode").value || "").trim().toUpperCase();
+  const name = $("#guestName").value.trim();
+  if (!code || code.length < 4) { toast("Code prüfen"); return; }
+  if (!name) { toast("Bitte Namen eingeben"); return; }
+  if (!db)   { toast("Firebase nicht konfiguriert"); return; }
+
+  try {
+    const snap = await refRoom(code).get();
+    if (!snap.exists()) { toast("Raum nicht gefunden"); return; }
+    const room = snap.val();
+    if (room.guest && room.guest.name) { toast("Raum ist voll"); return; }
+    if (room.status === "closed")      { toast("Raum wurde beendet"); return; }
+
+    S.code = code; S.role = "guest"; S.myName = name;
+    await refRoom(code).update({
+      guest: { name, score: 0, ready: true },
+      status: "playing",
+      lastAction: firebase.database.ServerValue.TIMESTAMP
+    });
+    subscribeRoom();
+  } catch(e){ console.error(e); toast("Beitritt fehlgeschlagen"); }
+});
+
+$("#joinCode").addEventListener("input", (e) => {
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+});
+
+/* =========================================================
+   WAITING-ROOM
+========================================================= */
+function enterWaiting(){
+  $("#roomCodeBig").textContent = S.code.split("").join(" ");
+  show("screenWaiting");
+  setRail("Warte auf Gegner · " + S.code);
+}
+$("#btnCopyCode").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(S.code); toast("Code kopiert · " + S.code); }
+  catch { toast("Kopieren nicht möglich"); }
+});
+$("#btnCancelRoom").addEventListener("click", async () => {
+  if (!S.code) return;
+  try { await refRoom(S.code).remove(); } catch(e){}
+  leaveRoom(false);
+});
+
+/* =========================================================
+   SUBSCRIBE
+========================================================= */
+function subscribeRoom(){
+  if (S.unsub) { S.unsub(); S.unsub = null; }
+  const r = refRoom(S.code);
+  const cb = r.on("value", snap => {
+    if (!snap.exists()){
+      toast("Raum wurde geschlossen");
+      leaveRoom(false);
+      return;
+    }
+    handleRoom(snap.val());
+  });
+  S.unsub = () => r.off("value", cb);
+}
+
+function handleRoom(room){
+  // Namen
+  S.myName  = (S.role === "host" ? room.host?.name : room.guest?.name) || S.myName;
+  S.oppName = (S.role === "host" ? room.guest?.name : room.host?.name) || "";
+  S.round   = room.round || 1;
+
+  $("#roomBadge").textContent = "RAUM " + S.code;
+
+  // Warte-Zustand
+  if (room.status === "waiting"){
+    if (S.role === "host") enterWaiting();
+    return;
+  }
+  // Beendet
+  if (room.status === "closed"){
+    toast("Raum wurde beendet");
+    leaveRoom(false);
+    return;
+  }
+  // End-Screen
+  if (room.status === "finished"){
+    renderEnd(room);
+    return;
+  }
+
+  // playing
+  S.questions = room.questions || [];
+  S.currentIdx = room.currentQ || 0;
+  renderDuel(room);
+}
+
+/* =========================================================
+   DUEL RENDERING
+========================================================= */
+function renderDuel(room){
+  show("screenDuel");
+  setRail("Runde " + S.round + " · Frage " + (S.currentIdx+1) + "/10");
+
+  const hostScore  = room.host?.score  || 0;
+  const guestScore = room.guest?.score || 0;
+  const myScore  = S.role === "host" ? hostScore : guestScore;
+  const oppScore = S.role === "host" ? guestScore : hostScore;
+
+  $("#meName").innerHTML  = escapeHTML(S.myName)  + ' <span class="badge">DU</span>';
+  $("#oppName").textContent = S.oppName || "…";
+  $("#meScore").textContent  = myScore;
+  $("#oppScore").textContent = oppScore;
+
+  const q = S.questions[S.currentIdx];
+  if (!q) return;
+
+  $("#qNum").textContent = String(S.currentIdx+1).padStart(2,"0");
+  $("#qProg").style.transform = "scaleX(" + ((S.currentIdx)/10) + ")";
+  $("#qText").textContent = q.q;
+
+  const answers = room.answers || {};
+  const key = "r" + S.round + "_q" + S.currentIdx;
+  const rec = answers[key] || {};
+  const myAns  = rec[S.role];
+  const oppAns = rec[S.role === "host" ? "guest" : "host"];
+
+  const opts = $("#qOpts");
+  opts.innerHTML = "";
+  const letters = ["A","B","C","D","E","F"];
+  q.options.forEach((opt, i) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    let tick = "";
+    if (myAns && myAns.idx === i)  b.classList.add("selected");
+    if (myAns) {
+      b.classList.add("locked");
+      b.disabled = true;
+      if (i === q.correct) b.classList.add("correct");
+      else if (myAns.idx === i) b.classList.add("wrong");
+      // tick markers
+      const tags = [];
+      if (myAns.idx === i)  tags.push("du");
+      if (oppAns && oppAns.idx === i) tags.push(S.oppName || "gegner");
+      if (tags.length) tick = "· " + tags.join(", ");
+    }
+    b.innerHTML = `
+      <span class="idx">${letters[i] || (i+1)}</span>
+      <span class="txt">${escapeHTML(opt)}</span>
+      <span class="tick">${tick}</span>`;
+    b.addEventListener("click", () => submitAnswer(i));
+    opts.appendChild(b);
+  });
+
+  // Status
+  if (!myAns) {
+    $("#qStatus").textContent = "Wähle eine Antwort";
+  } else if (!oppAns) {
+    $("#qStatus").textContent = "Warte auf " + (S.oppName || "Gegner") + " …";
+  } else {
+    $("#qStatus").textContent = "Nächste Frage in Kürze …";
+  }
+  $("#qTimer").textContent = "· Runde " + S.round;
+
+  // Explanation nur zeigen, wenn beide geantwortet haben
+  if (myAns && oppAns) {
+    $("#qExplain").classList.remove("hidden");
+    $("#qExplainText").textContent = q.explain || "—";
+    // Host schaltet weiter (Autorität)
+    if (S.role === "host") {
+      clearTimeout(renderDuel._advTimer);
+      renderDuel._advTimer = setTimeout(() => advance(room), 2600);
+    }
+  } else {
+    $("#qExplain").classList.add("hidden");
+    $("#qExplainText").textContent = "";
+  }
+}
+
+async function submitAnswer(idx){
+  const q = S.questions[S.currentIdx];
+  const key = "r" + S.round + "_q" + S.currentIdx;
+  // Optimistischer UI-Freeze
+  const opts = $("#qOpts");
+  [...opts.children].forEach((c,i)=>{
+    c.disabled = true; c.classList.add("locked");
+    if (i === idx) c.classList.add("selected");
+  });
+  try {
+    const path = "answers/" + key + "/" + S.role;
+    await refRoom(S.code).child(path).set({
+      idx,
+      correct: (idx === q.correct),
+      ts: firebase.database.ServerValue.TIMESTAMP
+    });
+    // Score-Update (transaktional)
+    if (idx === q.correct) {
+      await refRoom(S.code).child(S.role + "/score").transaction(v => (v || 0) + 1);
+    }
+  } catch(e){
+    console.error(e); toast("Antwort konnte nicht gesendet werden");
+  }
+}
+
+async function advance(room){
+  const next = (room.currentQ || 0) + 1;
+  if (next >= 10) {
+    await refRoom(S.code).update({
+      status: "finished",
+      rematch: { host: false, guest: false },
+      lastAction: firebase.database.ServerValue.TIMESTAMP
+    });
+  } else {
+    await refRoom(S.code).update({
+      currentQ: next,
+      lastAction: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+}
+
+/* =========================================================
+   ENDE
+========================================================= */
+function renderEnd(room){
+  show("screenEnd");
+  setRail("Runde beendet · " + S.code);
+
+  const hostScore  = room.host?.score  || 0;
+  const guestScore = room.guest?.score || 0;
+  const myScore  = S.role === "host" ? hostScore : guestScore;
+  const oppScore = S.role === "host" ? guestScore : hostScore;
+
+  $("#finalMeName").textContent  = S.myName;
+  $("#finalOppName").textContent = S.oppName || "—";
+  $("#finalMeScore").textContent  = myScore;
+  $("#finalOppScore").textContent = oppScore;
+
+  $("#finalMe").classList.toggle("win",  myScore >  oppScore);
+  $("#finalOpp").classList.toggle("win", oppScore > myScore);
+
+  const v = $("#verdictText");
+  if (myScore > oppScore)      v.innerHTML = "Sieg. <em>Bravo.</em>";
+  else if (myScore < oppScore) v.innerHTML = "Knapp <em>daneben</em>.";
+  else                          v.innerHTML = "Ein <em>Unentschieden</em>.";
+
+  // Rematch-Status
+  const rm = room.rematch || {};
+  const myReady  = !!rm[S.role];
+  const oppReady = !!rm[S.role === "host" ? "guest" : "host"];
+  const bReM = $("#btnRematch");
+  bReM.textContent = myReady ? "Wartet auf Gegner …" : "Noch eine Runde →";
+  bReM.disabled = myReady;
+  $("#endStatus").textContent = oppReady && !myReady
+      ? (S.oppName || "Gegner") + " will noch eine Runde"
+      : (myReady && !oppReady ? "Warte auf " + (S.oppName || "Gegner") + " …" : " ");
+
+  // Wenn beide Rematch wollen: Host resettet
+  if (myReady && oppReady && S.role === "host") {
+    doRematch();
+  }
+}
+
+async function doRematch(){
+  const questions = pickQuestions(10);
+  await refRoom(S.code).update({
+    status: "playing",
+    round: (S.round || 1) + 1,
+    currentQ: 0,
+    questions,
+    answers: {},
+    "host/score": 0,
+    "guest/score": 0,
+    rematch: { host: false, guest: false },
+    lastAction: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+$("#btnRematch").addEventListener("click", async () => {
+  if (!S.code) return;
+  try {
+    await refRoom(S.code).child("rematch/"+S.role).set(true);
+  } catch(e){ console.error(e); }
+});
+
+$("#btnClose").addEventListener("click", async () => {
+  if (!S.code) return;
+  try {
+    await refRoom(S.code).update({ status: "closed" });
+    await refRoom(S.code).remove();
+  } catch(e){}
+  leaveRoom(false);
+});
+
+/* =========================================================
+   AUFRÄUMEN + BEIM VERLASSEN
+========================================================= */
+function leaveRoom(silent){
+  if (S.unsub) { try { S.unsub(); } catch(e){} S.unsub = null; }
+  S.code = null; S.role = null; S.round = 1; S.currentIdx = 0;
+  S.questions = []; S.oppName = "";
+  $("#qExplain").classList.add("hidden");
+  $("#qOpts").innerHTML = "";
+  show("screenLobby");
+  setRail("Bereit");
+  if (!silent) $("#hostName").focus();
+}
+
+window.addEventListener("beforeunload", () => {
+  if (!S.code || !db) return;
+  try {
+    // Wenn Host allein → Raum löschen; sonst als „closed“ markieren
+    // (bewusst best-effort, kann durch Browser blockiert werden)
+    refRoom(S.code).update({ status: "closed" });
+  } catch(e){}
+});
+
+/* Kleine Escape-Helper */
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+/* Start */
+show("screenLobby");
+</script>
+
+</body>
+</html>
