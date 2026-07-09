@@ -38,6 +38,37 @@
     --warn:        #d68f4a;
   }
 
+  /* ————————————— VIEW TRANSITIONS ————————————— */
+  @view-transition { navigation: auto; }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) {
+    animation-name: paper-fade-out;
+  }
+  ::view-transition-new(root) {
+    animation-name: paper-fade-in;
+  }
+  @keyframes paper-fade-out {
+    to { opacity: 0; filter: blur(1.5px); }
+  }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  /* Marke bleibt beim Navigieren an Ort und Stelle */
+  .brand { view-transition-name: brand; }
+  ::view-transition-old(brand),
+  ::view-transition-new(brand) { animation-duration: .35s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
   *, *::before, *::after { box-sizing: border-box; }
   html { transition: background-color .35s ease, color .35s ease; }
   body {
@@ -49,14 +80,123 @@
     line-height: 1.5;
     transition: background-color .35s ease, color .35s ease;
     -webkit-font-smoothing: antialiased;
+    position: relative;
   }
 
   ::selection { background: var(--accent); color: #fff; }
+
+  /* ————————————— PAPIER-TEXTUR ————————————— */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22;
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after {
+    opacity: .08;
+    mix-blend-mode: screen;
+  }
+
+  /* Feine Faserlinien — nur in Serifentitel-Nähe spürbar */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before {
+    opacity: .35;
+    mix-blend-mode: overlay;
+  }
+
+  /* ————————————— TINTEN-BLEED ————————————— */
+  /* Sehr dezent auf allem, damit die Schrift „ins Papier läuft" */
+  body {
+    text-shadow: 0 0 .32px currentColor;
+  }
+  /* Serifen etwas kräftiger — wie Bleisatz auf saugendem Papier */
+  .brand,
+  .tile-title,
+  .dep-kicker,
+  .dep-body,
+  .tile-desc,
+  .fc-temp,
+  .tick-val,
+  .tick-name,
+  .ad-title,
+  .ad--paypal .ad-hero,
+  .ad--kirche .ad-hero {
+    text-shadow:
+      0 0 .45px currentColor,
+      .18px .12px .55px rgba(0,0,0,.10);
+  }
+  html[data-theme="dark"] .brand,
+  html[data-theme="dark"] .tile-title,
+  html[data-theme="dark"] .dep-kicker,
+  html[data-theme="dark"] .dep-body,
+  html[data-theme="dark"] .tile-desc,
+  html[data-theme="dark"] .fc-temp,
+  html[data-theme="dark"] .tick-val,
+  html[data-theme="dark"] .tick-name,
+  html[data-theme="dark"] .ad-title {
+    text-shadow:
+      0 0 .5px currentColor,
+      .15px .1px .6px rgba(255,235,200,.08);
+  }
+  /* Große kursive Kicker mit einem Hauch mehr Blutung */
+  .dep-kicker,
+  .brand .amp {
+    text-shadow:
+      0 0 .5px currentColor,
+      .3px .2px .8px rgba(200,68,42,.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body { text-shadow: none; }
+  }
+
+  /* ————————————— KAFFEEFLECK ————————————— */
+  .coffee-stain {
+    position: fixed;
+    width: 220px;
+    height: 220px;
+    pointer-events: none;
+    z-index: 9996;
+    opacity: 0;
+    mix-blend-mode: multiply;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'><defs><filter id='r' x='-20%25' y='-20%25' width='140%25' height='140%25'><feTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='2' seed='4'/><feDisplacementMap in='SourceGraphic' scale='14'/></filter><radialGradient id='g' cx='50%25' cy='50%25' r='50%25'><stop offset='55%25' stop-color='%236b3f1d' stop-opacity='0'/><stop offset='68%25' stop-color='%236b3f1d' stop-opacity='0.55'/><stop offset='78%25' stop-color='%234a2810' stop-opacity='0.7'/><stop offset='88%25' stop-color='%236b3f1d' stop-opacity='0.3'/><stop offset='100%25' stop-color='%236b3f1d' stop-opacity='0'/></radialGradient><radialGradient id='g2' cx='45%25' cy='55%25' r='45%25'><stop offset='0%25' stop-color='%236b3f1d' stop-opacity='0.15'/><stop offset='100%25' stop-color='%236b3f1d' stop-opacity='0'/></radialGradient></defs><circle cx='110' cy='110' r='95' fill='url(%23g)' filter='url(%23r)'/><ellipse cx='100' cy='115' rx='55' ry='48' fill='url(%23g2)' filter='url(%23r)'/><circle cx='108' cy='108' r='88' fill='none' stroke='%234a2810' stroke-width='0.8' stroke-opacity='0.35' filter='url(%23r)'/></svg>");
+    animation: stain-in 1.2s ease-out forwards;
+  }
+  html[data-theme="dark"] .coffee-stain {
+    mix-blend-mode: screen;
+    filter: hue-rotate(-8deg) brightness(.55);
+  }
+  @keyframes stain-in {
+    from { opacity: 0; }
+    to   { opacity: var(--stain-op, .28); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .coffee-stain { animation: none; opacity: var(--stain-op, .28); }
+  }
 
   .wrap {
     max-width: 1180px;
     margin: 0 auto;
     padding: 24px 28px 48px;
+    position: relative;
+    z-index: 1;
   }
 
   /* ————————————— MASTHEAD ————————————— */
@@ -502,6 +642,7 @@
     background-size: 200% 100%;
     animation: dep-shimmer 1.4s infinite;
     border-radius: 2px;
+    text-shadow: none;
   }
   .dep-col.loading .dep-kicker { min-height: 30px; margin-bottom: 12px; }
   .dep-col.loading .dep-body   { min-height: 60px; }
@@ -1087,7 +1228,9 @@
   document.getElementById('todayRight').textContent = dateStr;
   document.getElementById('year').textContent = now.getFullYear();
 
-  /* ———— THEME TOGGLE ———— */
+  /* ————————————————————————————————
+     THEME TOGGLE mit VIEW TRANSITION
+     ———————————————————————————————— */
   const themeBtn = document.getElementById('themeBtn');
   const themeLabel = document.getElementById('themeLabel');
   const root = document.documentElement;
@@ -1097,12 +1240,59 @@
   }
   const storedTheme = localStorage.getItem('werkzeuge-theme');
   applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+
   themeBtn.addEventListener('click', () => {
     const isDark = root.getAttribute('data-theme') === 'dark';
     const next = isDark ? 'light' : 'dark';
-    applyTheme(next);
-    localStorage.setItem('werkzeuge-theme', next);
+    const swap = () => {
+      applyTheme(next);
+      localStorage.setItem('werkzeuge-theme', next);
+    };
+    if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.startViewTransition(swap);
+    } else {
+      swap();
+    }
   });
+
+  /* ————————————————————————————————
+     KAFFEEFLECKEN — selten (12 %)
+     ———————————————————————————————— */
+  (function maybeCoffeeStain() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (Math.random() > 0.12) return; // ~ 1 von 8 Aufrufen
+
+    const stain = document.createElement('div');
+    stain.className = 'coffee-stain';
+
+    // Zufällige Größe (120–260 px)
+    const size = 120 + Math.random() * 140;
+    stain.style.width  = size + 'px';
+    stain.style.height = size + 'px';
+
+    // Zufällige Position (Ecken bevorzugen, damit Content lesbar bleibt)
+    const edges = [
+      { top: 4 + Math.random() * 18, left: 3 + Math.random() * 22 },              // links oben
+      { top: 4 + Math.random() * 18, left: 65 + Math.random() * 25 },             // rechts oben
+      { top: 62 + Math.random() * 30, left: 3 + Math.random() * 22 },             // links unten
+      { top: 62 + Math.random() * 30, left: 65 + Math.random() * 25 },            // rechts unten
+      { top: 30 + Math.random() * 40, left: 40 + Math.random() * 30 }             // mitte-rechts (selten)
+    ];
+    const pos = edges[Math.floor(Math.random() * edges.length)];
+    stain.style.top  = pos.top  + '%';
+    stain.style.left = pos.left + '%';
+
+    // Rotation + leichte Verzerrung
+    const rot = Math.random() * 360;
+    const skew = (Math.random() - .5) * 8;
+    stain.style.transform = `rotate(${rot}deg) skew(${skew}deg)`;
+
+    // Opazität (0.18–0.32)
+    stain.style.setProperty('--stain-op', (0.18 + Math.random() * 0.14).toFixed(2));
+
+    document.body.appendChild(stain);
+    console.log('☕ Ein Kaffeefleck heute — genieße den Vintage-Charme.');
+  })();
 
   /* ————————————————————————————————
      WEATHER — Open-Meteo
@@ -1206,11 +1396,10 @@
      DEPESCHEN
      ———————————————————————————————— */
   const DEP_ROTATE_MS   = 20000;
-  const DEP_CACHE_KEY   = 'werk-depeschen-v3'; // v3 = neue Ticker-API
+  const DEP_CACHE_KEY   = 'werk-depeschen-v3';
   const DEP_PAUSE_KEY   = 'werk-dep-paused';
   const DEP_CACHE_HOURS = 6;
 
-  // Die 5 wichtigsten Weltwährungen
   const CURRENCIES = [
     { code: 'USD', name: 'US-Dollar',         symbol: '$',   digits: 4 },
     { code: 'GBP', name: 'Britisches Pfund',  symbol: '£',   digits: 4 },
@@ -1229,7 +1418,6 @@
   const depNow    = new Date();
   depDateEl.textContent = `${depNow.getDate()}. ${depMonths[depNow.getMonth()]} · Tagesausgabe`;
 
-  // ——— Fetcher ———
   async function fetchOnThisDay() {
     const mm = String(depNow.getMonth() + 1).padStart(2, '0');
     const dd = String(depNow.getDate()).padStart(2, '0');
@@ -1267,15 +1455,11 @@
     return { text: d.text };
   }
 
-  // ——— Currency-Fetcher mit ZWEI unabhängigen Providern ———
-  //   Primär: @fawazahmed0/currency-api via jsDelivr CDN (extrem stabil, kein Rate-Limit)
-  //   Fallback: open.er-api.com (kostenlos, kein Key)
   async function fetchTickerAll() {
-    // ——— PRIMÄR: fawazahmed0/currency-api ———
     try {
       const primaryUrls = [
         'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json',
-        'https://latest.currency-api.pages.dev/v1/currencies/eur.json' // offizieller Fallback des Autors
+        'https://latest.currency-api.pages.dev/v1/currencies/eur.json'
       ];
       for (const url of primaryUrls) {
         try {
@@ -1290,9 +1474,7 @@
             if (typeof v !== 'number') { ok = false; break; }
             rates[c.code] = v;
           }
-          if (ok) {
-            return { date: d.date || new Date().toISOString().slice(0,10), rates, source: 'Currency-API' };
-          }
+          if (ok) return { date: d.date || new Date().toISOString().slice(0,10), rates, source: 'Currency-API' };
         } catch (e) { console.warn('primary currency url failed:', url, e.message); }
       }
       throw new Error('primary providers failed');
@@ -1300,7 +1482,6 @@
       console.warn('Currency primary failed, trying fallback:', primaryErr.message);
     }
 
-    // ——— FALLBACK: open.er-api.com ———
     try {
       const res = await fetch('https://open.er-api.com/v6/latest/EUR');
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1326,7 +1507,6 @@
     setTimeout(() => { updateFn(); colEl.classList.remove('fading'); }, 300);
   }
 
-  // ——— Renderer ———
   function renderOtd(data) {
     const col = document.getElementById('depOtd');
     col.classList.remove('loading');
@@ -1539,93 +1719,4 @@
     if (isPaused) stopRotation(); else startRotation();
   });
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopRotation();
-    else if (!isPaused)  startRotation();
-  });
-
-  applyPauseUI();
-  loadDepeschen().then(() => { setTimeout(startRotation, 2000); });
-
-  /* ————————————————————————————————
-     SIDE ADS
-     ———————————————————————————————— */
-  const PAYPAL_AD = {
-    cls: "paypal", eyebrow: "UNTERSTÜTZUNG", hero: "☕",
-    title: "Ein Kaffee für Maiko?",
-    body: "Wenn dir die App hilft — kleine Geste, große Freude.",
-    cta: { label: "paypal.me/maiggooo →", url: "https://paypal.me/maiggooo" },
-    foot: "PAYPAL · DANKE", mark: "♡"
-  };
-  const ADS = [
-    { cls:"kaffee", eyebrow:"CAMPUS", hero:"· · ·", title:"Linas Kaffee", body:"Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot:"Mo–Fr · ab 07:30", mark:"L" },
-    { cls:"stink", eyebrow:"DIENSTLEISTUNG", hero:"☁ ☁ ☁", title:"Pauls Stinke­service", body:"„Wir liefern Duft. Meistens den falschen.", foot:"Auf Anfrage", mark:"P" },
-    { cls:"pfalz", eyebrow:"SEIT '74", hero:"MARKT · FASS · FLASCHE", title:"Getränke Pfalzgraf", body:"Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.", foot:"Landau · Pfalz", mark:"✦", link:"http://www.getraenke-pfalzgraf.de/" },
-    { cls:"kirche", eyebrow:"SONNTAGS · 10 UHR", hero:"✝", title:"Kians Gottesdienst", body:"Predigt, Musik, Kaffee danach. Kommt zahlreich.", foot:"Eintritt frei", mark:"K" },
-    { cls:"reise", eyebrow:"REISEBÜRO", hero:"✈", title:"Konsis Reiseplaner", body:"Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.", foot:"Buchung · 24/7", mark:"→" },
-    { cls:"schweig", eyebrow:"PREMIUM STILLE", hero:". . .", title:"Katalinas Schweigen.", body:"Der Schweigeservice. Wir sagen nichts. Garantiert.", foot:"Diskretion inklusive", mark:"—" },
-    { cls:"gastro", eyebrow:"CATERING", hero:"G · I · G", title:"Mats Gastro", body:"Für Events, Meetings und den echten Hunger nach der Vorlesung.", foot:"Anfrage per DM", mark:"M" },
-    { cls:"minion", eyebrow:"LIVE-PERFORMANCE", hero:"BELLO!", title:"Selinas Minion Impressionen", body:"Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.", foot:"Buchbar für Events", mark:"S" }
-  ];
-
-  function renderAd(slotEl, ad) {
-    const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
-    const inner = `
-      <div class="ad ad--${ad.cls}">
-        <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
-        ${ad.hero ? `<div class="ad-hero">${ad.hero}</div>` : ``}
-        <div class="ad-title">${ad.title}</div>
-        <div class="ad-body">${ad.body}</div>
-        ${ctaHTML}
-        <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
-      </div>`;
-    slotEl.innerHTML = ad.link ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>` : inner;
-    requestAnimationFrame(() => {
-      const el = slotEl.querySelector('.ad');
-      if (el) el.classList.add('show');
-    });
-  }
-  function swapAd(slotEl, ad) {
-    const current = slotEl.querySelector('.ad');
-    if (!current) { renderAd(slotEl, ad); return; }
-    current.classList.remove('show');
-    setTimeout(() => renderAd(slotEl, ad), 380);
-  }
-  let adTick = 0;
-  function cycleAds() {
-    const rightSlot = document.getElementById('adSlotRight');
-    if (!rightSlot) return;
-    adTick = (adTick + 1) % ADS.length;
-    swapAd(rightSlot, ADS[adTick]);
-  }
-  function initAds() {
-    const leftSlot  = document.getElementById('adSlotLeft');
-    const rightSlot = document.getElementById('adSlotRight');
-    if (!leftSlot || !rightSlot) return;
-    renderAd(leftSlot,  PAYPAL_AD);
-    renderAd(rightSlot, ADS[0]);
-    adTick = 0;
-    setInterval(cycleAds, 10000);
-  }
-
-  function setAds(on) {
-    document.body.classList.toggle('ads-off', !on);
-    localStorage.setItem('werk-ads', on ? 'on' : 'off');
-    const label = document.getElementById('adsLabel');
-    if (label) label.textContent = on ? 'Ads' : 'Ads · aus';
-  }
-  (function initAdsToggle(){
-    const stored = localStorage.getItem('werk-ads');
-    setAds(stored !== 'off');
-    const btn = document.getElementById('adsBtn');
-    if (btn) btn.addEventListener('click', () => {
-      const on = !document.body.classList.contains('ads-off');
-      setAds(!on);
-    });
-  })();
-
-  initAds();
-</script>
-
-</body>
-</html>
+  document.addEventListener('visibilit
