@@ -593,7 +593,7 @@
         <p>Du bekommst einen 5-stelligen Code. Schick ihn deinem Gegner — sobald er beitritt, geht's los.</p>
         <div class="field">
           <label for="hostName">Dein Name</label>
-          <input id="hostName" type="text" maxlength="24" placeholder="Name" autocomplete="off" />
+          <input id="hostName" type="text" maxlength="24" placeholder="z. B. Maiko" autocomplete="off" />
         </div>
         <div style="display:flex; gap:12px; margin-top:6px;">
           <button class="btn accent" id="btnCreate">Raum erstellen &rarr;</button>
@@ -611,7 +611,7 @@
         </div>
         <div class="field">
           <label for="guestName">Dein Name</label>
-          <input id="guestName" type="text" maxlength="24" placeholder="Name" autocomplete="off" />
+          <input id="guestName" type="text" maxlength="24" placeholder="z. B. Lina" autocomplete="off" />
         </div>
         <div style="display:flex; gap:12px; margin-top:6px;">
           <button class="btn" id="btnJoin">Raum beitreten &rarr;</button>
@@ -619,7 +619,9 @@
       </div>
     </div>
 
-    
+    <div class="banner">
+      <span>Hinweis · Firebase-Konfiguration in <code>FIREBASE_CONFIG</code> im Skript setzen.</span>
+      <a class="link" href="https://console.firebase.google.com/" target="_blank" rel="noopener">Zur Firebase Console &rarr;</a>
     </div>
   </section>
 
@@ -1436,7 +1438,6 @@ TOPICS.forEach(t => {
 /* =========================================================
    HELFER
 ========================================================= */
-const $ = s => document.querySelector(s);
 function toast(msg, ms=2200){
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
   clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("show"), ms);
