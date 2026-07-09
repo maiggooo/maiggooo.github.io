@@ -428,6 +428,46 @@
     .toggle { padding: 5px 7px; letter-spacing: .06em; }
     .mast .brand { font-size: 22px; }
   }
+
+  /* SECTION-LABEL — Mobile-Fix (Depeschen-Kopf mit Buttons)
+     Auf schmalen Screens wickelt sich der Header sauber um, damit
+     Pause/Reload-Buttons nicht rechts überlaufen. */
+  @media (max-width:720px) {
+    .section-label {
+      flex-wrap: wrap;
+      row-gap: 10px;
+      gap: 10px;
+    }
+    .section-label .rule {
+      flex: 1 1 100%;
+      order: 10;
+      height: 0;
+      background: transparent;
+      margin: 0;
+    }
+    .section-label .meta {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .section-label .reload,
+    .section-label .pause {
+      flex: 0 0 auto;
+    }
+  }
+  @media (max-width:420px) {
+    .section-label {
+      font-size: 10px;
+      letter-spacing: .1em;
+      gap: 8px;
+    }
+    .section-label .meta { font-size: 10px; }
+    .section-label .reload,
+    .section-label .pause {
+      padding: 3px 7px;
+      font-size: 9.5px;
+      letter-spacing: .08em;
+    }
+  }
 </style>
 </head>
 <body>
