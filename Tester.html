@@ -9,332 +9,284 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ===================== THEME TOKENS ===================== */
   :root {
-    --paper:       #f4efe6;
-    --paper-2:     #ebe4d6;
-    --ink:         #1a1a1a;
-    --ink-soft:    #3a3a38;
-    --muted:       #6b6b66;
-    --rule:        #1a1a1a;
-    --rule-soft:   #d4cbb6;
-    --accent:      #c8442a;
-    --accent-soft: #f2d9d1;
-    --ok:          #2f6b3a;
-    --ok-soft:     #d6e5d3;
-    --warn:        #a8541a;
-    --shadow:      0 1px 0 var(--ink);
+    --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
+    --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
+    --accent:#c8442a; --accent-soft:#f2d9d1;
+    --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
+    --shadow:0 1px 0 var(--ink);
   }
   html[data-theme="dark"] {
-    --paper:       #24241d;
-    --paper-2:     #2e2e26;
-    --ink:         #efe8d8;
-    --ink-soft:    #cdc6b6;
-    --muted:       #8a857a;
-    --rule:        #efe8d8;
-    --rule-soft:   #3a3a30;
-    --accent:      #e8623f;
-    --accent-soft: #3a1f18;
-    --ok:          #9dc48b;
-    --ok-soft:     #24301f;
-    --warn:        #d68f4a;
+    --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
+    --muted:#8a857a; --rule:#efe8d8; --rule-soft:#3a3a30;
+    --accent:#e8623f; --accent-soft:#3a1f18;
+    --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: var(--paper); color: var(--ink); }
+  /* ————————————— DESIGN-EFFECTS (Editorial) ————————————— */
+  /* View Transitions */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  .mast .brand { view-transition-name: brand; }
+  ::view-transition-old(brand),
+  ::view-transition-new(brand) { animation-duration: .35s; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  /* Papier-Textur (SVG Noise Overlay) */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22;
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after {
+    opacity: .08;
+    mix-blend-mode: screen;
+  }
+  /* Feine Faserlinien */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before {
+    opacity: .35;
+    mix-blend-mode: overlay;
+  }
+
+  /* Tinten-Bleed */
+  body { text-shadow: 0 0 .32px currentColor; }
+  .mast .brand,
+  .ad-title,
+  .ad-hero,
+  .placeholder,
+  .subhead a.back .arrow {
+    text-shadow:
+      0 0 .45px currentColor,
+      .18px .12px .55px rgba(0,0,0,.10);
+  }
+  .mast .brand em,
+  .ad--paypal .ad-hero,
+  .ad--kirche .ad-hero {
+    text-shadow:
+      0 0 .5px currentColor,
+      .3px .2px .8px rgba(200,68,42,.18);
+  }
+  html[data-theme="dark"] .mast .brand,
+  html[data-theme="dark"] .ad-title,
+  html[data-theme="dark"] .ad-hero,
+  html[data-theme="dark"] .placeholder {
+    text-shadow:
+      0 0 .5px currentColor,
+      .15px .1px .6px rgba(255,235,200,.08);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body { text-shadow: none; }
+  }
+
+  /* Wrap über dem Overlay */
+  .wrap { position: relative; z-index: 1; }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); }
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    font-size:16px; line-height:1.5; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
     transition: background .25s ease, color .25s ease;
   }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 28px 48px; }
 
-  /* ===================== LAYOUT ===================== */
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 28px 48px; }
-
-  /* Masthead — editorial newspaper vibe */
   .mast {
-    border-top: 2px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    padding: 14px 0 10px;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 20px;
+    border-top:2px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:14px 0 10px; display:grid;
+    grid-template-columns:1fr auto 1fr; align-items:center; gap:20px;
   }
   .mast .edition {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
   }
-  .mast .edition.right { display: flex; gap: 8px; justify-content: flex-end; align-items: center; text-align: right; }
+  .mast .edition.right { display:flex; gap:8px; justify-content:flex-end; align-items:center; text-align:right; }
   .mast .brand {
-    font-family: 'Fraunces', serif;
-    font-weight: 800;
-    font-size: 22px;
-    letter-spacing: -.02em;
-    white-space: nowrap;
+    font-family:'Fraunces', serif; font-weight:800; font-size:22px;
+    letter-spacing:-.02em; white-space:nowrap;
   }
-  .mast .brand em { font-style: italic; font-weight: 400; color: var(--accent); }
+  .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
 
-  /* Sub-masthead */
   .subhead {
-    border-bottom: 1px solid var(--rule);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    gap: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
+    border-bottom:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; gap:20px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   }
   .subhead a.back {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color .18s ease;
+    display:inline-flex; align-items:center; gap:10px;
+    color:var(--muted); text-decoration:none; transition:color .18s ease;
   }
-  .subhead a.back:hover { color: var(--ink); }
+  .subhead a.back:hover { color:var(--ink); }
   .subhead a.back .arrow {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 15px;
-    letter-spacing: 0;
-    text-transform: none;
-    line-height: 1;
-    transition: transform .25s cubic-bezier(.7,0,.2,1);
-    display: inline-block;
+    font-family:'Fraunces', serif; font-style:italic; font-size:15px;
+    letter-spacing:0; text-transform:none; line-height:1;
+    transition:transform .25s cubic-bezier(.7,0,.2,1); display:inline-block;
   }
-  .subhead a.back:hover .arrow { transform: translateX(-3px); }
-  .subhead .meta { text-align: right; }
-  @media (max-width: 560px) {
-    .subhead { font-size: 10px; letter-spacing: .12em; }
-    .subhead .meta { display: none; }
+  .subhead a.back:hover .arrow { transform:translateX(-3px); }
+  .subhead .meta { text-align:right; }
+  @media (max-width:560px) {
+    .subhead { font-size:10px; letter-spacing:.12em; }
+    .subhead .meta { display:none; }
   }
 
-  /* Toggle-Buttons (Ads / Theme) */
   .toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid var(--rule);
-    padding: 6px 10px;
-    background: transparent;
-    color: var(--ink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background .15s;
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--rule); padding:6px 10px;
+    background:transparent; color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase;
+    cursor:pointer; transition:background .15s;
   }
-  .toggle:hover { background: var(--paper-2); }
+  .toggle:hover { background:var(--paper-2); }
   .toggle .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--ink);
-    border: 1px solid var(--ink);
-    box-sizing: border-box;
-    display: inline-block;
+    width:10px; height:10px; border-radius:50%;
+    background:var(--ink); border:1px solid var(--ink);
+    box-sizing:border-box; display:inline-block;
   }
 
-  /* ===================== SIDE ADS ===================== */
   .ads-side {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 200px;
-    z-index: 40;
-    display: none;
-    pointer-events: none;
+    position:fixed; top:50%; transform:translateY(-50%);
+    width:200px; z-index:40; display:none; pointer-events:none;
   }
-  .ads-side.left  { left: 20px; }
-  .ads-side.right { right: 20px; }
-  @media (min-width: 1560px) {
-    .ads-side { display: block; }
-  }
-  body.ads-off .ads-side { display: none !important; }
+  .ads-side.left  { left:20px; }
+  .ads-side.right { right:20px; }
+  @media (min-width:1560px) { .ads-side { display:block; } }
+  body.ads-off .ads-side { display:none !important; }
 
-  .ad-slot { position: relative; pointer-events: auto; }
-  .ad-link { display: block; color: inherit; text-decoration: none; }
-  .ad-link .ad { transition: transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
-  .ad-link:hover .ad { transform: translateY(-2px); box-shadow: 3px 3px 0 var(--rule); }
+  .ad-slot { position:relative; pointer-events:auto; }
+  .ad-link { display:block; color:inherit; text-decoration:none; }
+  .ad-link .ad { transition:transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
+  .ad-link:hover .ad { transform:translateY(-2px); box-shadow:3px 3px 0 var(--rule); }
   .ad {
-    position: relative;
-    border: 1px solid var(--rule);
-    background: var(--paper);
-    padding: 14px 14px 12px;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity .35s ease, transform .35s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-height: 200px;
-    font-family: 'Inter', sans-serif;
+    position:relative; border:1px solid var(--rule); background:var(--paper);
+    padding:14px 14px 12px; opacity:0; transform:translateY(4px);
+    transition:opacity .35s ease, transform .35s ease;
+    display:flex; flex-direction:column; gap:8px;
+    min-height:200px; font-family:'Inter', sans-serif;
   }
-  .ad.show { opacity: 1; transform: translateY(0); }
-
+  .ad.show { opacity:1; transform:translateY(0); }
   .ad-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-family:'JetBrains Mono', monospace; font-size:9px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
   }
-  .ad-eyebrow::before {
-    content: "ANZEIGE";
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .ad-eyebrow .sep { color: var(--rule-soft); }
-  .ad-title {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    line-height: 1.05;
-    color: var(--ink);
-    letter-spacing: -.01em;
-  }
-  .ad-body {
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: var(--ink-soft);
-  }
+  .ad-eyebrow::before { content:"ANZEIGE"; color:var(--accent); font-weight:600; }
+  .ad-eyebrow .sep { color:var(--rule-soft); }
+  .ad-title { font-family:'Fraunces', serif; font-size:22px; line-height:1.05; color:var(--ink); letter-spacing:-.01em; }
+  .ad-body { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
   .ad-foot {
-    margin-top: auto;
-    padding-top: 8px;
-    border-top: 1px solid var(--rule-soft);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    margin-top:auto; padding-top:8px; border-top:1px solid var(--rule-soft);
+    font-family:'JetBrains Mono', monospace; font-size:9.5px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+    display:flex; justify-content:space-between; align-items:center;
   }
-  .ad-mark {
-    color: var(--accent);
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-  }
+  .ad-mark { color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
 
-  /* ---- Per-ad variants ---- */
-  .ad--paypal .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; line-height: 1.15; letter-spacing: -.01em; }
-  .ad--paypal .ad-body  { font-size: 11.5px; line-height: 1.5; color: var(--ink-soft); }
-  .ad--paypal .ad-hero  { font-family: 'Fraunces', serif; font-style: italic; font-size: 42px; color: var(--accent); line-height: 1; margin-bottom: 2px; }
+  .ad--paypal .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:22px; line-height:1.15; letter-spacing:-.01em; }
+  .ad--paypal .ad-body  { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad--paypal .ad-hero  { font-family:'Fraunces', serif; font-style:italic; font-size:42px; color:var(--accent); line-height:1; margin-bottom:2px; }
   .ad--paypal .ad-cta {
-    display: block;
-    margin-top: 4px;
-    padding: 11px 12px;
-    background: var(--accent);
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    font-weight: 700;
-    border: 1px solid var(--accent);
-    transition: background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
-    box-shadow: 3px 3px 0 var(--ink);
+    display:block; margin-top:4px; padding:11px 12px;
+    background:var(--accent); color:#fff;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase;
+    text-decoration:none; text-align:center; font-weight:700;
+    border:1px solid var(--accent);
+    transition:background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
+    box-shadow:3px 3px 0 var(--ink);
   }
-  .ad--paypal .ad-cta:hover {
-    background: var(--ink);
-    border-color: var(--ink);
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 var(--accent);
-  }
-  .ad--paypal .ad-cta:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 var(--ink);
-  }
+  .ad--paypal .ad-cta:hover { background:var(--ink); border-color:var(--ink); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .ad--paypal .ad-cta:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
 
-  .ad--kaffee { background: var(--paper-2); }
-  .ad--kaffee .ad-title { font-style: italic; font-size: 28px; }
-  .ad--kaffee .ad-hero  { font-size: 18px; letter-spacing: .35em; color: var(--muted); }
+  .ad--kaffee { background:var(--paper-2); }
+  .ad--kaffee .ad-title { font-style:italic; font-size:28px; }
+  .ad--kaffee .ad-hero  { font-size:18px; letter-spacing:.35em; color:var(--muted); }
 
-  .ad--stink .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; line-height: 1.15; }
-  .ad--stink .ad-hero  { font-size: 28px; letter-spacing: .1em; }
-  .ad--stink .ad-body  { font-style: italic; font-family: 'Fraunces', serif; font-size: 13px; }
+  .ad--stink .ad-title { font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1.15; }
+  .ad--stink .ad-hero  { font-size:28px; letter-spacing:.1em; }
+  .ad--stink .ad-body  { font-style:italic; font-family:'Fraunces', serif; font-size:13px; }
 
-  .ad--pfalz { border-width: 2px; }
-  .ad--pfalz .ad-title { font-family: 'Fraunces', serif; font-size: 17px; text-align: center; line-height: 1.15; }
-  .ad--pfalz .ad-hero  { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; color: var(--accent); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 5px 0; }
-  .ad--pfalz .ad-body  { text-align: center; font-style: italic; font-family: 'Fraunces', serif; font-size: 12.5px; }
+  .ad--pfalz { border-width:2px; }
+  .ad--pfalz .ad-title { font-family:'Fraunces', serif; font-size:17px; text-align:center; line-height:1.15; }
+  .ad--pfalz .ad-hero  { text-align:center; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.3em; color:var(--accent); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:5px 0; }
+  .ad--pfalz .ad-body  { text-align:center; font-style:italic; font-family:'Fraunces', serif; font-size:12.5px; }
 
-  .ad--kirche .ad-hero  { font-family: 'Fraunces', serif; font-size: 34px; color: var(--accent); text-align: center; line-height: 1; }
-  .ad--kirche .ad-title { font-style: italic; font-size: 20px; text-align: center; }
-  .ad--kirche .ad-body  { text-align: center; }
+  .ad--kirche .ad-hero  { font-family:'Fraunces', serif; font-size:34px; color:var(--accent); text-align:center; line-height:1; }
+  .ad--kirche .ad-title { font-style:italic; font-size:20px; text-align:center; }
+  .ad--kirche .ad-body  { text-align:center; }
 
-  .ad--reise .ad-title { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .ad--reise .ad-hero  { font-size: 22px; color: var(--accent); }
-  .ad--reise .ad-body  { border-top: 1px dashed var(--rule-soft); border-bottom: 1px dashed var(--rule-soft); padding: 6px 0; }
+  .ad--reise .ad-title { font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .ad--reise .ad-hero  { font-size:22px; color:var(--accent); }
+  .ad--reise .ad-body  { border-top:1px dashed var(--rule-soft); border-bottom:1px dashed var(--rule-soft); padding:6px 0; }
 
-  .ad--schweig .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 30px; text-align: center; margin: 8px 0 4px; }
-  .ad--schweig .ad-hero  { text-align: center; font-size: 28px; letter-spacing: .5em; color: var(--muted); line-height: 1; }
-  .ad--schweig .ad-body  { text-align: center; font-size: 10.5px; letter-spacing: .02em; }
+  .ad--schweig .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:30px; text-align:center; margin:8px 0 4px; }
+  .ad--schweig .ad-hero  { text-align:center; font-size:28px; letter-spacing:.5em; color:var(--muted); line-height:1; }
+  .ad--schweig .ad-body  { text-align:center; font-size:10.5px; letter-spacing:.02em; }
 
-  .ad--gastro .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .4em; color: var(--paper); background: var(--accent); padding: 5px 10px; display: inline-block; align-self: flex-start; }
-  .ad--gastro .ad-title { font-family: 'Fraunces', serif; font-size: 24px; font-style: italic; }
+  .ad--gastro .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.4em; color:var(--paper); background:var(--accent); padding:5px 10px; display:inline-block; align-self:flex-start; }
+  .ad--gastro .ad-title { font-family:'Fraunces', serif; font-size:24px; font-style:italic; }
 
-  .ad--minion { background: #f5d547; color: #1a1a1a; border-color: #1a1a1a; }
-  .ad--minion .ad-eyebrow { color: #1a1a1a; }
-  .ad--minion .ad-eyebrow::before { background: #1a1a1a; }
-  .ad--minion .ad-hero  { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; letter-spacing: .22em; text-align: center; color: #1a1a1a; padding: 8px 0; border-top: 2px solid #1a1a1a; border-bottom: 2px solid #1a1a1a; }
-  .ad--minion .ad-title { font-family: 'Fraunces', serif; font-style: italic; font-size: 21px; text-align: center; color: #1a1a1a; line-height: 1.15; }
-  .ad--minion .ad-body  { text-align: center; color: #1a1a1a; }
-  .ad--minion .ad-foot  { color: #1a1a1a; border-top-color: rgba(26,26,26,.3); }
-  .ad--minion .ad-mark  { color: #1a1a1a; font-style: italic; }
+  .ad--minion { background:#f5d547; color:#1a1a1a; border-color:#1a1a1a; }
+  .ad--minion .ad-eyebrow { color:#1a1a1a; }
+  .ad--minion .ad-eyebrow::before { background:#1a1a1a; }
+  .ad--minion .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:700; letter-spacing:.22em; text-align:center; color:#1a1a1a; padding:8px 0; border-top:2px solid #1a1a1a; border-bottom:2px solid #1a1a1a; }
+  .ad--minion .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:21px; text-align:center; color:#1a1a1a; line-height:1.15; }
+  .ad--minion .ad-body  { text-align:center; color:#1a1a1a; }
+  .ad--minion .ad-foot  { color:#1a1a1a; border-top-color:rgba(26,26,26,.3); }
+  .ad--minion .ad-mark  { color:#1a1a1a; font-style:italic; }
 
-  /* ===================== FOOTER ===================== */
   .foot {
-    margin-top: 60px;
-    padding-top: 20px;
-    border-top: 2px solid var(--rule);
-    display: flex; justify-content: space-between;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
+    margin-top:60px; padding-top:20px; border-top:2px solid var(--rule);
+    display:flex; justify-content:space-between;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   }
 
-  /* ===================== PLACEHOLDER ===================== */
   .placeholder {
-    margin: 60px 0;
-    padding: 80px 24px;
-    border: 1px dashed var(--rule-soft);
-    text-align: center;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 20px;
-    color: var(--muted);
+    margin:60px 0; padding:80px 24px;
+    border:1px dashed var(--rule-soft); text-align:center;
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:20px; color:var(--muted);
   }
 
-  @media (max-width: 560px) {
-    .wrap { padding: 20px 18px 60px; }
-    .mast { grid-template-columns: 1fr auto; }
-    .mast .edition.left { display: none; }
+  @media (max-width:560px) {
+    .wrap { padding:20px 18px 60px; }
+    .mast { grid-template-columns:1fr auto; }
+    .mast .edition.left { display:none; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- ==================== MASTHEAD ==================== -->
   <header class="mast">
     <div class="edition left">Vol. I · SS 2026 · Nº 03</div>
     <div class="brand">Marketing<em>&amp;</em>Sales</div>
@@ -350,7 +302,6 @@
     </div>
   </header>
 
-  <!-- ==================== SUB-MASTHEAD ==================== -->
   <div class="subhead">
     <a class="back" href="index.html" aria-label="Zurück zur Startseite">
       <span class="arrow">&larr;</span>
@@ -359,28 +310,22 @@
     <span class="meta">Editorial Edition · Vorlage</span>
   </div>
 
-  <!-- ==================== CONTENT (PLATZHALTER) ==================== -->
   <main class="placeholder">
     Hier kommt der Inhalt.
   </main>
 
-  <!-- ==================== FOOTER ==================== -->
   <footer class="foot">
     <span>Strauss · Biebergemünd</span>
     <span id="footYear">© SS 2026 — Editorial edition</span>
   </footer>
 </div>
 
-<!-- ==================== SIDE ADS ==================== -->
 <aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
 <aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
 
 <script>
 const $ = sel => document.querySelector(sel);
 
-/* =========================================================
-   THEME
-========================================================= */
 function initTheme() {
   const saved = localStorage.getItem("ms-theme");
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -393,19 +338,20 @@ function setTheme(theme) {
 }
 $("#themeToggle").addEventListener("click", () => {
   const cur = document.documentElement.getAttribute("data-theme");
-  setTheme(cur === "dark" ? "light" : "dark");
+  const next = cur === "dark" ? "light" : "dark";
+  const swap = () => setTheme(next);
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(swap);
+  } else {
+    swap();
+  }
 });
 
-/* =========================================================
-   ADS TOGGLE
-========================================================= */
 function setAds(on) {
   document.body.classList.toggle("ads-off", !on);
   localStorage.setItem("ms-ads", on ? "on" : "off");
-  const label = $("#adsLabel");
-  if (label) label.textContent = on ? "Ads" : "Ads·off";
-  const dot = $("#adsDot");
-  if (dot) dot.style.background = on ? "var(--ink)" : "transparent";
+  const label = $("#adsLabel"); if (label) label.textContent = on ? "Ads" : "Ads·off";
+  const dot = $("#adsDot"); if (dot) dot.style.background = on ? "var(--ink)" : "transparent";
 }
 (function initAdsToggle(){
   const stored = localStorage.getItem("ms-ads");
@@ -416,35 +362,26 @@ $("#adsToggle").addEventListener("click", () => {
   setAds(!on);
 });
 
-/* =========================================================
-   SIDE ADS — rotierende Anzeigen
-========================================================= */
 const PAYPAL_AD = {
-  cls: "paypal",
-  eyebrow: "UNTERSTÜTZUNG",
-  hero: "☕",
-  title: "Ein Kaffee für Maiko?",
-  body: "Wenn dir die App hilft — kleine Geste, große Freude.",
-  cta: { label: "paypal.me/maiggooo →", url: "https://paypal.me/maiggooo" },
-  foot: "PAYPAL · DANKE",
-  mark: "♡"
+  cls:"paypal", eyebrow:"UNTERSTÜTZUNG", hero:"☕",
+  title:"Ein Kaffee für Maiko?",
+  body:"Wenn dir die App hilft — kleine Geste, große Freude.",
+  cta:{ label:"paypal.me/maiggooo →", url:"https://paypal.me/maiggooo" },
+  foot:"PAYPAL · DANKE", mark:"♡"
 };
-
 const ADS = [
-  { cls: "kaffee",  eyebrow: "CAMPUS",           hero: "· · ·",              title: "Linas Kaffee",             body: "Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot: "Mo–Fr · ab 07:30",  mark: "L" },
-  { cls: "stink",   eyebrow: "DIENSTLEISTUNG",   hero: "☁ ☁ ☁",              title: "Pauls Stinke\u00adservice", body: "„Wir liefern Duft. Meistens den falschen.“",                                          foot: "Auf Anfrage",       mark: "P" },
-  { cls: "pfalz",   eyebrow: "SEIT '74",         hero: "MARKT · FASS · FLASCHE", title: "Getränke Pfalzgraf",  body: "Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.",                          foot: "Landau · Pfalz",    mark: "✦", link: "http://www.getraenke-pfalzgraf.de/" },
-  { cls: "kirche",  eyebrow: "SONNTAGS · 10 UHR", hero: "✝",                 title: "Kians Gottesdienst",       body: "Predigt, Musik, Kaffee danach. Kommt zahlreich.",                                     foot: "Eintritt frei",     mark: "K" },
-  { cls: "reise",   eyebrow: "REISEBÜRO",         hero: "✈",                 title: "Konsis Reiseplaner",       body: "Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.",                  foot: "Buchung · 24/7",    mark: "→" },
-  { cls: "schweig", eyebrow: "PREMIUM STILLE",    hero: ". . .",             title: "Katalinas Schweigen.",     body: "Der Schweigeservice. Wir sagen nichts. Garantiert.",                                  foot: "Diskretion inklusive", mark: "—" },
-  { cls: "gastro",  eyebrow: "CATERING",          hero: "G · I · G",         title: "Mats Gastro",              body: "Für Events, Meetings und den echten Hunger nach der Vorlesung.",                      foot: "Anfrage per DM",    mark: "M" },
-  { cls: "minion",  eyebrow: "LIVE-PERFORMANCE",  hero: "BELLO!",            title: "Selinas Minion Impressionen", body: "Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.",       foot: "Buchbar für Events", mark: "S" }
+  { cls:"kaffee",  eyebrow:"CAMPUS",            hero:"· · ·",                title:"Linas Kaffee",              body:"Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot:"Mo–Fr · ab 07:30",     mark:"L" },
+  { cls:"stink",   eyebrow:"DIENSTLEISTUNG",    hero:"☁ ☁ ☁",                title:"Pauls Stinke\u00adservice", body:"„Wir liefern Duft. Meistens den falschen.“",                                           foot:"Auf Anfrage",          mark:"P" },
+  { cls:"pfalz",   eyebrow:"SEIT '74",          hero:"MARKT · FASS · FLASCHE", title:"Getränke Pfalzgraf",     body:"Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.",                          foot:"Landau · Pfalz",       mark:"✦", link:"http://www.getraenke-pfalzgraf.de/" },
+  { cls:"kirche",  eyebrow:"SONNTAGS · 10 UHR",  hero:"✝",                   title:"Kians Gottesdienst",        body:"Predigt, Musik, Kaffee danach. Kommt zahlreich.",                                      foot:"Eintritt frei",        mark:"K" },
+  { cls:"reise",   eyebrow:"REISEBÜRO",          hero:"✈",                   title:"Konsis Reiseplaner",        body:"Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.",                   foot:"Buchung · 24/7",       mark:"→" },
+  { cls:"schweig", eyebrow:"PREMIUM STILLE",     hero:". . .",               title:"Katalinas Schweigen.",      body:"Der Schweigeservice. Wir sagen nichts. Garantiert.",                                   foot:"Diskretion inklusive", mark:"—" },
+  { cls:"gastro",  eyebrow:"CATERING",           hero:"G · I · G",           title:"Mats Gastro",               body:"Für Events, Meetings und den echten Hunger nach der Vorlesung.",                       foot:"Anfrage per DM",       mark:"M" },
+  { cls:"minion",  eyebrow:"LIVE-PERFORMANCE",   hero:"BELLO!",              title:"Selinas Minion Impressionen", body:"Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.",         foot:"Buchbar für Events",   mark:"S" }
 ];
 
 function renderAd(slotEl, ad) {
-  const ctaHTML = ad.cta
-    ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>`
-    : ``;
+  const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
   const inner = `
     <div class="ad ad--${ad.cls}">
       <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
