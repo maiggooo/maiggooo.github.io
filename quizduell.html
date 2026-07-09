@@ -398,6 +398,32 @@
     .waiting { grid-template-columns: 1fr; text-align: left; }
   }
 
+  /* Ready panel */
+  .ready-panel { display:flex; flex-direction:column; gap:14px; }
+  .ready-row {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  .ready-player {
+    border:1px solid var(--rule); background:var(--paper); padding:12px 14px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .ready-player.is-ready { border-color:var(--accent); box-shadow:4px 4px 0 var(--accent); }
+  .rp-who {
+    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--muted);
+  }
+  .rp-name {
+    font-family:'Fraunces', serif; font-weight:700; font-size:20px; line-height:1.15;
+    color:var(--ink); word-break:break-word;
+  }
+  .rp-state {
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); margin-top:2px;
+  }
+  .rp-state.on { color:var(--accent); }
+  #btnReady[disabled] { opacity:.6; cursor:not-allowed; }
+  #btnReady.is-ready { background:var(--accent); color:var(--paper); border-color:var(--accent); }
+
   /* Duel: scoreboard */
   .board {
     display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px;
@@ -619,10 +645,6 @@
       </div>
     </div>
 
-    <div class="banner">
-      <span>Hinweis · Firebase-Konfiguration in <code>FIREBASE_CONFIG</code> im Skript setzen.</span>
-      <a class="link" href="https://console.firebase.google.com/" target="_blank" rel="noopener">Zur Firebase Console &rarr;</a>
-    </div>
   </section>
 
   <!-- ================= SCREEN 2: WAITING ================= -->
@@ -632,12 +654,29 @@
       <div>
         <div class="code-hint">Raum-Code &mdash; teilen</div>
         <div class="code-display" id="roomCodeBig">— — — — —</div>
-        <div style="display:flex; gap:10px; margin-top: 12px; align-items:center;">
+        <div style="display:flex; gap:10px; margin-top: 12px; align-items:center; flex-wrap:wrap;">
           <button class="btn ghost" id="btnCopyCode">Code kopieren</button>
           <button class="btn ghost" id="btnCancelRoom">Raum abbrechen</button>
         </div>
       </div>
-      <div class="status"><span class="pulse"></span><span>Warte auf zweiten Spieler …</span></div>
+      <div>
+        <div class="status" id="waitStatus"><span class="pulse"></span><span>Warte auf zweiten Spieler …</span></div>
+        <div class="ready-panel hidden" id="readyPanel" style="margin-top:14px;">
+          <div class="ready-row">
+            <div class="ready-player" id="rpMe">
+              <div class="rp-who">Du</div>
+              <div class="rp-name" id="rpMeName">—</div>
+              <div class="rp-state" id="rpMeState">nicht bereit</div>
+            </div>
+            <div class="ready-player" id="rpOpp">
+              <div class="rp-who">Gegner</div>
+              <div class="rp-name" id="rpOppName">—</div>
+              <div class="rp-state" id="rpOppState">nicht bereit</div>
+            </div>
+          </div>
+          <button class="btn accent" id="btnReady">Bereit &rarr;</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1514,7 +1553,7 @@ $("#btnCreate").addEventListener("click", async () => {
     round: 1,
     currentQ: 0,
     questions,
-    host:  { name, score: 0, ready: true },
+    host:  { name, score: 0, ready: false },
     guest: null,
     answers: {},       // { r1_q0: { host:{idx,ts}, guest:{idx,ts} } }
     rematch: { host: false, guest: false },
@@ -1545,10 +1584,10 @@ $("#btnJoin").addEventListener("click", async () => {
 
     S.code = code; S.role = "guest"; S.myName = name;
     await refRoom(code).update({
-      guest: { name, score: 0, ready: true },
-      status: "playing",
+      guest: { name, score: 0, ready: false },
       lastAction: firebase.database.ServerValue.TIMESTAMP
     });
+    enterWaiting();
     subscribeRoom();
   } catch(e){ console.error(e); toast("Beitritt fehlgeschlagen"); }
 });
@@ -1573,6 +1612,53 @@ $("#btnCancelRoom").addEventListener("click", async () => {
   if (!S.code) return;
   try { await refRoom(S.code).remove(); } catch(e){}
   leaveRoom(false);
+});
+
+function updateWaitingUI(room){
+  const me  = S.role === "host" ? room.host  : room.guest;
+  const opp = S.role === "host" ? room.guest : room.host;
+  const panel = $("#readyPanel");
+  const status = $("#waitStatus");
+
+  if (!opp || !opp.name){
+    // Noch kein Gegner: nur "Warte auf zweiten Spieler …"
+    panel.classList.add("hidden");
+    status.classList.remove("hidden");
+    return;
+  }
+
+  // Gegner da → Ready-Panel anzeigen
+  status.classList.add("hidden");
+  panel.classList.remove("hidden");
+
+  $("#rpMeName").textContent  = me?.name || "—";
+  $("#rpOppName").textContent = opp?.name || "—";
+
+  const meReady  = !!me?.ready;
+  const oppReady = !!opp?.ready;
+
+  $("#rpMe").classList.toggle("is-ready", meReady);
+  $("#rpOpp").classList.toggle("is-ready", oppReady);
+  $("#rpMeState").textContent  = meReady  ? "bereit ✓" : "nicht bereit";
+  $("#rpOppState").textContent = oppReady ? "bereit ✓" : "nicht bereit";
+  $("#rpMeState").classList.toggle("on", meReady);
+  $("#rpOppState").classList.toggle("on", oppReady);
+
+  const btn = $("#btnReady");
+  btn.disabled  = meReady;
+  btn.classList.toggle("is-ready", meReady);
+  btn.textContent = meReady
+    ? (oppReady ? "Starte …" : "Warte auf Gegner …")
+    : "Bereit →";
+}
+
+$("#btnReady").addEventListener("click", async () => {
+  if (!S.code || !S.role) return;
+  const key = S.role === "host" ? "host/ready" : "guest/ready";
+  try {
+    await refRoom(S.code).child(key).set(true);
+    await refRoom(S.code).child("lastAction").set(firebase.database.ServerValue.TIMESTAMP);
+  } catch(e){ console.error(e); toast("Konnte nicht bestätigen"); }
 });
 
 /* =========================================================
@@ -1602,7 +1688,15 @@ function handleRoom(room){
 
   // Warte-Zustand
   if (room.status === "waiting"){
-    if (S.role === "host") enterWaiting();
+    enterWaiting();
+    updateWaitingUI(room);
+    // Host schaltet auf "playing", sobald beide bereit sind
+    if (S.role === "host" && room.host?.ready && room.guest?.ready){
+      refRoom(S.code).update({
+        status: "playing",
+        lastAction: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
     return;
   }
   // Beendet
@@ -1627,8 +1721,28 @@ function handleRoom(room){
    DUEL RENDERING
 ========================================================= */
 function renderDuel(room){
+  const isNewQuestion =
+    renderDuel._lastIdx   !== S.currentIdx ||
+    renderDuel._lastRound !== S.round      ||
+    renderDuel._lastCode  !== S.code;
+  renderDuel._lastIdx   = S.currentIdx;
+  renderDuel._lastRound = S.round;
+  renderDuel._lastCode  = S.code;
+
   show("screenDuel");
   setRail("Runde " + S.round + " · Frage " + (S.currentIdx+1) + "/10");
+
+  if (isNewQuestion) {
+    // Smooth scroll zum Frage-Header, damit man beim Weiterschalten
+    // nicht plötzlich am Seitenanfang landet.
+    requestAnimationFrame(() => {
+      const target = document.querySelector("#screenDuel .qmeta");
+      if (!target) return;
+      const y = target.getBoundingClientRect().top + window.scrollY - 24;
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: Math.max(0, y), behavior: prefersReduced ? "auto" : "smooth" });
+    });
+  }
 
   const hostScore  = room.host?.score  || 0;
   const guestScore = room.guest?.score || 0;
