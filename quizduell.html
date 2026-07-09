@@ -1732,17 +1732,7 @@ function renderDuel(room){
   show("screenDuel");
   setRail("Runde " + S.round + " · Frage " + (S.currentIdx+1) + "/10");
 
-  if (isNewQuestion) {
-    // Smooth scroll zum Frage-Header, damit man beim Weiterschalten
-    // nicht plötzlich am Seitenanfang landet.
-    requestAnimationFrame(() => {
-      const target = document.querySelector("#screenDuel .qmeta");
-      if (!target) return;
-      const y = target.getBoundingClientRect().top + window.scrollY - 24;
-      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({ top: Math.max(0, y), behavior: prefersReduced ? "auto" : "smooth" });
-    });
-  }
+  // Kein Auto-Scroll beim Weiterschalten der Frage – nervt vor allem auf Mobile.
 
   const hostScore  = room.host?.score  || 0;
   const guestScore = room.guest?.score || 0;
