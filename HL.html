@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nº 05 · Was schaut die Welt? — Marketing &amp; Sales</title>
+<title>Marketing &amp; Sales — Vorlage</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,8 @@
     --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
   }
 
+  /* ————————————— DESIGN-EFFECTS (Editorial) ————————————— */
+  /* View Transitions */
   @view-transition { navigation: auto; }
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -44,6 +46,7 @@
     ::view-transition-new(root) { animation: none; }
   }
 
+  /* Papier-Textur (SVG Noise Overlay) */
   body::after {
     content: "";
     position: fixed; inset: 0;
@@ -56,6 +59,7 @@
     opacity: .08;
     mix-blend-mode: screen;
   }
+  /* Feine Faserlinien */
   body::before {
     content: "";
     position: fixed; inset: 0;
@@ -70,24 +74,28 @@
     mix-blend-mode: overlay;
   }
 
+  /* Tinten-Bleed */
   body { text-shadow: 0 0 .32px currentColor; }
   .mast .brand,
-  .ad-title, .ad-hero,
-  .card-title, .card-views,
+  .ad-title,
+  .ad-hero,
+  .placeholder,
   .subhead a.back .arrow {
     text-shadow:
       0 0 .45px currentColor,
       .18px .12px .55px rgba(0,0,0,.10);
   }
   .mast .brand em,
-  .card-views {
+  .ad--paypal .ad-hero,
+  .ad--kirche .ad-hero {
     text-shadow:
       0 0 .5px currentColor,
       .3px .2px .8px rgba(200,68,42,.18);
   }
   html[data-theme="dark"] .mast .brand,
   html[data-theme="dark"] .ad-title,
-  html[data-theme="dark"] .ad-hero {
+  html[data-theme="dark"] .ad-hero,
+  html[data-theme="dark"] .placeholder {
     text-shadow:
       0 0 .5px currentColor,
       .15px .1px .6px rgba(255,235,200,.08);
@@ -96,6 +104,7 @@
     body { text-shadow: none; }
   }
 
+  /* Wrap über dem Overlay */
   .wrap { position: relative; z-index: 1; }
 
   * { box-sizing:border-box; margin:0; padding:0; }
@@ -254,8 +263,6 @@
   .ad--minion .ad-foot  { color:#1a1a1a; border-top-color:rgba(26,26,26,.3); }
   .ad--minion .ad-mark  { color:#1a1a1a; font-style:italic; }
 
-  
-
   .foot {
     margin-top:60px; padding-top:20px; border-top:2px solid var(--rule);
     display:flex; justify-content:space-between;
@@ -263,225 +270,17 @@
     letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   }
 
-  /* ============ GAME ============ */
-  .game-head {
-    margin-top:28px; padding-bottom:14px; border-bottom:1px solid var(--rule-soft);
-    display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;
-  }
-  .game-title {
-    font-family:'Fraunces', serif; font-weight:800; font-size:44px;
-    line-height:1; letter-spacing:-.02em;
-  }
-  .game-title em { font-style:italic; font-weight:400; color:var(--accent); }
-  .game-sub {
-    margin-top:8px; font-family:'Fraunces', serif; font-style:italic;
-    font-size:16px; color:var(--muted); max-width:520px;
-  }
-  .scoreboard {
-    display:flex; gap:0; border:1px solid var(--rule);
-    font-family:'JetBrains Mono', monospace;
-  }
-  .score-cell {
-    padding:8px 14px; border-right:1px solid var(--rule);
-    display:flex; flex-direction:column; align-items:center; gap:2px; min-width:70px;
-  }
-  .score-cell:last-child { border-right:0; }
-  .score-label { font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
-  .score-value {
-    font-family:'Fraunces', serif; font-weight:800; font-size:22px; line-height:1;
-  }
-  .score-value.hot { color:var(--accent); }
-
-  .board {
-    display:grid; grid-template-columns:1fr 1fr; gap:20px;
-    margin-top:28px; align-items:stretch;
-  }
-  @media (max-width:720px) { .board { grid-template-columns:1fr; gap:14px; } }
-
-  .card {
-    background:var(--paper-2); border:1px solid var(--rule);
-    box-shadow:5px 5px 0 var(--ink);
-    display:flex; flex-direction:column;
-    transition:transform .35s cubic-bezier(.7,0,.2,1), box-shadow .35s;
-    overflow:hidden;
-  }
-  .card.left  { view-transition-name: cardA; }
-  .card.right { view-transition-name: cardB; }
-  ::view-transition-old(cardA), ::view-transition-new(cardA),
-  ::view-transition-old(cardB), ::view-transition-new(cardB) {
-    animation-duration:.5s; animation-timing-function: cubic-bezier(.7,0,.2,1);
-  }
-
-  .thumb-wrap {
-    position:relative; aspect-ratio:16/9; background:#0d0d0a;
-    overflow:hidden; border-bottom:1px solid var(--rule);
-  }
-  .thumb-wrap img {
-    width:100%; height:100%; object-fit:cover; display:block;
-    filter:contrast(1.05) saturate(.92);
-    transition:transform .5s cubic-bezier(.7,0,.2,1);
-  }
-  .card:hover .thumb-wrap img { transform:scale(1.02); }
-  /* Zeitungsraster über Thumbnails */
-  .thumb-wrap::after {
-    content:""; position:absolute; inset:0;
-    background-image:
-      radial-gradient(circle at center, rgba(0,0,0,.28) 0.5px, transparent 1.2px);
-    background-size: 2.2px 2.2px;
-    mix-blend-mode: multiply;
-    opacity:.55; pointer-events:none;
-  }
-  html[data-theme="dark"] .thumb-wrap::after { opacity:.35; mix-blend-mode:overlay; }
-  .cat-badge {
-    position:absolute; top:10px; left:10px; z-index:2;
-    background:var(--paper); color:var(--ink);
-    border:1px solid var(--ink);
-    font-family:'JetBrains Mono', monospace; font-size:9.5px;
-    letter-spacing:.16em; text-transform:uppercase;
-    padding:4px 8px;
-    box-shadow:2px 2px 0 var(--ink);
-  }
-
-  .card-body { padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px; flex:1; }
-  .card-eyebrow {
-    font-family:'JetBrains Mono', monospace; font-size:10px;
-    letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
-  }
-  .card-title {
-    font-family:'Fraunces', serif; font-weight:600; font-size:20px;
-    line-height:1.2; letter-spacing:-.005em;
-    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
-    overflow:hidden;
-  }
-  .card-channel {
-    font-family:'JetBrains Mono', monospace; font-size:11px;
-    color:var(--muted); letter-spacing:.02em; margin-top:2px;
-  }
-  .card-metric {
-    margin-top:14px; padding-top:12px;
-    border-top:1px dashed var(--rule-soft);
-    display:flex; flex-direction:column; align-items:center;
-  }
-  .card-metric-label {
-    font-family:'JetBrains Mono', monospace; font-size:10px;
-    letter-spacing:.22em; text-transform:uppercase; color:var(--muted);
-  }
-  .card-views {
-    font-family:'Fraunces', serif; font-weight:800;
-    font-size:56px; line-height:1; letter-spacing:-.02em;
-    color:var(--ink); margin-top:6px;
-  }
-  .card-views.reveal { color:var(--accent); }
-  .card-views-unit {
-    font-family:'JetBrains Mono', monospace; font-size:11px;
-    letter-spacing:.18em; color:var(--muted); margin-top:4px;
-  }
-  .card-link {
-    margin-top:12px; text-align:center;
-    font-family:'JetBrains Mono', monospace; font-size:10px;
-    letter-spacing:.18em; text-transform:uppercase;
-    color:var(--muted); text-decoration:none;
-  }
-  .card-link:hover { color:var(--accent); }
-  .card-link .arrow { font-family:'Fraunces', serif; font-style:italic; }
-
-  /* Aktionsleiste (mittig) */
-  .action-bar {
-    margin:28px auto 8px; max-width:520px;
-    display:flex; align-items:center; gap:14px; justify-content:center;
-    position:relative;
-  }
-  .action-bar::before, .action-bar::after {
-    content:""; flex:1; height:1px; background:var(--rule); opacity:.45;
-  }
-  .btn-choice {
-    background:var(--paper); color:var(--ink);
-    border:1.5px solid var(--ink);
-    font-family:'JetBrains Mono', monospace; font-weight:700;
-    font-size:12px; letter-spacing:.18em; text-transform:uppercase;
-    padding:14px 22px; cursor:pointer;
-    box-shadow:3px 3px 0 var(--ink);
-    transition:transform .12s ease, box-shadow .12s ease, background .15s, color .15s;
-    display:inline-flex; align-items:center; gap:10px;
-  }
-  .btn-choice:hover { background:var(--ink); color:var(--paper); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
-  .btn-choice:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
-  .btn-choice:disabled { opacity:.35; cursor:not-allowed; }
-  .btn-choice .arw {
-    font-family:'Fraunces', serif; font-style:normal; font-size:18px; line-height:1;
-  }
-  @media (max-width:560px) {
-    .action-bar::before, .action-bar::after { display:none; }
-    .action-bar { gap:10px; }
-    .btn-choice { padding:12px 16px; font-size:11px; }
-  }
-
-  .verdict {
-    margin:22px auto 0; text-align:center; min-height:44px;
-    font-family:'JetBrains Mono', monospace; font-size:12px;
-    letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
-    display:flex; align-items:center; justify-content:center; gap:12px;
-  }
-  .verdict .badge {
-    display:inline-block; padding:5px 12px; border:1.5px solid currentColor;
-    box-shadow:2px 2px 0 currentColor;
-  }
-  .verdict.ok    { color:var(--ok); }
-  .verdict.bad   { color:var(--accent); }
-
-  .end-panel {
-    margin-top:34px; padding:36px 28px;
-    border:1.5px solid var(--rule); background:var(--paper-2);
-    box-shadow:6px 6px 0 var(--ink);
-    text-align:center;
-  }
-  .end-title {
-    font-family:'Fraunces', serif; font-weight:800; font-size:34px;
-    letter-spacing:-.02em; line-height:1.1;
-  }
-  .end-title em { font-style:italic; color:var(--accent); }
-  .end-sub {
-    margin-top:10px; font-family:'Fraunces', serif; font-style:italic;
-    color:var(--muted); font-size:16px;
-  }
-  .end-stats {
-    margin:22px auto 24px; display:inline-flex; gap:0;
-    border:1px solid var(--rule);
-    font-family:'JetBrains Mono', monospace;
-  }
-  .end-stat { padding:12px 22px; border-right:1px solid var(--rule); text-align:center; }
-  .end-stat:last-child { border-right:0; }
-  .end-stat-label { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
-  .end-stat-value { font-family:'Fraunces', serif; font-weight:800; font-size:28px; margin-top:4px; }
-  .btn-restart {
-    background:var(--accent); color:#fff;
-    border:1.5px solid var(--accent);
-    font-family:'JetBrains Mono', monospace; font-weight:700;
-    font-size:12px; letter-spacing:.18em; text-transform:uppercase;
-    padding:14px 28px; cursor:pointer;
-    box-shadow:3px 3px 0 var(--ink);
-    transition:transform .12s ease, box-shadow .12s ease;
-  }
-  .btn-restart:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); background:var(--ink); border-color:var(--ink); }
-  .btn-restart:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
-
-  .kbd-hint {
-    margin-top:20px; text-align:center;
-    font-family:'JetBrains Mono', monospace; font-size:10px;
-    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
-  }
-  .kbd-hint kbd {
-    display:inline-block; padding:2px 6px; margin:0 2px;
-    border:1px solid var(--rule-soft); border-bottom-width:2px;
-    background:var(--paper-2); font-family:inherit; font-size:9px;
+  .placeholder {
+    margin:60px 0; padding:80px 24px;
+    border:1px dashed var(--rule-soft); text-align:center;
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:20px; color:var(--muted);
   }
 
   @media (max-width:560px) {
     .wrap { padding:20px 18px 60px; }
     .mast { grid-template-columns:1fr auto; }
     .mast .edition.left { display:none; }
-    .game-title { font-size:32px; }
-    .card-views { font-size:42px; }
   }
 </style>
 </head>
@@ -489,7 +288,7 @@
 <div class="wrap">
 
   <header class="mast">
-    <div class="edition left">Vol. I · SS 2026 · Nº 05</div>
+    <div class="edition left">Vol. I · SS 2026 · Nº 03</div>
     <div class="brand">Marketing<em>&amp;</em>Sales</div>
     <div class="edition right">
       <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus" title="Werbung ein/aus">
@@ -508,30 +307,411 @@
       <span class="arrow">&larr;</span>
       <span>Zurück zur Startseite</span>
     </a>
-    <span class="meta">Rubrik · Kabinett · Nº 05</span>
+    <span class="meta">Editorial Edition · Nº 05</span>
   </div>
 
-  <section class="game-head">
-    <div>
-      <h1 class="game-title">Was <em>schaut</em> die Welt?</h1>
-      <p class="game-sub">Zwei YouTube-Videos, eine Frage: Hat das rechte Video <b>mehr</b> oder <b>weniger</b> Aufrufe als das linke?</p>
-    </div>
-    <div class="scoreboard" id="scoreboard">
-      <div class="score-cell"><span class="score-label">Runde</span><span class="score-value" id="stRound">1</span></div>
-      <div class="score-cell"><span class="score-label">Serie</span><span class="score-value" id="stStreak">0</span></div>
-      <div class="score-cell"><span class="score-label">Bestmarke</span><span class="score-value hot" id="stBest">0</span></div>
-    </div>
-  </section>
+  <main class="content">
 
-  <main id="gameArea">
-    <div class="board" id="board"></div>
-    <div class="action-bar" id="actionBar">
-      <button class="btn-choice" id="btnHigher"><span class="arw">↑</span> Höher</button>
-      <button class="btn-choice" id="btnLower"><span class="arw">↓</span> Tiefer</button>
-    </div>
-    <div class="verdict" id="verdict" aria-live="polite"></div>
-    <div class="kbd-hint">Tastatur: <kbd>↑</kbd> Höher · <kbd>↓</kbd> Tiefer · <kbd>Leertaste</kbd> Weiter</div>
-  </main>
+<style>
+  main.placeholder{ all: unset; }
+  .yt-wrap{
+    display:grid; gap: clamp(18px, 3vw, 32px); padding: clamp(14px,3vw,24px) 0 40px;
+  }
+  .yt-lede{
+    text-align:center;
+  }
+  .yt-lede h1{
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size: clamp(30px, 5vw, 54px);
+    line-height:1.02; margin: 8px 0 6px;
+    font-variant: small-caps; letter-spacing: -.01em;
+  }
+  .yt-lede .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .yt-lede .dek{
+    font-family:'Fraunces', serif; font-style: italic;
+    font-size: clamp(15px, 1.6vw, 18px);
+    max-width: 60ch; margin: 6px auto 0; color: var(--ink-soft);
+  }
+  .yt-scoreboard{
+    display:flex; justify-content:center; gap: clamp(14px,3vw,36px);
+    border-block: 1.5px solid var(--rule);
+    padding: 10px 4px; flex-wrap: wrap;
+  }
+  .yt-score{
+    display:flex; flex-direction:column; align-items:center; min-width: 84px;
+  }
+  .yt-score .lbl{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.2em;
+    text-transform:uppercase; color: var(--ink-soft);
+  }
+  .yt-score .val{
+    font-family:'Fraunces',serif; font-weight:700;
+    font-size: clamp(22px, 3.4vw, 32px); line-height:1;
+    font-variant: tabular-nums;
+  }
+
+  .yt-board{
+    display:grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(14px, 2.5vw, 26px);
+    view-transition-name: yt-board;
+  }
+  @media (max-width: 720px){
+    .yt-board{ grid-template-columns: 1fr; }
+  }
+
+  .yt-card{
+    position:relative; display:flex; flex-direction:column;
+    background: var(--paper); border: 1.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 14px 14px 16px;
+    overflow: hidden;
+  }
+  .yt-card .role{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.22em;
+    text-transform:uppercase; color: var(--ink-soft);
+    border-bottom: 1px dashed var(--rule); padding-bottom: 6px; margin-bottom: 10px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .yt-card .role .badge{
+    display:inline-block; padding: 2px 7px; border:1px solid var(--ink);
+    background: color-mix(in oklab, var(--paper), var(--ink) 4%);
+    font-size:9px; letter-spacing:.18em;
+  }
+  .yt-thumb{
+    position:relative; aspect-ratio: 16/9; overflow:hidden;
+    border: 1.5px solid var(--ink); background: color-mix(in oklab, var(--paper), var(--ink) 6%);
+    filter: contrast(1.02) saturate(.9);
+  }
+  .yt-thumb img{
+    width:100%; height:100%; object-fit: cover; display:block;
+    filter: grayscale(.15) contrast(1.05);
+  }
+  /* newsprint dot overlay */
+  .yt-thumb::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image: radial-gradient(rgba(0,0,0,.35) 0.6px, transparent 1.2px);
+    background-size: 3px 3px; mix-blend-mode: multiply; opacity:.35;
+  }
+  .yt-thumb .cat-tag{
+    position:absolute; top:8px; left:8px; z-index:2;
+    background: var(--paper); border:1.5px solid var(--ink);
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; padding: 2px 7px;
+  }
+  .yt-card h2{
+    font-family:'Fraunces', serif; font-weight:700;
+    font-size: clamp(18px, 2vw, 22px);
+    line-height:1.15; margin: 12px 0 4px;
+    letter-spacing:-.005em;
+  }
+  .yt-card .channel{
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    color: var(--ink-soft); letter-spacing:.06em;
+  }
+  .yt-card .fig{
+    margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items: baseline;
+    gap: 12px;
+  }
+  .yt-card .fig .caption{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em;
+    text-transform:uppercase; color: var(--ink-soft);
+  }
+  .yt-card .fig .num{
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size: clamp(28px, 4.4vw, 44px); line-height:1;
+    font-variant: tabular-nums;
+  }
+  .yt-card .fig .num.unknown{ letter-spacing:.08em; }
+  .yt-card .verdict{
+    position:absolute; top: 14px; right: 14px; z-index:3;
+    font-family:'Fraunces', serif; font-weight:800; font-variant: small-caps;
+    letter-spacing:.05em; padding: 4px 10px;
+    border: 1.5px solid var(--ink); background: var(--paper);
+    box-shadow: 2px 2px 0 var(--ink);
+    transform: rotate(-4deg);
+    opacity: 0; transition: opacity .25s;
+  }
+  .yt-card .verdict.show{ opacity: 1; }
+  .yt-card .verdict.hit{ color: #1b6b2e; }
+  .yt-card .verdict.miss{ color: #a11d1d; }
+
+  .yt-card .link-row{
+    margin-top: 10px; display:flex; justify-content: space-between; align-items:center;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+  }
+  .yt-card .link-row a{
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+  }
+  .yt-card .link-row a:hover{ opacity: .7; }
+
+  /* Action bar centered */
+  .yt-actions{
+    display:flex; align-items:center; justify-content:center;
+    gap: 14px;
+    max-width: 520px; margin: 4px auto 0;
+    position: relative;
+  }
+  .yt-actions::before, .yt-actions::after{
+    content:""; flex: 1; height: 1.5px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 4px, transparent 4px 10px);
+    opacity: .55;
+  }
+  .yt-btn{
+    font-family:'Fraunces', serif; font-weight:700; font-variant: small-caps;
+    letter-spacing:.04em; font-size: clamp(15px, 1.8vw, 18px);
+    background: var(--paper); color: var(--ink);
+    border: 1.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+    padding: 10px 18px; cursor: pointer;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .yt-btn:hover{ transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
+  .yt-btn:active{ transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+  .yt-btn[disabled]{ opacity:.5; cursor: not-allowed; }
+  .yt-btn .arr{ display:inline-block; margin-right: 6px; }
+
+  /* End card */
+  .yt-end{
+    text-align:center; padding: 26px 18px;
+    border: 1.5px solid var(--ink); background: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+    max-width: 520px; margin: 10px auto 0;
+  }
+  .yt-end h3{
+    font-family:'Fraunces', serif; font-weight:800; font-variant: small-caps;
+    font-size: clamp(24px, 3.4vw, 34px); margin: 4px 0 6px;
+  }
+  .yt-end p{
+    font-family:'Fraunces', serif; font-style: italic;
+    color: var(--ink-soft); margin: 0 0 14px;
+  }
+  .yt-end .stat{
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    color: var(--ink-soft); letter-spacing:.14em; text-transform:uppercase;
+  }
+
+  /* discreet link + button to old version */
+  .yt-alt{
+    text-align:center; margin-top: 24px;
+    padding-top: 14px; border-top: 1px dashed var(--rule);
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing:.16em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .yt-alt .yt-alt-text{
+    display:block; margin-bottom: 10px;
+    font-family:'Fraunces', serif; font-style: italic;
+    font-size: 13px; letter-spacing: .02em; text-transform: none;
+    color: var(--ink-soft);
+  }
+  .yt-alt-btn{
+    display:inline-block;
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing:.18em; text-transform: uppercase;
+    color: var(--ink-soft); text-decoration: none;
+    background: var(--paper);
+    border: 1px solid var(--ink-soft);
+    box-shadow: 2px 2px 0 var(--ink-soft);
+    padding: 8px 14px;
+    transition: transform .08s, box-shadow .08s, color .08s, border-color .08s;
+  }
+  .yt-alt-btn:hover{
+    color: var(--ink); border-color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: translate(-1px,-1px);
+  }
+  .yt-alt-btn:active{
+    box-shadow: 1px 1px 0 var(--ink);
+    transform: translate(1px,1px);
+  }
+</style>
+
+<div class="yt-wrap">
+  <div class="yt-lede">
+    <div class="kicker">Nº 05 · Feuilleton digital</div>
+    <h1>Was schaut die Welt?</h1>
+    <p class="dek">Höher oder Tiefer — mit echten YouTube-Aufrufen. Welches Video wurde öfter gesehen?</p>
+  </div>
+
+  <div class="yt-scoreboard">
+    <div class="yt-score"><span class="lbl">Runde</span><span class="val" id="ytRound">1</span></div>
+    <div class="yt-score"><span class="lbl">Serie</span><span class="val" id="ytStreak">0</span></div>
+    <div class="yt-score"><span class="lbl">Bestmarke</span><span class="val" id="ytBest">0</span></div>
+  </div>
+
+  <div class="yt-board" id="ytBoard">
+    <!-- Karten werden per JS gerendert -->
+  </div>
+
+  <div class="yt-actions" id="ytActions">
+    <button class="yt-btn" id="ytHigher" type="button"><span class="arr">↑</span>Höher</button>
+    <button class="yt-btn" id="ytLower"  type="button"><span class="arr">↓</span>Tiefer</button>
+  </div>
+
+  <div id="ytEnd"></div>
+
+  <div class="yt-alt">
+    <span class="yt-alt-text">Du willst zur alten Version? Klicke hier —</span>
+    <a class="yt-alt-btn" href="HigherLower.html">Nº 04 · Wikipedia-Variante</a>
+  </div>
+</div>
+
+<script>
+(() => {
+  const VIDEOS = [{"id": "kJQP7kiw5Fk", "cat": "Musik", "views": 8800000000, "title": "Luis Fonsi - Despacito ft. Daddy Yankee", "channel": "LuisFonsiVEVO"}, {"id": "XqZsoesa55w", "cat": "Kids", "views": 15800000000, "title": "Baby Shark Dance", "channel": "Baby Shark - Pinkfong Kids’ Songs & Stories"}, {"id": "9bZkp7q19f0", "cat": "Musik", "views": 5500000000, "title": "PSY - GANGNAM STYLE(강남스타일) M/V", "channel": "officialpsy"}, {"id": "JGwWNGJdvx8", "cat": "Musik", "views": 6400000000, "title": "Ed Sheeran - Shape of You", "channel": "Ed Sheeran"}, {"id": "RgKAFK5djSk", "cat": "Musik", "views": 6400000000, "title": "Wiz Khalifa - See You Again ft. Charlie Puth [Official Video] Furious 7 Soundtrack", "channel": "Wiz Khalifa Music"}, {"id": "OPf0YbXqDm0", "cat": "Musik", "views": 5400000000, "title": "Mark Ronson - Uptown Funk (Official Video) ft. Bruno Mars", "channel": "MarkRonsonVEVO"}, {"id": "hT_nvWreIhg", "cat": "Musik", "views": 3800000000, "title": "OneRepublic - Counting Stars", "channel": "OneRepublicVEVO"}, {"id": "YQHsXMglC9A", "cat": "Musik", "views": 3500000000, "title": "Adele - Hello", "channel": "Adele"}, {"id": "fRh_vgS2dFE", "cat": "Musik", "views": 3400000000, "title": "Justin Bieber - Sorry (PURPOSE : The Movement)", "channel": "JustinBieberVEVO"}, {"id": "uelHwf8o7_U", "cat": "Musik", "views": 3100000000, "title": "Eminem - Love The Way You Lie ft. Rihanna", "channel": "EminemVEVO"}, {"id": "CevxZvSJLk8", "cat": "Musik", "views": 3600000000, "title": "Katy Perry - Roar", "channel": "KatyPerryVEVO"}, {"id": "60ItHLz5WEA", "cat": "Musik", "views": 3300000000, "title": "Alan Walker - Faded", "channel": "Alan Walker"}, {"id": "kffacxfA7G4", "cat": "Musik", "views": 3500000000, "title": "Justin Bieber - Baby ft. Ludacris", "channel": "JustinBieberVEVO"}, {"id": "nfWlot6h_JM", "cat": "Musik", "views": 3400000000, "title": "Taylor Swift - Shake It Off", "channel": "Taylor Swift"}, {"id": "papuvlVeZg8", "cat": "Kids", "views": 3200000000, "title": "Clean Bandit - Rockabye (feat. Sean Paul & Anne-Marie)", "channel": "Clean Bandit"}, {"id": "lp-EO5I60KA", "cat": "Musik", "views": 2500000000, "title": "Ed Sheeran - Thinking Out Loud", "channel": "Ed Sheeran"}, {"id": "PT2_F-1esPk", "cat": "Musik", "views": 2400000000, "title": "The Chainsmokers - Closer (Lyric) ft. Halsey", "channel": "ChainsmokersVEVO"}, {"id": "2Vv-BfVoq4g", "cat": "Musik", "views": 4100000000, "title": "Ed Sheeran - Perfect", "channel": "Ed Sheeran"}, {"id": "pRpeEdMmmQ0", "cat": "Musik", "views": 3800000000, "title": "Shakira - Waka Waka (This Time for Africa) (The Official 2010 FIFA World Cup™ Song)", "channel": "shakiraVEVO"}, {"id": "HP-MbfHFUqs", "cat": "Musik", "views": 2700000000, "title": "Wheels On The Bus + More", "channel": "Little Baby Bum - Nursery Rhymes & Kids Songs"}, {"id": "QtXby3twMmI", "cat": "Musik", "views": 2200000000, "title": "Coldplay - Adventure Of A Lifetime", "channel": "Coldplay"}, {"id": "450p7goxZqg", "cat": "Musik", "views": 4200000000, "title": "John Legend - All of Me", "channel": "johnlegendVEVO"}, {"id": "ktvTqknDobU", "cat": "Musik", "views": 3200000000, "title": "Imagine Dragons - Radioactive", "channel": "ImagineDragonsVEVO"}, {"id": "7wtfhZwyrcc", "cat": "Musik", "views": 2400000000, "title": "Imagine Dragons - Believer", "channel": "ImagineDragonsVEVO"}, {"id": "gCYcHz2k5x0", "cat": "Musik", "views": 1900000000, "title": "Martin Garrix - Animals", "channel": "STMPD RCRDS"}, {"id": "JRfuAukYTKg", "cat": "Musik", "views": 2100000000, "title": "David Guetta - Titanium ft. Sia", "channel": "David Guetta"}, {"id": "Pkh8UtuejGw", "cat": "Musik", "views": 1100000000, "title": "Shawn Mendes, Camila Cabello - Señorita", "channel": "ShawnMendesVEVO"}, {"id": "hLQl3WQQoQ0", "cat": "Musik", "views": 3300000000, "title": "Adele - Someone Like You", "channel": "Adele"}, {"id": "rYEDA3JcQqw", "cat": "Musik", "views": 3200000000, "title": "Adele - Rolling in the Deep", "channel": "Adele"}, {"id": "EPo5wWmKEaI", "cat": "Musik", "views": 800000000, "title": "Pitbull - Give Me Everything ft. Ne-Yo, Afrojack, Nayer", "channel": "PitbullVEVO"}, {"id": "nCkpzqqog4k", "cat": "Musik", "views": 900000000, "title": "Sam Smith - I'm Not The Only One", "channel": "SamSmithVEVO"}, {"id": "5NPBIwQyPWE", "cat": "Musik", "views": 900000000, "title": "Avril Lavigne - Complicated", "channel": "AvrilLavigneVEVO"}, {"id": "FM7MFYoylVs", "cat": "Musik", "views": 2600000000, "title": "The Chainsmokers & Coldplay - Something Just Like This", "channel": "ChainsmokersVEVO"}, {"id": "RBumgq5yVrA", "cat": "Musik", "views": 2800000000, "title": "Passenger", "channel": "Passenger"}, {"id": "dQw4w9WgXcQ", "cat": "Meme", "views": 1500000000, "title": "Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)", "channel": "Rick Astley"}, {"id": "y6120QOlsfU", "cat": "Musik", "views": 620000000, "title": "Darude - Sandstorm", "channel": "Darude"}, {"id": "iik25wqIuFo", "cat": "Musik", "views": 340000000, "title": "Rick roll, but with different link", "channel": "Rick roll, but with a different link"}, {"id": "VYOjWnS4cMY", "cat": "Musik", "views": 730000000, "title": "Childish Gambino - This Is America", "channel": "ChildishGambinoVEVO"}, {"id": "dvgZkm1xWPE", "cat": "Musik", "views": 1300000000, "title": "Coldplay - Viva La Vida", "channel": "Coldplay"}, {"id": "k4V3Mo61fJM", "cat": "Musik", "views": 470000000, "title": "Coldplay - Fix You", "channel": "Coldplay"}, {"id": "YkgkThdzX-8", "cat": "Musik", "views": 4100000000, "title": "IMAGINE. (Ultimate Mix, 2020) - John Lennon & The Plastic Ono Band (with the Flux Fiddlers) HD", "channel": "johnlennon"}, {"id": "KQ6zr6kCPj8", "cat": "Musik", "views": 1800000000, "title": "LMFAO - Party Rock Anthem ft. Lauren Bennett, GoonRock", "channel": "LMFAOVEVO"}, {"id": "SlPhMPnQ58k", "cat": "Musik", "views": 800000000, "title": "Maroon 5 - Memories", "channel": "Maroon5VEVO"}, {"id": "YykjpeuMNEk", "cat": "Musik", "views": 900000000, "title": "Coldplay - Hymn For The Weekend", "channel": "Coldplay"}, {"id": "gdZLi9oWNZg", "cat": "Musik", "views": 3700000000, "title": "BTS (방탄소년단) 'Dynamite' Official MV", "channel": "HYBE LABELS"}, {"id": "WMweEpGlu_U", "cat": "Musik", "views": 2200000000, "title": "BTS (방탄소년단) 'Butter' Official MV", "channel": "HYBE LABELS"}, {"id": "Ct6BUPvE2sM", "cat": "Musik", "views": 900000000, "title": "PIKOTARO - PPAP (Pen Pineapple Apple Pen) (Long Version) (Official Video) [Ultra Records]", "channel": "Ultra Records"}, {"id": "IHNzOHi8sJs", "cat": "Musik", "views": 1600000000, "title": "BLACKPINK - ‘뚜두뚜두 (DDU-DU DDU-DU)’ M/V", "channel": "BLACKPINK"}, {"id": "ioNng23DkIM", "cat": "Musik", "views": 1800000000, "title": "BLACKPINK - 'How You Like That' M/V", "channel": "BLACKPINK"}, {"id": "gQlMMD8auMs", "cat": "Musik", "views": 900000000, "title": "BLACKPINK - ‘Pink Venom’ M/V", "channel": "BLACKPINK"}, {"id": "dyRsYk0LyA8", "cat": "Musik", "views": 800000000, "title": "BLACKPINK - 'Lovesick Girls' M/V", "channel": "BLACKPINK"}, {"id": "32si5cfrCNc", "cat": "Musik", "views": 900000000, "title": "BLACKPINK - 'How You Like That' DANCE PERFORMANCE VIDEO", "channel": "BLACKPINK"}, {"id": "bwmSjveL3Lc", "cat": "Musik", "views": 800000000, "title": "BLACKPINK - '붐바야 (BOOMBAYAH)' M/V", "channel": "BLACKPINK"}, {"id": "Amq-qlqbjYA", "cat": "Musik", "views": 800000000, "title": "BLACKPINK - '마지막처럼 (AS IF IT'S YOUR LAST)' M/V", "channel": "BLACKPINK"}, {"id": "MBdVXkSdhwU", "cat": "Musik", "views": 800000000, "title": "BTS (방탄소년단) 'DNA' Official MV", "channel": "HYBE LABELS"}, {"id": "XsX3ATc3FbA", "cat": "Musik", "views": 3500000000, "title": "BTS (방탄소년단) '작은 것들을 위한 시 (Boy With Luv) (feat. Halsey)' Official MV", "channel": "HYBE LABELS"}, {"id": "09R8_2nJtjg", "cat": "Musik", "views": 3000000000, "title": "Maroon 5 - Sugar", "channel": "Maroon5VEVO"}, {"id": "aJOTlE1K90k", "cat": "Musik", "views": 3500000000, "title": "Maroon 5 - Girls Like You ft. Cardi B", "channel": "Maroon5VEVO"}, {"id": "Ye8mB6VsUHw", "cat": "Musik", "views": 1800000000, "title": "Sesame Street: Cookie Monster Sings C is for Cookie", "channel": "Sesame Street"}, {"id": "YlUKcNNmywk", "cat": "Musik", "views": 470000000, "title": "Red Hot Chili Peppers - Californication (Official Music Video) [HD UPGRADE]", "channel": "Red Hot Chili Peppers"}, {"id": "p47fEXGabaY", "cat": "Musik", "views": 850000000, "title": "Ricky Martin - Livin' La Vida Loca (Official HD Video)", "channel": "RickyMartinVEVO"}, {"id": "F57P9C4SAW4", "cat": "Musik", "views": 200000000, "title": "Katy Perry - California Gurls (Official Music Video) ft. Snoop Dogg", "channel": "KatyPerryVEVO"}, {"id": "nfs8NYg7yQM", "cat": "Musik", "views": 700000000, "title": "Charlie Puth - Attention", "channel": "Charlie Puth"}, {"id": "hFZFjoX2cGg", "cat": "Musik", "views": 800000000, "title": "Backyard Squirrel Maze 1.0- Ninja Warrior Course", "channel": "Mark Rober"}, {"id": "KYniUCGPGLs", "cat": "Musik", "views": 480000000, "title": "Маша и Медведь (Masha and The Bear) - Маша плюс каша (17 Серия)", "channel": "Get Movies"}, {"id": "djV11Xbc914", "cat": "Musik", "views": 4500000000, "title": "a-ha - Take On Me (Official Video) [4K]", "channel": "a-ha"}, {"id": "fJ9rUzIMcZQ", "cat": "Musik", "views": 1700000000, "title": "Queen – Bohemian Rhapsody (Official Video Remastered)", "channel": "Queen Official"}, {"id": "HgzGwKwLmgM", "cat": "Musik", "views": 700000000, "title": "Queen - Don't Stop Me Now", "channel": "Queen Official"}, {"id": "_JZom_gVfuw", "cat": "Musik", "views": 500000000, "title": "The Notorious B.I.G. - Juicy (Official Video) [4K]", "channel": "The Notorious B.I.G."}, {"id": "Zi_XLOBDo_Y", "cat": "Musik", "views": 1200000000, "title": "Michael Jackson - Billie Jean", "channel": "michaeljacksonVEVO"}, {"id": "sOnqjkJTMaA", "cat": "Musik", "views": 3000000000, "title": "Michael Jackson - Thriller (Official 4K Video)", "channel": "michaeljacksonVEVO"}, {"id": "BB0DU4DoPP4", "cat": "Musik", "views": 300000000, "title": "Nickelback - Photograph", "channel": "Nickelback"}, {"id": "QDYfEBY9NM4", "cat": "Musik", "views": 700000000, "title": "Let It Be (Remastered 2009)", "channel": "The Beatles - Topic"}, {"id": "1w7OgIMMRc4", "cat": "Musik", "views": 2200000000, "title": "Guns N' Roses - Sweet Child O' Mine", "channel": "GunsNRosesVEVO"}, {"id": "hTWKbfoikeg", "cat": "Musik", "views": 2100000000, "title": "Nirvana - Smells Like Teen Spirit", "channel": "NirvanaVEVO"}, {"id": "n4RjJKxsamQ", "cat": "Musik", "views": 400000000, "title": "Scorpions - Wind Of Change", "channel": "ScorpionsVEVO"}, {"id": "YnopHCL1Jk8", "cat": "Musik", "views": 100000000, "title": "O-Zone - Dragostea Din Tei", "channel": "Time Records"}, {"id": "O-zpOMYRi0w", "cat": "Musik", "views": 400000000, "title": "Iggy Azalea - Fancy ft. Charli XCX", "channel": "iggyazaleamusicVEVO"}, {"id": "R7yfISlGLNU", "cat": "Musik", "views": 400000000, "title": "I'm On A Boat (ft. T-Pain) - Album Version", "channel": "thelonelyisland"}, {"id": "LjhCEhWiKXk", "cat": "Musik", "views": 300000000, "title": "Bruno Mars - Just The Way You Are", "channel": "Bruno Mars"}, {"id": "TcMBFSGVi1c", "cat": "Trailer", "views": 250000000, "title": "Marvel Studios' Avengers: Endgame - Official Trailer", "channel": "Marvel Entertainment"}, {"id": "6ZfuNTqbHE8", "cat": "Trailer", "views": 180000000, "title": "Marvel Studios' Avengers: Infinity War Official Trailer", "channel": "Marvel Entertainment"}, {"id": "QwievZ1Tx-8", "cat": "Trailer", "views": 100000000, "title": "Marvel Studios' Avengers: Infinity War - Official Trailer", "channel": "Marvel Entertainment"}, {"id": "adzYW5DZoWs", "cat": "Trailer", "views": 70000000, "title": "Star Wars: The Rise of Skywalker – Teaser", "channel": "Star Wars"}, {"id": "sGbxmsDFVnE", "cat": "Trailer", "views": 100000000, "title": "Star Wars: The Force Awakens Trailer (Official)", "channel": "Star Wars"}, {"id": "giXco2jaZ_4", "cat": "Trailer", "views": 90000000, "title": "Top Gun: Maverick", "channel": "Paramount Pictures"}, {"id": "uYPbbksJxIg", "cat": "Trailer", "views": 80000000, "title": "Oppenheimer", "channel": "Universal Pictures"}, {"id": "hA6hldpSTF8", "cat": "Trailer", "views": 70000000, "title": "Marvel Studios' Avengers - Official Trailer", "channel": "Marvel Entertainment"}, {"id": "EXeTwQWrcwY", "cat": "Trailer", "views": 60000000, "title": "The Dark Knight (2008) Official Trailer #1 - Christopher Nolan Movie HD", "channel": "Rotten Tomatoes Classic Trailers"}, {"id": "t433PEQGErc", "cat": "Trailer", "views": 30000000, "title": "JOKER - Teaser Trailer - Now Playing In Theaters", "channel": "Warner Bros."}, {"id": "bK6ldnjE3Y0", "cat": "Trailer", "views": 20000000, "title": "Oppenheimer", "channel": "Universal Pictures"}, {"id": "_OBlgSz8sSM", "cat": "Meme", "views": 900000000, "title": "Charlie bit my finger - again !", "channel": "HDCYT"}, {"id": "kfVsfOSbJY0", "cat": "Meme", "views": 300000000, "title": "Rebecca Black - Friday", "channel": "rebecca"}, {"id": "hFcLyDb6niA", "cat": "Viral", "views": 200000000, "title": "Todd and the sweet little lies", "channel": "Crowbcat"}, {"id": "HEXWRTEbj1I", "cat": "Viral", "views": 100000000, "title": "Haddaway - What Is Love (Official 4K Video)", "channel": "DECADR"}, {"id": "0e3GPea1Tyg", "cat": "Viral", "views": 800000000, "title": "$456,000 Squid Game In Real Life!", "channel": "MrBeast"}, {"id": "WcwGleN38zE", "cat": "Viral", "views": 250000000, "title": "Extreme $100,000 Game of Tag!", "channel": "MrBeast"}, {"id": "erLbbextvlY", "cat": "Viral", "views": 300000000, "title": "7 Days Stranded On An Island", "channel": "MrBeast"}, {"id": "2isYuQZMbdU", "cat": "Viral", "views": 200000000, "title": "100 People Fight For A Private Island", "channel": "MrBeast"}, {"id": "_lNF3_30lUE", "cat": "Musik", "views": 60000000, "title": "How Small Is An Atom? Spoiler: Very Small.", "channel": "Kurzgesagt – In a Nutshell"}, {"id": "k85mRPqvMbE", "cat": "Gaming", "views": 100000000, "title": "Crazy Frog - Axel F", "channel": "Crazy Frog"}, {"id": "VbfpW0pbvaU", "cat": "Musik", "views": 200000000, "title": "Shawn Mendes - Stitches", "channel": "ShawnMendesVEVO"}, {"id": "nvlTJrNJ5lA", "cat": "Musik", "views": 850000000, "title": "Tom Petty And The Heartbreakers - I Won't Back Down", "channel": "TomPettyVEVO"}, {"id": "Io0fBr1XBUA", "cat": "Musik", "views": 800000000, "title": "The Chainsmokers - Don't Let Me Down (Official Video) ft. Daya", "channel": "ChainsmokersVEVO"}, {"id": "2vjPBrBU-TM", "cat": "Musik", "views": 4800000000, "title": "Sia - Chandelier", "channel": "SiaVEVO"}, {"id": "BQ0mxQXmLsk", "cat": "Musik", "views": 250000000, "title": "Camila Cabello - Havana (Official Video) ft. Young Thug", "channel": "CamilaCabelloVEVO"}, {"id": "ZbZSe6N_BXs", "cat": "Musik", "views": 3100000000, "title": "Pharrell Williams - Happy", "channel": "PharrellWilliamsVEVO"}, {"id": "YR5ApYxkU-U", "cat": "Musik", "views": 500000000, "title": "Pink Floyd - Another Brick In The Wall (HQ)", "channel": "mongchilde"}, {"id": "YBHQbu5rbdQ", "cat": "Musik", "views": 200000000, "title": "Fifth Harmony - Worth It (Official Video) ft. Kid Ink", "channel": "FifthHarmonyVEVO"}, {"id": "O4irXQhgMqg", "cat": "Musik", "views": 800000000, "title": "The Rolling Stones - Paint It, Black", "channel": "ABKCOVEVO"}, {"id": "PIh2xe4jnpk", "cat": "Musik", "views": 400000000, "title": "MAGIC! - Rude", "channel": "ournameismagicVEVO"}, {"id": "6Ejga4kJUts", "cat": "Musik", "views": 3400000000, "title": "The Cranberries - Zombie", "channel": "TheCranberriesVEVO"}, {"id": "XjwZAa2EjKA", "cat": "Musik", "views": 100000000, "title": "Katy Perry - Unconditionally (Official)", "channel": "KatyPerryVEVO"}, {"id": "aatr_2MstrI", "cat": "Musik", "views": 300000000, "title": "Clean Bandit - Symphony (feat. Zara Larsson)", "channel": "Clean Bandit"}, {"id": "ru0K8uYEZWw", "cat": "Musik", "views": 200000000, "title": "Justin Timberlake - CAN'T STOP THE FEELING! (from DreamWorks Animation's \"TROLLS\")", "channel": "justintimberlakeVEVO"}, {"id": "qrO4YZeyl0I", "cat": "Musik", "views": 3400000000, "title": "Lady Gaga - Bad Romance", "channel": "LadyGagaVEVO"}, {"id": "bo_efYhYU2A", "cat": "Musik", "views": 1500000000, "title": "Lady Gaga, Bradley Cooper - Shallow (from A Star Is Born)", "channel": "LadyGagaVEVO"}, {"id": "kOkQ4T5WO9E", "cat": "Musik", "views": 800000000, "title": "Calvin Harris, Rihanna - This Is What You Came For", "channel": "CalvinHarrisVEVO"}, {"id": "MB3VkzPdgLA", "cat": "Musik", "views": 400000000, "title": "Billie Eilish - LUNCH", "channel": "BillieEilishVEVO"}, {"id": "QGJuMBdaqIw", "cat": "Musik", "views": 400000000, "title": "Katy Perry - Firework", "channel": "KatyPerryVEVO"}, {"id": "SR6iYWJxHqs", "cat": "Musik", "views": 3400000000, "title": "Bruno Mars - Grenade", "channel": "Bruno Mars"}, {"id": "nPvuNsRccVw", "cat": "Musik", "views": 600000000, "title": "Bruno Mars - Treasure", "channel": "Bruno Mars"}, {"id": "LsoLEjrDogU", "cat": "Musik", "views": 4100000000, "title": "Bruno Mars - Finesse (Remix) (feat. Cardi B)", "channel": "Bruno Mars"}, {"id": "ekzHIouo8Q4", "cat": "Musik", "views": 3500000000, "title": "Bruno Mars - When I Was Your Man", "channel": "Bruno Mars"}, {"id": "PMivT7MJ41M", "cat": "Musik", "views": 200000000, "title": "Bruno Mars - That’s What I Like", "channel": "Bruno Mars"}, {"id": "SC4xMk98Pdc", "cat": "Musik", "views": 3100000000, "title": "Post Malone - Congratulations (Official Music Video) ft. Quavo", "channel": "PostMaloneVEVO"}, {"id": "34Na4j8AVgA", "cat": "Musik", "views": 3300000000, "title": "The Weeknd - Starboy ft. Daft Punk (Official Video) ft. Daft Punk", "channel": "TheWeekndVEVO"}, {"id": "iS1g8G_njx8", "cat": "Musik", "views": 100000000, "title": "Ariana Grande - Problem ft. Iggy Azalea", "channel": "ArianaGrandeVevo"}, {"id": "hHW1oY26kxQ", "cat": "Musik", "views": 300000000, "title": "lofi hip hop radio - beats to relax/study to", "channel": "Lofi Girl"}, {"id": "kXYiU_JCYtU", "cat": "Musik", "views": 2300000000, "title": "Numb (Official Music Video) [4K UPGRADE] – Linkin Park", "channel": "Linkin Park"}, {"id": "v2AC41dglnM", "cat": "Musik", "views": 2400000000, "title": "AC/DC - Thunderstruck", "channel": "acdcVEVO"}, {"id": "qeMFqkcPYcg", "cat": "Musik", "views": 900000000, "title": "Eurythmics, Annie Lennox, Dave Stewart - Sweet Dreams (Are Made Of This)", "channel": "EurythmicsVEVO"}, {"id": "YVkUvmDQ3HY", "cat": "Musik", "views": 900000000, "title": "Eminem - Without Me", "channel": "EminemVEVO"}, {"id": "_Yhyp-_hX2s", "cat": "Musik", "views": 3000000000, "title": "Eminem - Lose Yourself [HD]", "channel": "msvogue23"}, {"id": "QYh6mYIJG2Y", "cat": "Musik", "views": 800000000, "title": "Ariana Grande - 7 rings", "channel": "ArianaGrandeVevo"}, {"id": "SXiSVQZLje8", "cat": "Musik", "views": 300000000, "title": "Ariana Grande ft. Nicki Minaj - Side To Side (Official Video) ft. Nicki Minaj", "channel": "ArianaGrandeVevo"}, {"id": "gl1aHhXnN1k", "cat": "Musik", "views": 300000000, "title": "Ariana Grande - thank u, next", "channel": "ArianaGrandeVevo"}, {"id": "d1YBv2mWll0", "cat": "Kids", "views": 800000000, "title": "Jebaited Song", "channel": "Sordiway"}, {"id": "ZanHgPprl-0", "cat": "Kids", "views": 700000000, "title": "Head Shoulders Knees & Toes (Sing It)", "channel": "Super Simple Songs - Kids Songs"}, {"id": "Zv11L-ZfrSg", "cat": "Kids", "views": 500000000, "title": "Ultimate Wild Animals Collection in 8K ULTRA HD / 8K TV", "channel": "8K VIDEO ULTRA HD HDR"}, {"id": "nW948Va-l10", "cat": "Trailer", "views": 20000000, "title": "Marvel Studios' Loki", "channel": "Marvel Entertainment"}, {"id": "8g18jFHCLXk", "cat": "Trailer", "views": 100000000, "title": "Dune", "channel": "Warner Bros."}, {"id": "hEJnMQG9ev8", "cat": "Trailer", "views": 60000000, "title": "Mad Max: Fury Road - Official Main Trailer [HD]", "channel": "Warner Bros."}, {"id": "mqqft2x_Aa4", "cat": "Trailer", "views": 30000000, "title": "THE BATMAN – Main Trailer", "channel": "Warner Bros."}, {"id": "d9MyW72ELq0", "cat": "Trailer", "views": 200000000, "title": "Avatar: The Way of Water", "channel": "Avatar"}, {"id": "KK8FHdFluOQ", "cat": "Trailer", "views": 50000000, "title": "Disney's Mulan", "channel": "Disney"}, {"id": "HPPj6viIBmU", "cat": "Viral", "views": 300000000, "title": "Star Wars Kid", "channel": "Jimi Love"}, {"id": "EIyixC9NsLI", "cat": "Viral", "views": 300000000, "title": "Badgers : animated music video : MrWeebl", "channel": "Weebl's Stuff"}, {"id": "2Z4m4lnjxkY", "cat": "Viral", "views": 200000000, "title": "Trololo Sing Along!", "channel": "Skip Everling"}, {"id": "dsUXAEzaC3Q", "cat": "Musik", "views": 2100000000, "title": "Michael Jackson - Bad (Shortened Version)", "channel": "michaeljacksonVEVO"}, {"id": "PsO6ZnUZI0g", "cat": "Viral", "views": 200000000, "title": "Kanye West - Stronger", "channel": "KanyeWestVEVO"}, {"id": "l482T0yNkeo", "cat": "Viral", "views": 100000000, "title": "AC/DC - Highway to Hell", "channel": "acdcVEVO"}, {"id": "KlyXNRrsk4A", "cat": "Musik", "views": 200000000, "title": "Katy Perry - Last Friday Night (T.G.I.F.)", "channel": "KatyPerryVEVO"}, {"id": "psuRGfAaju4", "cat": "Musik", "views": 500000000, "title": "Owl City - Fireflies", "channel": "OwlCityVEVO"}, {"id": "QqsLTNkzvaY", "cat": "Viral", "views": 100000000, "title": "What If You Fall into a Black Hole?", "channel": "Kurzgesagt – In a Nutshell"}, {"id": "nGeKSiCQkPw", "cat": "Viral", "views": 100000000, "title": "Ultimate Dog Tease", "channel": "Talking Animals"}, {"id": "MmB9b5njVbA", "cat": "Gaming", "views": 200000000, "title": "Official Minecraft Trailer", "channel": "Minecraft"}, {"id": "HyHNuVaZJ-k", "cat": "Gaming", "views": 300000000, "title": "Gorillaz - Feel Good Inc.", "channel": "Gorillaz"}, {"id": "D_2DBLAt57c", "cat": "Sport", "views": 30000000, "title": "How to Make Classic Carbonara", "channel": "Jamie Oliver"}, {"id": "MnrJzXM7a6o", "cat": "Tech", "views": 30000000, "title": "Steve Jobs introduces iPhone in 2007", "channel": "John Schroter"}, {"id": "kTJczUoc26U", "cat": "Musik", "views": 200000000, "title": "The Kid LAROI, Justin Bieber - STAY", "channel": "TheKidLAROIVEVO"}, {"id": "2yzMUs3badc", "cat": "Musik", "views": 100000000, "title": "Why some Asian accents swap Ls and Rs in English", "channel": "Vox"}, {"id": "Y2V6yjjPbX0", "cat": "Musik", "views": 300000000, "title": "Fitz and the Tantrums - HandClap", "channel": "Fitz and the Tantrums"}, {"id": "W-fFHeTX70Q", "cat": "Musik", "views": 250000000, "title": "The Best of Beethoven", "channel": "HALIDONMUSIC"}, {"id": "6JCLY0Rlx6Q", "cat": "Musik", "views": 100000000, "title": "WALK THE MOON - Shut Up and Dance", "channel": "WalkTheMoonVEVO"}, {"id": "g4mHPeMGTJM", "cat": "Musik", "views": 100000000, "title": "10 hours of absolute silence (the original)", "channel": "Trollmann"}, {"id": "MYSVMgRr6pw", "cat": "Musik", "views": 300000000, "title": "Hozier - Take Me To Church", "channel": "HozierVEVO"}];
+
+  const fmt = new Intl.NumberFormat('de-DE');
+  const $ = (id) => document.getElementById(id);
+  const board = $('ytBoard');
+  const btnHi = $('ytHigher'), btnLo = $('ytLower');
+  const endEl = $('ytEnd'), actionsEl = $('ytActions');
+  const roundEl = $('ytRound'), streakEl = $('ytStreak'), bestEl = $('ytBest');
+
+  // shuffle helper
+  const shuffle = (a) => { for (let i=a.length-1;i>0;i--){ const j=Math.random()*(i+1)|0; [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+  let deck = shuffle([...VIDEOS]);
+  let left = null, right = null;
+  let round = 1, streak = 0, best = +(localStorage.getItem('yt-hl-best') || 0);
+  bestEl.textContent = best;
+
+  const nextCard = () => {
+    if (!deck.length) deck = shuffle([...VIDEOS]);
+    return deck.pop();
+  };
+
+  const cardHTML = (v, role, reveal) => {
+    const thumb = `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
+    const num = reveal
+      ? `<span class="num">${fmt.format(v.views)}</span>`
+      : `<span class="num unknown">?</span>`;
+    const caption = reveal ? 'Aufrufe' : 'Aufrufe · verdeckt';
+    return `
+      <article class="yt-card" data-role="${role}">
+        <div class="role"><span>${role === 'left' ? 'Referenz' : 'Rätsel'}</span><span class="badge">${v.cat}</span></div>
+        <div class="yt-thumb">
+          <span class="cat-tag">YouTube</span>
+          <img src="${thumb}" alt="" loading="lazy"
+               onerror="this.style.opacity=0" />
+        </div>
+        <h2>${v.title.replace(/</g,'&lt;')}</h2>
+        <div class="channel">${(v.channel||'').replace(/</g,'&lt;')}</div>
+        <div class="fig">
+          <span class="caption">${caption}</span>
+          ${num}
+        </div>
+        <div class="link-row">
+          <span>Video-ID · ${v.id}</span>
+          <a href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">Auf YouTube ansehen →</a>
+        </div>
+        <div class="verdict" data-verdict></div>
+      </article>
+    `;
+  };
+
+  const renderBoard = () => {
+    board.innerHTML = cardHTML(left, 'left', true) + cardHTML(right, 'right', false);
+  };
+
+  const startRound = () => {
+    if (!left) left = nextCard();
+    right = nextCard();
+    // avoid same video twice in a row
+    while (right.id === left.id) right = nextCard();
+    round++;
+    roundEl.textContent = round - 1; // display current round (starts at 1)
+    renderBoard();
+    btnHi.disabled = false; btnLo.disabled = false;
+  };
+
+  const setVerdict = (cardEl, ok) => {
+    const v = cardEl.querySelector('[data-verdict]');
+    v.textContent = ok ? 'Treffer' : 'Daneben';
+    v.classList.remove('hit','miss');
+    v.classList.add(ok ? 'hit' : 'miss', 'show');
+  };
+
+  const revealRight = () => {
+    const rightEl = board.querySelector('[data-role="right"]');
+    const fig = rightEl.querySelector('.fig');
+    fig.innerHTML = `<span class="caption">Aufrufe</span><span class="num">${fmt.format(right.views)}</span>`;
+  };
+
+  const endGame = () => {
+    actionsEl.style.display = 'none';
+    if (streak > best) { best = streak; localStorage.setItem('yt-hl-best', best); bestEl.textContent = best; }
+    endEl.innerHTML = `
+      <div class="yt-end">
+        <div class="stat">Ausgabe geschlossen</div>
+        <h3>${streak} in Folge</h3>
+        <p>${streak === 0 ? 'Ein neuer Versuch?' : streak >= best ? 'Neue Bestmarke — die Redaktion applaudiert.' : 'Noch nicht die Bestmarke. Nächste Ausgabe?'}</p>
+        <button class="yt-btn" id="ytRestart" type="button">Neue Runde</button>
+      </div>
+    `;
+    document.getElementById('ytRestart').addEventListener('click', restart);
+  };
+
+  const answer = (guessHigher) => {
+    btnHi.disabled = true; btnLo.disabled = true;
+    revealRight();
+
+    const rightViews = right.views, leftViews = left.views;
+    const isEqual = rightViews === leftViews;
+    const rightHigher = rightViews > leftViews;
+    const ok = isEqual || (guessHigher ? rightHigher : !rightHigher);
+
+    const rightEl = board.querySelector('[data-role="right"]');
+    const leftEl  = board.querySelector('[data-role="left"]');
+    setVerdict(rightEl, ok);
+
+    if (ok) {
+      streak++;
+      streakEl.textContent = streak;
+      // slide: right becomes the new left; new right slides in
+      setTimeout(() => {
+        const doSwap = () => {
+          left = right; // right becomes reference next round
+          startRound();
+        };
+        if (document.startViewTransition) {
+          document.startViewTransition(doSwap);
+        } else {
+          doSwap();
+        }
+      }, 900);
+    } else {
+      setTimeout(endGame, 1200);
+    }
+  };
+
+  const restart = () => {
+    endEl.innerHTML = '';
+    actionsEl.style.display = '';
+    deck = shuffle([...VIDEOS]);
+    left = null; right = null; round = 0; streak = 0;
+    streakEl.textContent = 0;
+    startRound();
+  };
+
+  btnHi.addEventListener('click', () => answer(true));
+  btnLo.addEventListener('click', () => answer(false));
+  document.addEventListener('keydown', (e) => {
+    if (btnHi.disabled) return;
+    if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'h') answer(true);
+    if (e.key === 'ArrowDown' || e.key.toLowerCase() === 't') answer(false);
+  });
+
+  startRound();
+})();
+</script>
+
+</main>
 
   <footer class="foot">
     <span>Strauss · Biebergemünd</span>
@@ -643,322 +823,6 @@ function initAds() {
 
 initTheme();
 initAds();
-
-
-/* ================= GAME ================= */
-const VIDEOS = [
-  {id:'kJQP7kiw5Fk', title:'Luis Fonsi - Despacito ft. Daddy Yankee', channel:'LuisFonsiVEVO', views:8700, cat:'Musik'},
-  {id:'9bZkp7q19f0', title:'PSY - GANGNAM STYLE(강남스타일) M/V', channel:'officialpsy', views:5400, cat:'Musik'},
-  {id:'RgKAFK5djSk', title:'Wiz Khalifa - See You Again ft. Charlie Puth [Official Video] Furious 7 Soundtrack', channel:'Wiz Khalifa Music', views:6500, cat:'Musik'},
-  {id:'JGwWNGJdvx8', title:'Ed Sheeran - Shape of You (Official Music Video)', channel:'Ed Sheeran', views:6300, cat:'Musik'},
-  {id:'OPf0YbXqDm0', title:'Mark Ronson - Uptown Funk (Official Video) ft. Bruno Mars', channel:'MarkRonsonVEVO', views:5600, cat:'Musik'},
-  {id:'fRh_vgS2dFE', title:'Justin Bieber - Sorry (PURPOSE : The Movement)', channel:'JustinBieberVEVO', views:3900, cat:'Musik'},
-  {id:'09R8_2nJtjg', title:'Maroon 5 - Sugar (Official Music Video)', channel:'Maroon5VEVO', views:4100, cat:'Musik'},
-  {id:'CevxZvSJLk8', title:'Katy Perry - Roar', channel:'KatyPerryVEVO', views:4000, cat:'Musik'},
-  {id:'0KSOMA3QBU0', title:'Katy Perry - Dark Horse ft. Juicy J', channel:'KatyPerryVEVO', views:3800, cat:'Musik'},
-  {id:'q0hyYWKXF0Q', title:'TONES AND I - DANCE MONKEY (OFFICIAL VIDEO)', channel:'Tones And I', views:2900, cat:'Musik'},
-  {id:'BQ0mxQXmLsk', title:'Camila Cabello - Havana (Official Video) ft. Young Thug', channel:'CamilaCabelloVEVO', views:2100, cat:'Musik'},
-  {id:'nfWlot6h_JM', title:'Taylor Swift - Shake It Off', channel:'Taylor Swift', views:3600, cat:'Musik'},
-  {id:'e-ORhEE9VVg', title:'Taylor Swift - Blank Space', channel:'Taylor Swift', views:3500, cat:'Musik'},
-  {id:'7PCkvCPvDXk', title:'Meghan Trainor - All About That Bass (Official Video)', channel:'MeghanTrainorVEVO', views:2700, cat:'Musik'},
-  {id:'hT_nvWreIhg', title:'OneRepublic - Counting Stars', channel:'OneRepublicVEVO', views:4400, cat:'Musik'},
-  {id:'lp-EO5I60KA', title:'Ed Sheeran - Thinking Out Loud (Official Music Video)', channel:'Ed Sheeran', views:3800, cat:'Musik'},
-  {id:'rYEDA3JcQqw', title:'Adele - Rolling in the Deep (Official Music Video)', channel:'Adele', views:2500, cat:'Musik'},
-  {id:'YQHsXMglC9A', title:'Adele - Hello (Official Music Video)', channel:'Adele', views:3500, cat:'Musik'},
-  {id:'ASO_zypdnsQ', title:'PSY - GENTLEMAN M/V', channel:'officialpsy', views:1600, cat:'Musik'},
-  {id:'nYh-n7EOtMA', title:'Sia - Cheap Thrills (Official Lyric Video) ft. Sean Paul', channel:'SiaVEVO', views:2000, cat:'Musik'},
-  {id:'60ItHLz5WEA', title:'Alan Walker - Faded', channel:'Alan Walker', views:3900, cat:'Musik'},
-  {id:'pRpeEdMmmQ0', title:'Shakira - Waka Waka (This Time for Africa) (The Official 2010 FIFA World Cup™ Song)', channel:'shakiraVEVO', views:4200, cat:'Musik'},
-  {id:'r7qovpFAGrQ', title:'Lil Nas X - Old Town Road (Official Video) ft. Billy Ray Cyrus', channel:'LilNasXVEVO', views:620, cat:'Musik'},
-  {id:'DyDfgMOUjCI', title:'Billie Eilish - bad guy', channel:'BillieEilishVEVO', views:1500, cat:'Musik'},
-  {id:'2Vv-BfVoq4g', title:'Ed Sheeran - Perfect (Official Music Video)', channel:'Ed Sheeran', views:4100, cat:'Musik'},
-  {id:'nfs8NYg7yQM', title:'Charlie Puth - Attention [Official Video]', channel:'Charlie Puth', views:1400, cat:'Musik'},
-  {id:'PT2_F-1esPk', title:'The Chainsmokers - Closer (Lyric) ft. Halsey', channel:'ChainsmokersVEVO', views:3600, cat:'Musik'},
-  {id:'aJOTlE1K90k', title:'Maroon 5 - Girls Like You ft. Cardi B (Official Music Video)', channel:'Maroon5VEVO', views:3200, cat:'Musik'},
-  {id:'kOkQ4T5WO9E', title:'Calvin Harris, Rihanna - This Is What You Came For (Official Video)', channel:'CalvinHarrisVEVO', views:570, cat:'Musik'},
-  {id:'kffacxfA7G4', title:'Justin Bieber - Baby ft. Ludacris', channel:'JustinBieberVEVO', views:3400, cat:'Musik'},
-  {id:'hLQl3WQQoQ0', title:'Adele - Someone Like You (Official Music Video)', channel:'Adele', views:2800, cat:'Musik'},
-  {id:'papuvlVeZg8', title:'Clean Bandit - Rockabye (feat. Sean Paul & Anne-Marie) [Official Video]', channel:'Clean Bandit', views:2600, cat:'Musik'},
-  {id:'Io0fBr1XBUA', title:'The Chainsmokers - Don\'t Let Me Down (Official Video) ft. Daya', channel:'ChainsmokersVEVO', views:2000, cat:'Musik'},
-  {id:'2vjPBrBU-TM', title:'Sia - Chandelier (Official Video)', channel:'SiaVEVO', views:400, cat:'Musik'},
-  {id:'YykjpeuMNEk', title:'Coldplay - Hymn For The Weekend (Official Video)', channel:'Coldplay', views:2500, cat:'Musik'},
-  {id:'dvgZkm1xWPE', title:'Coldplay - Viva La Vida (Official Video)', channel:'Coldplay', views:1300, cat:'Musik'},
-  {id:'RB-RcX5DS5A', title:'Coldplay - The Scientist (Official 4K Video)', channel:'Coldplay', views:1400, cat:'Musik'},
-  {id:'QK8mJJJvaes', title:'MACKLEMORE & RYAN LEWIS - THRIFT SHOP FEAT. WANZ (OFFICIAL VIDEO)', channel:'Macklemore', views:1000, cat:'Musik'},
-  {id:'dQw4w9WgXcQ', title:'Rick Astley - Never Gonna Give You Up (Official Video) (4K Remaster)', channel:'Rick Astley', views:1700, cat:'Musik'},
-  {id:'fJ9rUzIMcZQ', title:'Queen – Bohemian Rhapsody (Official Video Remastered)', channel:'Queen Official', views:2300, cat:'Musik'},
-  {id:'iywaBOMvYLI', title:'System Of A Down - Toxicity (Official HD Video)', channel:'systemofadownVEVO', views:400, cat:'Musik'},
-  {id:'btPJPFnesV4', title:'Survivor - Eye Of The Tiger (Official HD Video)', channel:'SurvivorVEVO', views:900, cat:'Musik'},
-  {id:'y6120QOlsfU', title:'Darude - Sandstorm', channel:'Darude', views:300, cat:'Musik'},
-  {id:'SlPhMPnQ58k', title:'Maroon 5 - Memories (Official Video)', channel:'Maroon5VEVO', views:400, cat:'Musik'},
-  {id:'450p7goxZqg', title:'John Legend - All of Me (Official Video)', channel:'johnlegendVEVO', views:3000, cat:'Musik'},
-  {id:'QGJuMBdaqIw', title:'Katy Perry - Firework (Official Music Video)', channel:'KatyPerryVEVO', views:100, cat:'Musik'},
-  {id:'iS1g8G_njx8', title:'Ariana Grande - Problem ft. Iggy Azalea', channel:'ArianaGrandeVevo', views:900, cat:'Musik'},
-  {id:'VbfpW0pbvaU', title:'Shawn Mendes - Stitches (Official Music Video)', channel:'ShawnMendesVEVO', views:250, cat:'Musik'},
-  {id:'kXYiU_JCYtU', title:'Numb (Official Music Video) [4K UPGRADE] – Linkin Park', channel:'Linkin Park', views:2500, cat:'Musik'},
-  {id:'v2AC41dglnM', title:'AC/DC - Thunderstruck (Official Video)', channel:'acdcVEVO', views:2000, cat:'Musik'},
-  {id:'gdZLi9oWNZg', title:'BTS (방탄소년단) \'Dynamite\' Official MV', channel:'HYBE LABELS', views:2100, cat:'Musik'},
-  {id:'Ovj4hFxko7c', title:'What the #$%@ is UX Design?', channel:'UX Mastery', views:970, cat:'Musik'},
-  {id:'32si5cfrCNc', title:'BLACKPINK - \'How You Like That\' DANCE PERFORMANCE VIDEO', channel:'BLACKPINK', views:2200, cat:'Musik'},
-  {id:'gQlMMD8auMs', title:'BLACKPINK - ‘Pink Venom’ M/V', channel:'BLACKPINK', views:1400, cat:'Musik'},
-  {id:'POe9SOEKotk', title:'BLACKPINK - ‘Shut Down’ M/V', channel:'BLACKPINK', views:750, cat:'Musik'},
-  {id:'XsX3ATc3FbA', title:'BTS (방탄소년단) \'작은 것들을 위한 시 (Boy With Luv) (feat. Halsey)\' Official MV', channel:'HYBE LABELS', views:1100, cat:'Musik'},
-  {id:'Zi_XLOBDo_Y', title:'Michael Jackson - Billie Jean (Official Video)', channel:'michaeljacksonVEVO', views:1500, cat:'Musik'},
-  {id:'2zNSgSzhBfM', title:'MACKLEMORE & RYAN LEWIS - CAN\'T HOLD US FEAT. RAY DALTON (OFFICIAL MUSIC VIDEO)', channel:'Macklemore', views:250, cat:'Musik'},
-  {id:'bnVUHWCynig', title:'Beyoncé - Halo', channel:'BeyoncéVEVO', views:200, cat:'Musik'},
-  {id:'XqZsoesa55w', title:'Baby Shark Dance | #babyshark Most Viewed Video | Animal Songs | PINKFONG Songs for Children', channel:'Baby Shark - Pinkfong Kids’ Songs & Stories', views:15000, cat:'Kids'},
-  {id:'_UR-l3QI2nE', title:'ABC SONG | ABC Songs for Children - 13 Alphabet Songs & 26 Videos', channel:'Cocomelon - Nursery Rhymes', views:5500, cat:'Kids'},
-  {id:'e_04ZrNroTo', title:'Wheels on the Bus | @CoComelon Nursery Rhymes & Kids Songs', channel:'Cocomelon - Nursery Rhymes', views:6500, cat:'Kids'},
-  {id:'XiCrniLQGYc', title:'I had a black dog, his name was depression', channel:'World Health Organization (WHO)', views:3000, cat:'Kids'},
-  {id:'KYniUCGPGLs', title:'Маша и Медведь (Masha and The Bear) - Маша плюс каша (17 Серия)', channel:'Get Movies', views:2900, cat:'Kids'},
-  {id:'EXeTwQWrcwY', title:'The Dark Knight (2008) Official Trailer #1 - Christopher Nolan Movie HD', channel:'Rotten Tomatoes Classic Trailers', views:60, cat:'Trailer'},
-  {id:'6ZfuNTqbHE8', title:'Marvel Studios\' Avengers: Infinity War Official Trailer', channel:'Marvel Entertainment', views:350, cat:'Trailer'},
-  {id:'TcMBFSGVi1c', title:'Marvel Studios\' Avengers: Endgame - Official Trailer', channel:'Marvel Entertainment', views:250, cat:'Trailer'},
-  {id:'d9MyW72ELq0', title:'Avatar: The Way of Water | Official Trailer', channel:'Avatar', views:130, cat:'Trailer'},
-  {id:'adzYW5DZoWs', title:'Star Wars: The Rise of Skywalker – Teaser', channel:'Star Wars', views:60, cat:'Trailer'},
-  {id:'sGbxmsDFVnE', title:'Star Wars: The Force Awakens Trailer (Official)', channel:'Star Wars', views:375, cat:'Trailer'},
-  {id:'giXco2jaZ_4', title:'Top Gun: Maverick | NEW Official Trailer (2022 Movie) - Tom Cruise', channel:'Paramount Pictures', views:45, cat:'Trailer'},
-  {id:'TnGl01FkMMo', title:'The Super Mario Bros. Movie | Official Trailer', channel:'Illumination', views:60, cat:'Trailer'},
-  {id:'bK6ldnjE3Y0', title:'Oppenheimer | Official Trailer', channel:'Universal Pictures', views:30, cat:'Trailer'},
-  {id:'uYPbbksJxIg', title:'Oppenheimer | New Trailer', channel:'Universal Pictures', views:200, cat:'Trailer'},
-  {id:'VyHV0BRtdxo', title:'Harry Potter and the Sorcerer\'s Stone (2001) Official Trailer - Daniel Radcliffe Movie HD', channel:'Rotten Tomatoes Classic Trailers', views:165, cat:'Trailer'},
-  {id:'_OBlgSz8sSM', title:'Charlie bit my finger - again !', channel:'HDCYT', views:900, cat:'Viral'},
-  {id:'otCpCn0l4Wo', title:'M.C. Hammer - U Can\'t Touch This', channel:'MCHammerVevo', views:145, cat:'Viral'},
-  {id:'dMH0bHeiRNg', title:'Evolution of Dance', channel:'Judson Laipply', views:300, cat:'Viral'},
-  {id:'W6DmHGYy_xk', title:'Wrecking Ball (Chatroulette Version)', channel:'SteveKardynal', views:150, cat:'Viral'},
-  {id:'0e3GPea1Tyg', title:'$456,000 Squid Game In Real Life!', channel:'MrBeast', views:700, cat:'Viral'},
-  {id:'WcwGleN38zE', title:'Extreme $100,000 Game of Tag!', channel:'MrBeast', views:200, cat:'Viral'},
-  {id:'erLbbextvlY', title:'7 Days Stranded On An Island', channel:'MrBeast', views:300, cat:'Viral'},
-  {id:'QkkoHAzjnUs', title:'Grand Theft Auto V Trailer', channel:'Rockstar Games', views:250, cat:'Gaming'},
-  {id:'MnrJzXM7a6o', title:'Steve Jobs introduces iPhone in 2007', channel:'John Schroter', views:30, cat:'Tech'},
-  {id:'bZe5J8SVCYQ', title:'The Missile Knows Where It Is...', channel:'Jeff7181', views:5, cat:'Tech'},
-  {id:'qX2GsMj7154', title:'MAYDAY 五月天 [ 乾杯 Cheers ] Official Music Video', channel:'相信音樂BinMusic', views:100, cat:'Sport'},
-  {id:'uelHwf8o7_U', title:'Eminem - Love The Way You Lie ft. Rihanna', channel:'EminemVEVO', views:2600, cat:'Musik'},
-  {id:'YVkUvmDQ3HY', title:'Eminem - Without Me (Official Music Video)', channel:'EminemVEVO', views:1400, cat:'Musik'},
-  {id:'_Yhyp-_hX2s', title:'Eminem - Lose Yourself [HD]', channel:'msvogue23', views:1300, cat:'Musik'},
-  {id:'XbGs_qK2PQA', title:'Eminem - Rap God (Explicit)', channel:'EminemVEVO', views:1500, cat:'Musik'},
-  {id:'j5-yKhDd64s', title:'Eminem - Not Afraid', channel:'EminemVEVO', views:100, cat:'Musik'},
-  {id:'DK_0jXPuIr0', title:'Justin Bieber - What Do You Mean?', channel:'JustinBieberVEVO', views:200, cat:'Musik'},
-  {id:'iAP9AF6DCu4', title:'The Calling - Wherever You Will Go (Official Video)', channel:'TheCallingVEVO', views:900, cat:'Musik'},
-  {id:'2Y6Nne8RvaA', title:'Kungs vs Cookin’ on 3 Burners - This Girl', channel:'KungsVEVO', views:900, cat:'Musik'},
-  {id:'EIyixC9NsLI', title:'Badgers : animated music video : MrWeebl', channel:'Weebl\'s Stuff', views:700, cat:'Musik'},
-  {id:'VBmMU_iwe6U', title:'Beyoncé - Run the World (Girls) (Official Video)', channel:'BeyoncéVEVO', views:500, cat:'Musik'},
-  {id:'gCYcHz2k5x0', title:'Martin Garrix - Animals (Official Video)', channel:'STMPD RCRDS', views:2200, cat:'Musik'},
-  {id:'IcrbM1l_BoI', title:'Avicii - Wake Me Up (Official Video)', channel:'AviciiOfficialVEVO', views:1000, cat:'Musik'},
-  {id:'D5drYkLiLI8', title:'Kygo & Selena Gomez - It Ain\'t Me (Audio)', channel:'KygoOfficialVEVO', views:700, cat:'Musik'},
-  {id:'V1bFr2SWP1I', title:'OFFICIAL Somewhere over the Rainbow - Israel "IZ" Kamakawiwoʻole', channel:'Mountain Apple Company Inc', views:700, cat:'Musik'},
-  {id:'mWRsgZuwf_8', title:'Imagine Dragons - Demons (Official Music Video)', channel:'ImagineDragonsVEVO', views:500, cat:'Musik'},
-  {id:'6Dh-RL__uN4', title:'bitch lasagna', channel:'PewDiePie', views:900, cat:'Musik'},
-  {id:'hFdMHvB6-Jk', title:'Mel Wainwright - Cold`n hot duck time - Eddie Harris', channel:'Mel Wainwright', views:900, cat:'Musik'},
-  {id:'bo_efYhYU2A', title:'Lady Gaga, Bradley Cooper - Shallow (from A Star Is Born) (Official Music Video)', channel:'LadyGagaVEVO', views:500, cat:'Musik'},
-  {id:'qrO4YZeyl0I', title:'Lady Gaga - Bad Romance (Official Music Video)', channel:'LadyGagaVEVO', views:900, cat:'Musik'},
-  {id:'TgOu00Mf3kI', title:'[MV] IU(아이유) _ eight(에잇) (Prod.&Feat. SUGA of BTS)', channel:'1theK (원더케이)', views:300, cat:'Musik'},
-  {id:'wagn8Wrmzuc', title:'Lady Gaga - Judas (Official Music Video)', channel:'LadyGagaVEVO', views:500, cat:'Musik'},
-  {id:'oygrmJFKYZY', title:'Dua Lipa - Don\'t Start Now (Official Music Video)', channel:'Dua Lipa', views:600, cat:'Musik'},
-  {id:'k2qgadSvNyU', title:'Dua Lipa - New Rules (Official Music Video)', channel:'Dua Lipa', views:3000, cat:'Musik'},
-  {id:'Q0oIoR9mLwc', title:'Red Hot Chili Peppers - Dark Necessities [Official Music Video]', channel:'Red Hot Chili Peppers', views:900, cat:'Musik'},
-  {id:'uPD0QOGTmMI', title:'The Weeknd - Die For You', channel:'TheWeekndVEVO', views:1400, cat:'Musik'},
-  {id:'RBumgq5yVrA', title:'Passenger | Let Her Go (Official Video)', channel:'Passenger', views:900, cat:'Musik'},
-  {id:'HP-MbfHFUqs', title:'Wheels On The Bus + More | Nursery Rhymes for for Babies by LittleBabyBum', channel:'Little Baby Bum - Nursery Rhymes & Kids Songs', views:900, cat:'Musik'},
-  {id:'E07s5ZYygMg', title:'Harry Styles - Watermelon Sugar (Official Video)', channel:'HarryStylesVEVO', views:600, cat:'Musik'},
-  {id:'i_kF4zLNKio', title:'Fetty Wap  - Trap Queen (Official Video) Prod. By Tony Fadd', channel:'Harlem Fetty', views:1500, cat:'Musik'},
-  {id:'HCjNJDNzw8Y', title:'Camila Cabello - Havana (Audio) ft. Young Thug', channel:'CamilaCabelloVEVO', views:700, cat:'Musik'},
-  {id:'SC4xMk98Pdc', title:'Post Malone - Congratulations (Official Music Video) ft. Quavo', channel:'PostMaloneVEVO', views:800, cat:'Musik'},
-  {id:'UYwF-jdcVjY', title:'Post Malone - Better Now', channel:'PostMaloneVEVO', views:1700, cat:'Musik'},
-  {id:'au2n7VVGv_c', title:'Post Malone - Psycho (Official Music Video) ft. Ty Dolla $ign', channel:'PostMaloneVEVO', views:700, cat:'Musik'},
-  {id:'ApXoWvfEYVU', title:'Post Malone, Swae Lee - Sunflower (Spider-Man: Into the Spider-Verse)', channel:'PostMaloneVEVO', views:2500, cat:'Musik'},
-  {id:'uSD4vsh1zDA', title:'The Black Eyed Peas - I Gotta Feeling (Official Music Video)', channel:'BlackEyedPeasVEVO', views:1600, cat:'Musik'},
-  {id:'k4V3Mo61fJM', title:'Coldplay - Fix You (Official Video)', channel:'Coldplay', views:700, cat:'Musik'},
-  {id:'nCkpzqqog4k', title:'Sam Smith - I\'m Not The Only One (Official Music Video)', channel:'SamSmithVEVO', views:700, cat:'Musik'},
-  {id:'9h30Bx4Klxg', title:'Selena Gomez - Same Old Love', channel:'SelenaGomezVEVO', views:1700, cat:'Musik'},
-  {id:'QcIy9NiNbmo', title:'Taylor Swift - Bad Blood ft. Kendrick Lamar', channel:'Taylor Swift', views:1700, cat:'Musik'},
-  {id:'BjhW3vBA1QU', title:'J Balvin, Dua Lipa, Bad Bunny, Tainy - UN DIA (ONE DAY)', channel:'jbalvinVEVO', views:240, cat:'Musik'},
-  {id:'VuNIsY6JdUw', title:'Taylor Swift - You Belong With Me', channel:'Taylor Swift', views:1600, cat:'Musik'},
-  {id:'LDZX4ooRsWs', title:'Nicki Minaj - Anaconda', channel:'NickiMinajAtVEVO', views:500, cat:'Musik'},
-  {id:'b1kbLwvqugk', title:'Taylor Swift - Anti-Hero (Official Music Video)', channel:'Taylor Swift', views:800, cat:'Musik'},
-  {id:'XnbCSboujF4', title:'73 Questions With Taylor Swift | Vogue', channel:'Vogue', views:1000, cat:'Musik'},
-  {id:'hewioIU4a64', title:'Farm animals for kids - Vocabulary fo kids', channel:'Smile and Learn - English', views:400, cat:'Musik'},
-  {id:'K44j-sb1SRY', title:'DRAM - Broccoli feat. Lil Yachty (Official Music Video)', channel:'DRAM', views:190, cat:'Musik'},
-  {id:'tgbNymZ7vqY', title:'Bohemian Rhapsody | Muppet Music Video | The Muppets', channel:'The Muppets', views:1400, cat:'Musik'},
-  {id:'uxpDa-c-4Mc', title:'Drake - Hotline Bling', channel:'DrakeVEVO', views:3300, cat:'Musik'},
-  {id:'7wtfhZwyrcc', title:'Imagine Dragons - Believer (Official Music Video)', channel:'ImagineDragonsVEVO', views:300, cat:'Musik'},
-  {id:'ktvTqknDobU', title:'Imagine Dragons - Radioactive', channel:'ImagineDragonsVEVO', views:2200, cat:'Musik'},
-  {id:'tvTRZJ-4EyI', title:'Kendrick Lamar - HUMBLE.', channel:'KendrickLamarVEVO', views:1200, cat:'Musik'},
-  {id:'W0DM5lcj6mw', title:'Imagine Dragons - Believer (Lyrics)', channel:'7clouds', views:2500, cat:'Musik'},
-  {id:'MtN1YnoL46Q', title:'The Duck Song', channel:'forrestfire101', views:300, cat:'Musik'},
-  {id:'kTJczUoc26U', title:'The Kid LAROI, Justin Bieber - STAY (Official Video)', channel:'TheKidLAROIVEVO', views:200, cat:'Musik'},
-  {id:'_JZom_gVfuw', title:'The Notorious B.I.G. - Juicy (Official Video) [4K]', channel:'The Notorious B.I.G.', views:100, cat:'Musik'},
-  {id:'hXTAn4ELEwM', title:'Olly Alexander (Years & Years) - Shine (Official Video)', channel:'YearsAndYearsVEVO', views:900, cat:'Musik'},
-  {id:'xpVfcZ0ZcFM', title:'Drake - God\'s Plan', channel:'DrakeVEVO', views:500, cat:'Musik'},
-  {id:'ZmDBbnmKpqQ', title:'Olivia Rodrigo - drivers license (Official Video)', channel:'OliviaRodrigoVEVO', views:700, cat:'Musik'},
-  {id:'aAkMkVFwAoo', title:'Mariah Carey - All I Want for Christmas Is You (Make My Wish Come True Edition)', channel:'MariahCareyVEVO', views:900, cat:'Musik'},
-  {id:'yXQViqx6GMY', title:'Mariah Carey - All I Want For Christmas Is You (Official Video)', channel:'MariahCareyVEVO', views:900, cat:'Musik'},
-  {id:'1w7OgIMMRc4', title:'Guns N\' Roses - Sweet Child O\' Mine (Official Music Video)', channel:'GunsNRosesVEVO', views:1900, cat:'Musik'},
-  {id:'o1tj2zJ2Wvg', title:'Guns N\' Roses - Welcome To The Jungle', channel:'GunsNRosesVEVO', views:2000, cat:'Musik'},
-  {id:'hTWKbfoikeg', title:'Nirvana - Smells Like Teen Spirit (Official Music Video)', channel:'NirvanaVEVO', views:2100, cat:'Musik'},
-  {id:'6JCLY0Rlx6Q', title:'WALK THE MOON - Shut Up and Dance (Official Video)', channel:'WalkTheMoonVEVO', views:400, cat:'Musik'},
-  {id:'A_MjCqQoLLA', title:'The Beatles - The Beatles - Hey Jude (Official Music Video) [Remastered 2015]', channel:'TheBeatlesVEVO', views:200, cat:'Musik'},
-  {id:'NUsoVlDFqZg', title:'Enrique Iglesias - Bailando ft. Descemer Bueno, Gente De Zona', channel:'EnriqueIglesiasVEVO', views:250, cat:'Musik'},
-  {id:'QDYfEBY9NM4', title:'Let It Be (Remastered 2009)', channel:'The Beatles - Topic', views:250, cat:'Musik'},
-  {id:'YlUKcNNmywk', title:'Red Hot Chili Peppers - Californication (Official Music Video) [HD UPGRADE]', channel:'Red Hot Chili Peppers', views:900, cat:'Musik'},
-  {id:'Gd9OhYroLN0', title:'Crawling [Official HD Music Video] - Linkin Park', channel:'Linkin Park', views:700, cat:'Musik'},
-  {id:'eVTXPUF4Oz4', title:'In The End [Official HD Music Video] - Linkin Park', channel:'Linkin Park', views:2500, cat:'Musik'},
-  {id:'WM8bTdBs-cw', title:'Metallica: One (Official Music Video)', channel:'Metallica', views:300, cat:'Musik'},
-  {id:'Bg59q4puhmg', title:'Avril Lavigne - Girlfriend (Official Video)', channel:'AvrilLavigneVEVO', views:200, cat:'Musik'},
-  {id:'d96cjJhvlMA', title:'Marvel\'s Guardians of the Galaxy - Trailer 1 (OFFICIAL)', channel:'Marvel Entertainment', views:30, cat:'Trailer'},
-  {id:'8g18jFHCLXk', title:'Dune | Official Main Trailer', channel:'Warner Bros.', views:100, cat:'Trailer'},
-  {id:'Go8nTmfrQd8', title:'Marvel Studios\' Thor: Love and Thunder | Official Trailer', channel:'Marvel Entertainment', views:60, cat:'Trailer'},
-  {id:'qEVUtrk8_B4', title:'John Wick: Chapter 4 (2023 Movie) Official Trailer – Keanu Reeves, Donnie Yen, Bill Skarsgård', channel:'Lionsgate Movies', views:30, cat:'Trailer'},
-  {id:'t433PEQGErc', title:'JOKER - Teaser Trailer - Now Playing In Theaters', channel:'Warner Bros.', views:100, cat:'Trailer'},
-  {id:'nW948Va-l10', title:'Marvel Studios\' Loki | Official Trailer | Disney+', channel:'Marvel Entertainment', views:40, cat:'Trailer'},
-  {id:'bLHL75H_VEM', title:'You\'re dereferencing a null pointer!', channel:'gigagigagilgamesh', views:50, cat:'Viral'},
-  {id:'BgAlQuqzl8o', title:'John Williams - Star Wars Parody (Cello Wars / Lightsaber Duel) The Piano Guys', channel:'The Piano Guys', views:100, cat:'Sport'},
-  {id:'6M6samPEMpM', title:'Backstreet Boys - Everybody (Backstreet\'s Back) (Official HD Video)', channel:'BackstreetBoysVEVO', views:100, cat:'Musik'},
-  {id:'uAsV5-Hv-7U', title:'Don McLean- American Pie (with Lyrics)', channel:'lukutiss1324', views:100, cat:'Musik'},
-  {id:'t99KH0TR-J4', title:'Queen - The Show Must Go On (Official Video)', channel:'Queen Official', views:100, cat:'Musik'},
-];
-
-
-const BEST_KEY = 'ms-tool05-best';
-let idxA = 0, idxB = 0, round = 1, streak = 0, best = 0, revealed = false, ended = false;
-let deck = [];
-
-function shuffle(a) {
-  for (let i=a.length-1; i>0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
-function formatViews(v) {
-  // v is in millions
-  if (v >= 1000) return (v/1000).toFixed(v>=10000?0:1).replace('.',',') + ' Mrd';
-  if (v >= 1)    return v.toLocaleString('de-DE') + ' Mio';
-  return (v*1000).toFixed(0) + ' Tsd';
-}
-function thumbUrl(id) {
-  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-}
-function cardHTML(video, side, reveal) {
-  const isRight = side === 'right';
-  const eyebrow = isRight ? 'RÄTSEL · MEHR ODER WENIGER?' : 'REFERENZ · YOUTUBE-AUFRUFE';
-  const viewsHTML = (!isRight || reveal)
-    ? `<div class="card-views ${reveal && isRight ? 'reveal':''}">${formatViews(video.views)}</div>
-       <div class="card-views-unit">Aufrufe</div>`
-    : `<div class="card-views" style="opacity:.4">? ? ?</div>
-       <div class="card-views-unit">Aufrufe</div>`;
-  return `
-    <article class="card ${side}">
-      <div class="thumb-wrap">
-        <span class="cat-badge">${video.cat}</span>
-        <img src="${thumbUrl(video.id)}" alt="" loading="lazy"
-             onerror="this.style.display='none'; this.parentNode.style.background='var(--paper-2)';">
-      </div>
-      <div class="card-body">
-        <div class="card-eyebrow">${eyebrow}</div>
-        <div class="card-title">${video.title}</div>
-        <div class="card-channel">${video.channel}</div>
-        <div class="card-metric">
-          <span class="card-metric-label">Aufrufe (weltweit)</span>
-          ${viewsHTML}
-        </div>
-        <a class="card-link" href="https://www.youtube.com/watch?v=${video.id}" target="_blank" rel="noopener">
-          Auf YouTube ansehen <span class="arrow">→</span>
-        </a>
-      </div>
-    </article>`;
-}
-
-function renderBoard(reveal=false) {
-  const board = $("#board");
-  const a = deck[idxA], b = deck[idxB];
-  board.innerHTML = cardHTML(a, 'left', true) + cardHTML(b, 'right', reveal);
-}
-function updateScore() {
-  $("#stRound").textContent = round;
-  $("#stStreak").textContent = streak;
-  $("#stBest").textContent = best;
-}
-function guess(direction) {
-  if (revealed || ended) return;
-  const a = deck[idxA], b = deck[idxB];
-  const higher = b.views > a.views;
-  const equal  = b.views === a.views;
-  const correct = equal || (direction === 'higher' ? higher : !higher);
-  revealed = true;
-
-  const doReveal = () => {
-    renderBoard(true);
-    const v = $("#verdict");
-    if (correct) {
-      streak++;
-      if (streak > best) { best = streak; localStorage.setItem(BEST_KEY, best); }
-      v.className = 'verdict ok';
-      v.innerHTML = `<span class="badge">✓ Treffer</span> <span>Serie · ${streak}</span>`;
-    } else {
-      v.className = 'verdict bad';
-      v.innerHTML = `<span class="badge">✗ Daneben</span> <span>Serie beendet bei ${streak}</span>`;
-    }
-    updateScore();
-    setTimeout(() => {
-      if (correct) nextRound();
-      else endGame();
-    }, 1400);
-  };
-
-  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.startViewTransition(doReveal);
-  } else {
-    doReveal();
-  }
-}
-function nextRound() {
-  round++;
-  idxA = idxB;
-  idxB = (idxB + 1) % deck.length;
-  if (idxB === idxA) idxB = (idxB + 1) % deck.length;
-  revealed = false;
-  $("#verdict").innerHTML = '';
-  const swap = () => renderBoard(false);
-  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.startViewTransition(swap);
-  } else swap();
-}
-function endGame() {
-  ended = true;
-  const area = $("#gameArea");
-  area.innerHTML = `
-    <div class="end-panel">
-      <div class="end-title">Ausgabe <em>geschlossen</em></div>
-      <div class="end-sub">Danke fürs Mitraten. Neue Ausgabe gefällig?</div>
-      <div class="end-stats">
-        <div class="end-stat"><div class="end-stat-label">Serie</div><div class="end-stat-value">${streak}</div></div>
-        <div class="end-stat"><div class="end-stat-label">Runden</div><div class="end-stat-value">${round}</div></div>
-        <div class="end-stat"><div class="end-stat-label">Bestmarke</div><div class="end-stat-value" style="color:var(--accent)">${best}</div></div>
-      </div>
-      <div><button class="btn-restart" id="btnRestart">Neue Ausgabe</button></div>
-    </div>`;
-  $("#btnRestart").addEventListener('click', () => location.reload());
-}
-
-function initGame() {
-  best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
-  deck = shuffle(VIDEOS.slice());
-  idxA = 0; idxB = 1; round = 1; streak = 0; revealed = false; ended = false;
-  updateScore();
-  renderBoard(false);
-  $("#btnHigher").addEventListener('click', () => guess('higher'));
-  $("#btnLower").addEventListener('click',  () => guess('lower'));
-  document.addEventListener('keydown', (e) => {
-    if (ended) return;
-    if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'h') { e.preventDefault(); guess('higher'); }
-    else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 't') { e.preventDefault(); guess('lower'); }
-  });
-}
-
-initTheme();
-initAds();
-initGame();
 </script>
 </body>
 </html>
