@@ -253,19 +253,26 @@
     box-shadow:3px 3px 0 var(--ink);
     transition:transform .25s ease;
   }
+  /* Rings pulsieren global synchron — Delay wird per JS als negativer
+     Wert relativ zu einem Startzeitpunkt gesetzt. */
   .finger .ring {
     position:absolute; inset:0; border-radius:50%;
     border:2px solid var(--f-color, var(--accent));
     opacity:.75;
     animation:idle-pulse 1.6s ease-out infinite;
   }
-  .finger .ring.r2 { animation-delay:.55s; }
+  .finger .ring.r2 {
+    animation:idle-pulse 1.6s ease-out infinite;
+    /* zweiter Ring ist relativ zum ersten um halbe Periode versetzt,
+       aber alle Finger sind untereinander synchron */
+  }
   @keyframes idle-pulse {
     0%   { transform:scale(.55); opacity:.85; }
     100% { transform:scale(1.15); opacity:0; }
   }
 
-  .stage.armed .finger .ring {
+  .stage.armed .finger .ring,
+  .stage.armed .finger .ring.r2 {
     animation:arm-pulse .9s ease-out infinite;
     border-width:3px;
   }
@@ -284,7 +291,8 @@
   .finger.chosen .core {
     animation:chosen-pop .6s cubic-bezier(.34,1.56,.64,1) both;
   }
-  .finger.chosen .ring {
+  .finger.chosen .ring,
+  .finger.chosen .ring.r2 {
     animation:chosen-ring 1.4s ease-out infinite !important;
     border-width:3px;
   }
@@ -296,6 +304,13 @@
   @keyframes chosen-ring {
     0%   { transform:scale(.5);  opacity:1; }
     100% { transform:scale(2.2); opacity:0; }
+  }
+
+  /* Auto-Fade-Out nach Auswahl */
+  .stage.fading .finger {
+    transition:opacity .6s ease, transform .6s ease;
+    opacity:0;
+    transform:scale(.4);
   }
 
   /* Controls */
@@ -358,7 +373,7 @@
 
       <div class="slider-box">
         <span class="slider-label">Auswahl</span>
-        <input type="range" id="pickCount" min="1" max="10" step="1" value="1" />
+        <input type="range" id="pickCount" min="1" max="5" step="1" value="1" />
         <span class="slider-value" id="pickValue">1</span>
       </div>
     </section>
@@ -423,10 +438,16 @@ const COLORS = [
   "#7a2e8a", "#c9a227", "#0e8074", "#b03a5b",
   "#405d27", "#5a3f9c"
 ];
-const COUNTDOWN_MS = 3000;
+const COUNTDOWN_MS   = 3000;   // Zeit bis Auswahl
+const AUTO_RESET_MS  = 3000;   // Zeit nach Auswahl bis Auto-Reset
 
-let fingers = new Map();  // id -> {el, color}
+// Referenz-Zeitpunkt, damit alle Finger die selben Animation-Delays haben
+// -> Ringe pulsieren global synchron
+const ANIM_EPOCH = performance.now();
+
+let fingers = new Map();  // id -> {el}
 let armTimer = null;
+let autoResetTimer = null;
 let phase = "idle"; // idle | armed | picked
 
 /* Slider */
@@ -442,6 +463,16 @@ function updateStatus() {
   stage.classList.toggle("has-fingers", fingers.size > 0);
 }
 
+/* Sync-Delay relativ zur gemeinsamen Epoche */
+function syncDelays(el) {
+  const elapsed = (performance.now() - ANIM_EPOCH) / 1000; // s
+  const rings = el.querySelectorAll(".ring");
+  // r1: exakt in Phase mit Epoche
+  rings[0].style.animationDelay = `${-elapsed}s`;
+  // r2: um halbe Periode (0.8s) versetzt, aber ebenfalls global synchron
+  rings[1].style.animationDelay = `${-(elapsed + 0.8)}s`;
+}
+
 function addFinger(id, x, y) {
   if (phase === "picked") return;
   const el = document.createElement("div");
@@ -455,7 +486,8 @@ function addFinger(id, x, y) {
     <div class="core"></div>
   `;
   stage.appendChild(el);
-  fingers.set(id, { el, color });
+  syncDelays(el);
+  fingers.set(id, { el });
   updateStatus();
   scheduleArm();
 }
@@ -513,13 +545,24 @@ function pickWinners() {
   });
 
   if (navigator.vibrate) navigator.vibrate([40, 80, 200]);
+
+  // Automatischer Reset nach kurzer Anzeige
+  clearTimeout(autoResetTimer);
+  autoResetTimer = setTimeout(() => {
+    // Erst weich ausblenden …
+    stage.classList.add("fading");
+    setTimeout(resetRound, 650);
+  }, AUTO_RESET_MS);
 }
 
 function resetRound() {
-  cancelArm();
+  clearTimeout(armTimer);
+  clearTimeout(autoResetTimer);
+  armTimer = null;
+  autoResetTimer = null;
   fingers.forEach(f => f.el.remove());
   fingers.clear();
-  stage.classList.remove("armed", "picking", "locked", "has-fingers");
+  stage.classList.remove("armed", "picking", "locked", "has-fingers", "fading");
   phase = "idle";
   updateStatus();
 }
