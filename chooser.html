@@ -62,7 +62,7 @@
   html[data-theme="dark"] body::before { opacity: .35; mix-blend-mode: overlay; }
 
   body { text-shadow: 0 0 .32px currentColor; }
-  .mast .brand, .headline, .stage-hint {
+  .mast .brand, .headline {
     text-shadow: 0 0 .45px currentColor, .18px .12px .55px rgba(0,0,0,.10);
   }
   .mast .brand em, .headline em {
@@ -138,26 +138,58 @@
 
   /* ————————————— CHOOSER ————————————— */
   .chooser-head { padding:28px 0 18px; text-align:center; }
-  .eyebrow {
-    font-family:'JetBrains Mono', monospace; font-size:11px;
-    letter-spacing:.28em; text-transform:uppercase; color:var(--accent);
-    margin-bottom:14px;
-  }
   .headline {
     font-family:'Fraunces', serif; font-weight:800;
-    font-size:clamp(38px, 7vw, 72px);
+    font-size:clamp(44px, 8vw, 84px);
     line-height:.95; letter-spacing:-.02em;
-    margin-bottom:14px;
   }
   .headline em { font-style:italic; font-weight:400; color:var(--accent); }
-  .lede {
-    max-width:640px; margin:0 auto;
-    font-family:'Fraunces', serif; font-style:italic;
-    font-size:17px; color:var(--ink-soft); line-height:1.5;
+
+  /* Slider */
+  .slider-box {
+    max-width:520px; margin:22px auto 0;
+    border-top:1px solid var(--rule-soft);
+    border-bottom:1px solid var(--rule-soft);
+    padding:16px 18px;
+    display:grid; grid-template-columns:auto 1fr auto; gap:16px; align-items:center;
+  }
+  .slider-label {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    white-space:nowrap;
+  }
+  .slider-value {
+    font-family:'Fraunces', serif; font-weight:800; font-style:italic;
+    font-size:32px; color:var(--accent); line-height:1;
+    min-width:34px; text-align:right;
+  }
+  input[type="range"] {
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:22px; background:transparent; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height:2px; background:var(--rule); border-radius:0;
+  }
+  input[type="range"]::-moz-range-track {
+    height:2px; background:var(--rule); border-radius:0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:22px; height:22px; border-radius:50%;
+    background:var(--accent); border:2px solid var(--ink);
+    box-shadow:2px 2px 0 var(--ink);
+    margin-top:-10px; cursor:pointer;
+    transition:transform .12s;
+  }
+  input[type="range"]::-webkit-slider-thumb:active { transform:scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width:20px; height:20px; border-radius:50%;
+    background:var(--accent); border:2px solid var(--ink);
+    box-shadow:2px 2px 0 var(--ink); cursor:pointer;
   }
 
   .stage-wrap {
-    margin:22px 0 18px;
+    margin:18px 0;
     border-top:2px solid var(--rule);
     border-bottom:2px solid var(--rule);
   }
@@ -245,39 +277,25 @@
   .stage.picking .finger {
     transition:opacity .35s ease, transform .35s ease;
   }
-  .stage.picking .finger:not(.winner) {
+  .stage.picking .finger:not(.chosen) {
     opacity:.12; transform:scale(.6);
   }
-  .stage.picking .finger:not(.winner) .ring { animation:none; opacity:0; }
-  .finger.winner .core {
-    animation:winner-pop .6s cubic-bezier(.34,1.56,.64,1) both;
+  .stage.picking .finger:not(.chosen) .ring { animation:none; opacity:0; }
+  .finger.chosen .core {
+    animation:chosen-pop .6s cubic-bezier(.34,1.56,.64,1) both;
   }
-  .finger.winner .ring {
-    animation:winner-ring 1.4s ease-out infinite !important;
+  .finger.chosen .ring {
+    animation:chosen-ring 1.4s ease-out infinite !important;
     border-width:3px;
   }
-  @keyframes winner-pop {
+  @keyframes chosen-pop {
     0%   { transform:scale(1); }
     50%  { transform:scale(1.6); }
     100% { transform:scale(1.35); }
   }
-  @keyframes winner-ring {
+  @keyframes chosen-ring {
     0%   { transform:scale(.5);  opacity:1; }
     100% { transform:scale(2.2); opacity:0; }
-  }
-  .finger.winner .label {
-    position:absolute; top:100%; left:50%;
-    transform:translate(-50%, 10px);
-    font-family:'Fraunces', serif; font-style:italic; font-weight:600;
-    font-size:22px; color:var(--ink);
-    white-space:nowrap;
-    background:var(--paper); padding:4px 12px;
-    border:1px solid var(--ink); box-shadow:2px 2px 0 var(--accent);
-    animation:winner-label .35s ease .3s both;
-  }
-  @keyframes winner-label {
-    from { opacity:0; transform:translate(-50%, 4px); }
-    to   { opacity:1; transform:translate(-50%, 10px); }
   }
 
   /* Controls */
@@ -295,36 +313,12 @@
   }
   .btn:hover { background:var(--paper-2); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
   .btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
-  .btn--accent { background:var(--accent); color:#fff; border-color:var(--accent); }
-  .btn--accent:hover { background:var(--ink); border-color:var(--ink); }
 
-  .rules {
-    max-width:780px; margin:22px auto 0;
-    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
-    border-top:1px solid var(--rule-soft);
-    border-bottom:1px solid var(--rule-soft);
-  }
-  .rule {
-    padding:14px 16px; text-align:center;
-    border-right:1px dashed var(--rule-soft);
-  }
-  .rule:last-child { border-right:none; }
-  .rule .n {
-    font-family:'Fraunces', serif; font-style:italic; font-weight:800;
-    font-size:28px; color:var(--accent); line-height:1;
-  }
-  .rule .t {
-    font-family:'JetBrains Mono', monospace; font-size:10.5px;
-    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
-    margin-top:6px;
-  }
   @media (max-width:560px) {
-    .rules { grid-template-columns:1fr; }
-    .rule { border-right:none; border-bottom:1px dashed var(--rule-soft); }
-    .rule:last-child { border-bottom:none; }
     .stage { height:min(65vh, 520px); }
     .finger { width:100px; height:100px; margin:-50px 0 0 -50px; }
     .finger .core { width:56px; height:56px; }
+    .slider-value { font-size:26px; }
   }
 
   .foot {
@@ -334,8 +328,6 @@
     font-family:'JetBrains Mono', monospace; font-size:10.5px;
     letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   }
-
-  .ads-side { display:none; }
 </style>
 </head>
 <body>
@@ -362,12 +354,13 @@
 
   <main>
     <section class="chooser-head">
-      <div class="eyebrow">· Multi-Touch Chooser ·</div>
-      <h1 class="headline">Wer <em>zahlt</em>?</h1>
-      <p class="lede">
-        Alle legen einen Finger auf die Bühne. Sobald für drei Sekunden nichts passiert,
-        entscheidet der Zufall — und der Rest schaut zu.
-      </p>
+      <h1 class="headline"><em>Chooser</em></h1>
+
+      <div class="slider-box">
+        <span class="slider-label">Auswahl</span>
+        <input type="range" id="pickCount" min="1" max="10" step="1" value="1" />
+        <span class="slider-value" id="pickValue">1</span>
+      </div>
     </section>
 
     <div class="stage-wrap">
@@ -384,22 +377,6 @@
 
     <div class="controls">
       <button class="btn" id="btnReset">Neue Runde</button>
-      <button class="btn btn--accent" id="btnDemo">Demo (Maus-Klick)</button>
-    </div>
-
-    <div class="rules">
-      <div class="rule">
-        <div class="n">1</div>
-        <div class="t">Finger auflegen</div>
-      </div>
-      <div class="rule">
-        <div class="n">2</div>
-        <div class="t">3 Sek. warten</div>
-      </div>
-      <div class="rule">
-        <div class="n">3</div>
-        <div class="t">Zufall entscheidet</div>
-      </div>
     </div>
   </main>
 
@@ -435,11 +412,11 @@ initTheme();
 
 /* ————————————— Chooser Logic ————————————— */
 const stage       = $("#stage");
-const stageHint   = $("#stageHint");
 const stageStatus = $("#stageStatus");
 const fingerCount = $("#fingerCount");
 const btnReset    = $("#btnReset");
-const btnDemo     = $("#btnDemo");
+const pickCount   = $("#pickCount");
+const pickValue   = $("#pickValue");
 
 const COLORS = [
   "#c8442a", "#2f6b3a", "#1e5f8a", "#a8541a",
@@ -450,8 +427,12 @@ const COUNTDOWN_MS = 3000;
 
 let fingers = new Map();  // id -> {el, color}
 let armTimer = null;
-let armStart = 0;
 let phase = "idle"; // idle | armed | picked
+
+/* Slider */
+pickCount.addEventListener("input", () => {
+  pickValue.textContent = pickCount.value;
+});
 
 function colorForIndex(i) {
   return COLORS[i % COLORS.length];
@@ -501,9 +482,7 @@ function scheduleArm() {
   if (fingers.size < 1) return;
   phase = "armed";
   stage.classList.add("armed");
-  stageStatus.querySelector("#fingerCount").textContent = fingers.size;
-  armStart = performance.now();
-  armTimer = setTimeout(pickWinner, COUNTDOWN_MS);
+  armTimer = setTimeout(pickWinners, COUNTDOWN_MS);
 }
 function cancelArm() {
   clearTimeout(armTimer);
@@ -513,23 +492,26 @@ function cancelArm() {
     stage.classList.remove("armed");
   }
 }
-function pickWinner() {
+function pickWinners() {
   if (fingers.size === 0) return;
   phase = "picked";
   stage.classList.remove("armed");
   stage.classList.add("picking", "locked");
 
   const ids = [...fingers.keys()];
-  const winnerId = ids[Math.floor(Math.random() * ids.length)];
-  const winner = fingers.get(winnerId);
-  winner.el.classList.add("winner");
+  const n = Math.min(parseInt(pickCount.value, 10) || 1, ids.length);
 
-  const label = document.createElement("div");
-  label.className = "label";
-  label.textContent = "GEWINNER";
-  winner.el.appendChild(label);
+  // Fisher-Yates
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+  const chosen = ids.slice(0, n);
 
-  // Haptics
+  chosen.forEach(id => {
+    fingers.get(id).el.classList.add("chosen");
+  });
+
   if (navigator.vibrate) navigator.vibrate([40, 80, 200]);
 }
 
@@ -567,26 +549,11 @@ stage.addEventListener("touchmove", (e) => {
 
 function endTouch(e) {
   e.preventDefault();
-  if (phase === "picked") return; // Nach Auswahl: Kreise erst per Reset weg
+  if (phase === "picked") return;
   for (const t of e.changedTouches) removeFinger("t" + t.identifier);
 }
 stage.addEventListener("touchend",    endTouch, { passive:false });
 stage.addEventListener("touchcancel", endTouch, { passive:false });
-
-/* ————— Demo per Maus (Desktop) ————— */
-/* Jeder Klick fügt/entfernt einen "Finger" für Testen ohne Touch */
-let demoIdx = 0;
-btnDemo.addEventListener("click", () => {
-  // Beim ersten Klick: Modus einschalten -> Klick auf Bühne = Finger
-  stage.dataset.demo = "1";
-  btnDemo.textContent = "Demo aktiv · Klick auf Bühne";
-});
-stage.addEventListener("mousedown", (e) => {
-  if (stage.dataset.demo !== "1") return;
-  const { x, y } = stagePos(e.clientX, e.clientY);
-  const id = "m" + (demoIdx++);
-  addFinger(id, x, y);
-});
 </script>
 </body>
 </html>
