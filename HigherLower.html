@@ -1,1 +1,1359 @@
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Higher &amp; Lower — Nº 04 · Was liest die Welt?</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
+    --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
+    --accent:#c8442a; --accent-soft:#f2d9d1;
+    --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
+    --shadow:0 1px 0 var(--ink);
+  }
+  html[data-theme="dark"] {
+    --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
+    --muted:#8a857a; --rule:#efe8d8; --rule-soft:#3a3a30;
+    --accent:#e8623f; --accent-soft:#3a1f18;
+    --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
+  }
+
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  .mast .brand { view-transition-name: brand; }
+  ::view-transition-old(brand),
+  ::view-transition-new(brand) { animation-duration: .35s; }
+  .card-b { view-transition-name: cardB; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  body::after {
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22; mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after { opacity: .08; mix-blend-mode: screen; }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before { opacity: .35; mix-blend-mode: overlay; }
+
+  body { text-shadow: 0 0 .32px currentColor; }
+  .mast .brand, .ad-title, .ad-hero, .subhead a.back .arrow,
+  .card .headline, .streak-num, .verdict, .final-title {
+    text-shadow: 0 0 .45px currentColor, .18px .12px .55px rgba(0,0,0,.10);
+  }
+  .mast .brand em, .ad--paypal .ad-hero, .ad--kirche .ad-hero, .verdict.correct, .verdict.wrong {
+    text-shadow: 0 0 .5px currentColor, .3px .2px .8px rgba(200,68,42,.18);
+  }
+  html[data-theme="dark"] .mast .brand,
+  html[data-theme="dark"] .card .headline,
+  html[data-theme="dark"] .streak-num {
+    text-shadow: 0 0 .5px currentColor, .15px .1px .6px rgba(255,235,200,.08);
+  }
+  @media (prefers-reduced-motion: reduce) { body { text-shadow: none; } }
+
+  .wrap { position: relative; z-index: 1; }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); }
+  body {
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    font-size:16px; line-height:1.5; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    transition: background .25s ease, color .25s ease;
+  }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 28px 48px; }
+
+  .mast {
+    border-top:2px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:14px 0 10px; display:grid;
+    grid-template-columns:1fr auto 1fr; align-items:center; gap:20px;
+  }
+  .mast .edition {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .mast .edition.right { display:flex; gap:8px; justify-content:flex-end; align-items:center; text-align:right; }
+  .mast .brand {
+    font-family:'Fraunces', serif; font-weight:800; font-size:22px;
+    letter-spacing:-.02em; white-space:nowrap;
+  }
+  .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
+
+  .subhead {
+    border-bottom:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; gap:20px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .subhead a.back {
+    display:inline-flex; align-items:center; gap:10px;
+    color:var(--muted); text-decoration:none; transition:color .18s ease;
+  }
+  .subhead a.back:hover { color:var(--ink); }
+  .subhead a.back .arrow {
+    font-family:'Fraunces', serif; font-style:italic; font-size:15px;
+    letter-spacing:0; text-transform:none; line-height:1;
+    transition:transform .25s cubic-bezier(.7,0,.2,1); display:inline-block;
+  }
+  .subhead a.back:hover .arrow { transform:translateX(-3px); }
+  .subhead .meta { text-align:right; }
+  @media (max-width:560px) {
+    .subhead { font-size:10px; letter-spacing:.12em; }
+    .subhead .meta { display:none; }
+  }
+
+  .toggle {
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--rule); padding:6px 10px;
+    background:transparent; color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase;
+    cursor:pointer; transition:background .15s;
+  }
+  .toggle:hover { background:var(--paper-2); }
+  .toggle .dot {
+    width:10px; height:10px; border-radius:50%;
+    background:var(--ink); border:1px solid var(--ink);
+    box-sizing:border-box; display:inline-block;
+  }
+
+  .ads-side {
+    position:fixed; top:50%; transform:translateY(-50%);
+    width:200px; z-index:40; display:none; pointer-events:none;
+  }
+  .ads-side.left  { left:20px; }
+  .ads-side.right { right:20px; }
+  @media (min-width:1560px) { .ads-side { display:block; } }
+  body.ads-off .ads-side { display:none !important; }
+
+  .ad-slot { position:relative; pointer-events:auto; }
+  .ad-link { display:block; color:inherit; text-decoration:none; }
+  .ad-link .ad { transition:transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
+  .ad-link:hover .ad { transform:translateY(-2px); box-shadow:3px 3px 0 var(--rule); }
+  .ad {
+    position:relative; border:1px solid var(--rule); background:var(--paper);
+    padding:14px 14px 12px; opacity:0; transform:translateY(4px);
+    transition:opacity .35s ease, transform .35s ease;
+    display:flex; flex-direction:column; gap:8px;
+    min-height:200px; font-family:'Inter', sans-serif;
+  }
+  .ad.show { opacity:1; transform:translateY(0); }
+  .ad-eyebrow {
+    font-family:'JetBrains Mono', monospace; font-size:9px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
+  }
+  .ad-eyebrow::before { content:"ANZEIGE"; color:var(--accent); font-weight:600; }
+  .ad-eyebrow .sep { color:var(--rule-soft); }
+  .ad-title { font-family:'Fraunces', serif; font-size:22px; line-height:1.05; color:var(--ink); letter-spacing:-.01em; }
+  .ad-body { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad-foot {
+    margin-top:auto; padding-top:8px; border-top:1px solid var(--rule-soft);
+    font-family:'JetBrains Mono', monospace; font-size:9.5px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .ad-mark { color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
+
+  .ad--paypal .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:22px; line-height:1.15; letter-spacing:-.01em; }
+  .ad--paypal .ad-body  { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .ad--paypal .ad-hero  { font-family:'Fraunces', serif; font-style:italic; font-size:42px; color:var(--accent); line-height:1; margin-bottom:2px; }
+  .ad--paypal .ad-cta {
+    display:block; margin-top:4px; padding:11px 12px;
+    background:var(--accent); color:#fff;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase;
+    text-decoration:none; text-align:center; font-weight:700;
+    border:1px solid var(--accent);
+    transition:background .18s ease, border-color .18s ease, transform .12s ease, box-shadow .18s ease;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .ad--paypal .ad-cta:hover { background:var(--ink); border-color:var(--ink); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .ad--paypal .ad-cta:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+
+  .ad--kaffee { background:var(--paper-2); }
+  .ad--kaffee .ad-title { font-style:italic; font-size:28px; }
+  .ad--kaffee .ad-hero  { font-size:18px; letter-spacing:.35em; color:var(--muted); }
+  .ad--stink .ad-title { font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1.15; }
+  .ad--stink .ad-hero  { font-size:28px; letter-spacing:.1em; }
+  .ad--stink .ad-body  { font-style:italic; font-family:'Fraunces', serif; font-size:13px; }
+  .ad--pfalz { border-width:2px; }
+  .ad--pfalz .ad-title { font-family:'Fraunces', serif; font-size:17px; text-align:center; line-height:1.15; }
+  .ad--pfalz .ad-hero  { text-align:center; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.3em; color:var(--accent); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:5px 0; }
+  .ad--pfalz .ad-body  { text-align:center; font-style:italic; font-family:'Fraunces', serif; font-size:12.5px; }
+  .ad--kirche .ad-hero  { font-family:'Fraunces', serif; font-size:34px; color:var(--accent); text-align:center; line-height:1; }
+  .ad--kirche .ad-title { font-style:italic; font-size:20px; text-align:center; }
+  .ad--kirche .ad-body  { text-align:center; }
+  .ad--reise .ad-title { font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .ad--reise .ad-hero  { font-size:22px; color:var(--accent); }
+  .ad--reise .ad-body  { border-top:1px dashed var(--rule-soft); border-bottom:1px dashed var(--rule-soft); padding:6px 0; }
+  .ad--schweig .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:30px; text-align:center; margin:8px 0 4px; }
+  .ad--schweig .ad-hero  { text-align:center; font-size:28px; letter-spacing:.5em; color:var(--muted); line-height:1; }
+  .ad--schweig .ad-body  { text-align:center; font-size:10.5px; letter-spacing:.02em; }
+  .ad--gastro .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.4em; color:var(--paper); background:var(--accent); padding:5px 10px; display:inline-block; align-self:flex-start; }
+  .ad--gastro .ad-title { font-family:'Fraunces', serif; font-size:24px; font-style:italic; }
+  .ad--minion .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:20px; font-weight:700; letter-spacing:.22em; text-align:center; color:#1a1a1a; padding:8px 0; border-top:2px solid #1a1a1a; border-bottom:2px solid #1a1a1a; }
+  .ad--minion .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:21px; text-align:center; color:#1a1a1a; line-height:1.15; }
+  .ad--minion .ad-body  { text-align:center; color:#1a1a1a; }
+  .ad--minion .ad-foot  { color:#1a1a1a; border-top-color:rgba(26,26,26,.3); }
+  .ad--minion .ad-mark  { color:#1a1a1a; font-style:italic; }
+
+  .foot {
+    margin-top:60px; padding-top:20px; border-top:2px solid var(--rule);
+    display:flex; justify-content:space-between;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+
+  /* ————————— GAME ————————— */
+  .lede {
+    margin:26px 0 18px; display:grid;
+    grid-template-columns: 1fr auto 1fr; align-items:end; gap:24px;
+    border-bottom:1px solid var(--rule); padding-bottom:14px;
+  }
+  .lede h1 {
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size:clamp(30px, 5vw, 52px); line-height:.95;
+    letter-spacing:-.02em;
+  }
+  .lede h1 em { font-style:italic; font-weight:400; color:var(--accent); }
+  .lede .kicker {
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:10px;
+  }
+  .lede .period {
+    text-align:right; font-family:'JetBrains Mono', monospace;
+    font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  @media (max-width:720px) {
+    .lede { grid-template-columns: 1fr; gap:10px; }
+    .lede .period { text-align:left; }
+  }
+
+  .scoreboard {
+    display:grid; grid-template-columns: 1fr 1fr 1fr;
+    border:1px solid var(--rule); background:var(--paper-2);
+    margin-bottom:24px;
+  }
+  .scoreboard > div {
+    padding:12px 16px; text-align:center;
+    border-right:1px solid var(--rule-soft);
+  }
+  .scoreboard > div:last-child { border-right:none; }
+  .score-label {
+    font-family:'JetBrains Mono', monospace; font-size:9.5px;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:4px;
+  }
+  .score-val {
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size:26px; line-height:1;
+  }
+  .score-val em { font-style:italic; color:var(--accent); font-weight:400; }
+
+  .board {
+    display:grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap:14px; align-items:stretch;
+  }
+  @media (max-width:720px) {
+    .board { grid-template-columns: 1fr; }
+    .board .vs { transform:rotate(90deg); }
+  }
+
+  .card {
+    border:1px solid var(--rule); background:var(--paper);
+    padding:22px 22px 18px; display:flex; flex-direction:column;
+    min-height:340px; position:relative;
+    box-shadow:3px 3px 0 var(--rule);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .card.dim { opacity:.5; }
+  .card .eyebrow {
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    padding-bottom:8px; border-bottom:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .card .eyebrow .badge {
+    background:var(--ink); color:var(--paper); padding:2px 6px;
+    font-size:9px; letter-spacing:.15em;
+  }
+  .card .headline {
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size:clamp(24px, 3.4vw, 34px); line-height:1.05;
+    letter-spacing:-.01em; margin:14px 0 8px;
+    min-height:120px; display:flex; align-items:center;
+  }
+  .card .subline {
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:14px; color:var(--muted); margin-bottom:14px;
+  }
+  .card .value-block {
+    margin-top:auto; padding-top:14px; border-top:1px solid var(--rule-soft);
+    text-align:center;
+  }
+  .card .value-label {
+    font-family:'JetBrains Mono', monospace; font-size:9.5px;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:6px;
+  }
+  .card .value {
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size:44px; line-height:1; letter-spacing:-.02em;
+  }
+  .card .value em { font-style:italic; color:var(--accent); font-weight:400; }
+  .card .value.reveal { animation: valueReveal .55s cubic-bezier(.7,0,.2,1); }
+  @keyframes valueReveal {
+    0% { opacity:0; transform:translateY(10px) scale(.92); filter:blur(2px); }
+    100% { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+  }
+
+  .vs {
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:34px; color:var(--muted);
+  }
+
+  .actions {
+    margin: 22px auto 0; max-width: 480px;
+    display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    position:relative;
+  }
+  /* Zeitungsartige Zierlinien links & rechts der Buttons */
+  .actions.center-bar::before, .actions.center-bar::after {
+    content:""; position:absolute; top:50%; height:1px;
+    width:min(80px, calc((100vw - 520px) / 2));
+    background:var(--rule); opacity:.35; pointer-events:none;
+  }
+  .actions.center-bar::before { right:calc(100% + 14px); }
+  .actions.center-bar::after  { left:calc(100% + 14px); }
+  @media (max-width: 720px) {
+    .actions.center-bar::before, .actions.center-bar::after { display:none; }
+  }
+  .btn {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.18em; text-transform:uppercase; font-weight:700;
+    padding:14px 10px; border:1px solid var(--ink); background:var(--paper);
+    color:var(--ink); cursor:pointer;
+    transition:transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .btn:hover:not(:disabled) {
+    background:var(--ink); color:var(--paper);
+    transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent);
+  }
+  .btn:active:not(:disabled) { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+  .btn:disabled { opacity:.4; cursor:not-allowed; box-shadow:none; }
+  .btn .arrow { display:block; font-family:'Fraunces', serif; font-style:italic; font-size:22px; margin-bottom:2px; letter-spacing:0; text-transform:none; }
+
+  .verdict {
+    margin-top:16px; padding:12px 16px; text-align:center;
+    font-family:'Fraunces', serif; font-style:italic; font-size:18px;
+    border:1px dashed var(--rule-soft); min-height:52px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .verdict.correct { color:var(--ok); border-color:var(--ok); background:var(--ok-soft); }
+  .verdict.wrong   { color:var(--accent); border-color:var(--accent); background:var(--accent-soft); }
+  .verdict .badge {
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:.18em; text-transform:uppercase; font-style:normal;
+    padding:3px 8px; border:1px solid currentColor;
+  }
+
+  .wiki-link {
+    display:inline-block; margin-top:8px;
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+    text-decoration:none; border-bottom:1px solid var(--rule-soft);
+    padding-bottom:1px;
+  }
+  .wiki-link:hover { color:var(--accent); border-color:var(--accent); }
+
+  .loading {
+    display:inline-block; width:16px; height:16px;
+    border:2px solid var(--rule-soft); border-top-color:var(--ink);
+    border-radius:50%; animation:spin .8s linear infinite;
+    vertical-align:middle; margin-right:8px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .final {
+    margin-top:22px; padding:28px 22px; text-align:center;
+    border:2px solid var(--rule); background:var(--paper-2);
+    display:none;
+  }
+  .final.show { display:block; animation: valueReveal .5s ease; }
+  .final-title {
+    font-family:'Fraunces', serif; font-style:italic; font-weight:600;
+    font-size:34px; margin-bottom:6px;
+  }
+  .final-sub {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:18px;
+  }
+  .final-score {
+    font-family:'Fraunces', serif; font-weight:800; font-size:64px;
+    line-height:1; margin-bottom:14px;
+  }
+  .final-score em { font-style:italic; color:var(--accent); font-weight:400; }
+
+  .rules {
+    margin-top:32px; padding:18px 22px;
+    border:1px solid var(--rule-soft); background:var(--paper);
+    font-size:13.5px; line-height:1.65; color:var(--ink-soft);
+    columns:2; column-gap:32px;
+  }
+  .rules h3 {
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:6px; font-weight:600;
+    column-span:all;
+  }
+  .rules p { break-inside:avoid; margin-bottom:8px; }
+  @media (max-width:620px) { .rules { columns:1; } }
+
+  @media (max-width:560px) {
+    .wrap { padding:20px 18px 60px; }
+    .mast { grid-template-columns:1fr auto; }
+    .mast .edition.left { display:none; }
+    .card { min-height:auto; padding:18px; }
+    .card .headline { min-height:auto; font-size:22px; margin:10px 0 6px; }
+    .card .value { font-size:36px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="edition left">Vol. I · SS 2026 · Nº 04</div>
+    <div class="brand">Higher<em>&amp;</em>Lower</div>
+    <div class="edition right">
+      <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus" title="Werbung ein/aus">
+        <span class="dot" id="adsDot"></span>
+        <span id="adsLabel">Ads</span>
+      </button>
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta">Feuilleton · Höher oder Tiefer</span>
+  </div>
+
+  <section class="lede">
+    <div>
+      <div class="kicker">Nº 04 · Depesche aus dem Nachschlagewerk</div>
+      <h1>Was liest <em>die Welt?</em></h1>
+    </div>
+    <div class="vs" aria-hidden="true">·</div>
+    <div class="period">
+      <div id="periodLabel">Wikipedia-Aufrufe · lädt …</div>
+      <div style="margin-top:4px; opacity:.7;">Quelle: <span style="font-style:italic;">de.wikipedia</span></div>
+    </div>
+  </section>
+
+  <div class="scoreboard">
+    <div>
+      <div class="score-label">Serie</div>
+      <div class="score-val streak-num"><em id="streakVal">0</em></div>
+    </div>
+    <div>
+      <div class="score-label">Bestmarke</div>
+      <div class="score-val" id="bestVal">0</div>
+    </div>
+    <div>
+      <div class="score-label">Runde</div>
+      <div class="score-val" id="roundVal">1</div>
+    </div>
+  </div>
+
+  <main>
+    <div class="board" id="board">
+      <!-- Card A -->
+      <article class="card card-a" id="cardA">
+        <div class="eyebrow">
+          <span>Artikel A</span>
+          <span class="badge">Referenz</span>
+        </div>
+        <div class="headline" id="titleA">—</div>
+        <div class="subline" id="subA">&nbsp;</div>
+        <div class="value-block">
+          <div class="value-label">Aufrufe</div>
+          <div class="value" id="valueA">—</div>
+          <a class="wiki-link" id="linkA" href="#" target="_blank" rel="noopener">Bei Wikipedia lesen →</a>
+        </div>
+      </article>
+
+      <div class="vs" aria-hidden="true">vs</div>
+
+      <!-- Card B -->
+      <article class="card card-b" id="cardB">
+        <div class="eyebrow">
+          <span>Artikel B</span>
+          <span class="badge" id="badgeB">Rätsel</span>
+        </div>
+        <div class="headline" id="titleB">—</div>
+        <div class="subline" id="subB">&nbsp;</div>
+        <div class="value-block">
+          <div class="value-label" id="valueLabelB">Aufrufe · verdeckt</div>
+          <div class="value" id="valueB">?</div>
+          <a class="wiki-link" id="linkB" href="#" target="_blank" rel="noopener" style="visibility:hidden;">Bei Wikipedia lesen →</a>
+        </div>
+      </article>
+    </div>
+
+    <div class="actions center-bar" id="actions">
+      <button class="btn" id="btnHigher">
+        <span class="arrow">↑</span>
+        Höher
+      </button>
+      <button class="btn" id="btnLower">
+        <span class="arrow">↓</span>
+        Tiefer
+      </button>
+    </div>
+
+    <div class="verdict" id="verdict">
+      <span class="loading" id="loader"></span>
+      <span id="verdictText">Kuratiert die Redaktion die Auflagenzahlen …</span>
+    </div>
+
+    <div class="final" id="finalPanel">
+      <div class="final-title">Ausgabe geschlossen.</div>
+      <div class="final-sub">Depesche · Endstand</div>
+      <div class="final-score"><em id="finalStreak">0</em> in Folge</div>
+      <button class="btn" id="btnRestart" style="max-width:260px; margin:0 auto; display:block;">
+        Neue Ausgabe drucken
+      </button>
+    </div>
+  </main>
+
+  <section class="rules">
+    <h3>Spielanleitung</h3>
+    <p><strong>So funktioniert's:</strong> Zwei Wikipedia-Artikel treten gegeneinander an. Bei Artikel A siehst du, wie oft er im letzten Monat aufgerufen wurde. Rate, ob Artikel B <em>höher</em> oder <em>tiefer</em> liegt.</p>
+    <p><strong>Serie:</strong> Bei jedem Treffer rutscht Artikel B nach links und ein neuer Herausforderer erscheint. Ein Fehler beendet die Runde.</p>
+    <p><strong>Datenquelle:</strong> Wikimedia Pageviews API — echte, öffentliche Aufrufzahlen der deutschen Wikipedia im letzten kalendarischen Monat.</p>
+    <p><strong>Fairness:</strong> Bei Gleichstand zählen beide Antworten. Die Redaktion irrt sich nicht.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Strauss · Biebergemünd</span>
+    <span id="footYear">© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
+<aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
+
+<script>
+const $ = sel => document.querySelector(sel);
+
+/* ————————— Theme + Ads (unverändert aus Vorlage) ————————— */
+function initTheme() {
+  const saved = localStorage.getItem("ms-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(saved || (prefersDark ? "dark" : "light"));
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("ms-theme", theme);
+  $("#themeLabel").textContent = theme === "dark" ? "Light" : "Dark";
+}
+$("#themeToggle").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : "dark";
+  const swap = () => setTheme(next);
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(swap);
+  } else { swap(); }
+});
+function setAds(on) {
+  document.body.classList.toggle("ads-off", !on);
+  localStorage.setItem("ms-ads", on ? "on" : "off");
+  const label = $("#adsLabel"); if (label) label.textContent = on ? "Ads" : "Ads·off";
+  const dot = $("#adsDot"); if (dot) dot.style.background = on ? "var(--ink)" : "transparent";
+}
+(function initAdsToggle(){
+  const stored = localStorage.getItem("ms-ads");
+  setAds(stored !== "off");
+})();
+$("#adsToggle").addEventListener("click", () => {
+  const on = !document.body.classList.contains("ads-off");
+  setAds(!on);
+});
+
+const PAYPAL_AD = {
+  cls:"paypal", eyebrow:"UNTERSTÜTZUNG", hero:"☕",
+  title:"Ein Kaffee für Maiko?",
+  body:"Wenn dir die App hilft — kleine Geste, große Freude.",
+  cta:{ label:"paypal.me/maiggooo →", url:"https://paypal.me/maiggooo" },
+  foot:"PAYPAL · DANKE", mark:"♡"
+};
+const ADS = [
+  { cls:"kaffee",  eyebrow:"CAMPUS",            hero:"· · ·",                title:"Linas Kaffee",              body:"Der einzige Grund, morgens die Vorlesung nicht zu schwänzen. Bohnen aus Überzeugung.", foot:"Mo–Fr · ab 07:30",     mark:"L" },
+  { cls:"stink",   eyebrow:"DIENSTLEISTUNG",    hero:"☁ ☁ ☁",                title:"Pauls Stinke\u00adservice", body:"„Wir liefern Duft. Meistens den falschen.“",                                           foot:"Auf Anfrage",          mark:"P" },
+  { cls:"pfalz",   eyebrow:"SEIT '74",          hero:"MARKT · FASS · FLASCHE", title:"Getränke Pfalzgraf",     body:"Regional, ehrlich, kalt. Für jede Runde die richtige Kiste.",                          foot:"Landau · Pfalz",       mark:"✦", link:"http://www.getraenke-pfalzgraf.de/" },
+  { cls:"kirche",  eyebrow:"SONNTAGS · 10 UHR",  hero:"✝",                   title:"Kians Gottesdienst",        body:"Predigt, Musik, Kaffee danach. Kommt zahlreich.",                                      foot:"Eintritt frei",        mark:"K" },
+  { cls:"reise",   eyebrow:"REISEBÜRO",          hero:"✈",                   title:"Konsis Reiseplaner",        body:"Von Biebergemünd in die Welt — und rechtzeitig zurück zur Klausur.",                   foot:"Buchung · 24/7",       mark:"→" },
+  { cls:"schweig", eyebrow:"PREMIUM STILLE",     hero:". . .",               title:"Katalinas Schweigen.",      body:"Der Schweigeservice. Wir sagen nichts. Garantiert.",                                   foot:"Diskretion inklusive", mark:"—" },
+  { cls:"minion",  eyebrow:"LIVE-PERFORMANCE",   hero:"BELLO!",              title:"Selinas Minion Impressionen", body:"Banana. Papoy. Tulaliloo. Selina macht sie alle — auf Wunsch mit Latzhose.",         foot:"Buchbar für Events",   mark:"S" }
+];
+function renderAd(slotEl, ad) {
+  const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
+  const inner = `
+    <div class="ad ad--${ad.cls}">
+      <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
+      ${ad.hero ? `<div class="ad-hero">${ad.hero}</div>` : ``}
+      <div class="ad-title">${ad.title}</div>
+      <div class="ad-body">${ad.body}</div>
+      ${ctaHTML}
+      <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
+    </div>`;
+  slotEl.innerHTML = ad.link
+    ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>`
+    : inner;
+  requestAnimationFrame(() => {
+    const el = slotEl.querySelector('.ad');
+    if (el) el.classList.add('show');
+  });
+}
+function swapAd(slotEl, ad) {
+  const current = slotEl.querySelector('.ad');
+  if (!current) { renderAd(slotEl, ad); return; }
+  current.classList.remove('show');
+  setTimeout(() => renderAd(slotEl, ad), 380);
+}
+let adTick = 0;
+function cycleAds() {
+  const rightSlot = document.getElementById('adSlotRight');
+  if (!rightSlot) return;
+  adTick = (adTick + 1) % ADS.length;
+  swapAd(rightSlot, ADS[adTick]);
+}
+function initAds() {
+  const leftSlot  = document.getElementById('adSlotLeft');
+  const rightSlot = document.getElementById('adSlotRight');
+  if (!leftSlot || !rightSlot) return;
+  renderAd(leftSlot,  PAYPAL_AD);
+  renderAd(rightSlot, ADS[0]);
+  adTick = 0;
+  setInterval(cycleAds, 10000);
+}
+initTheme();
+initAds();
+
+/* ————————— GAME LOGIC ————————— */
+
+// Kuratierte Artikelliste (deutsche Wikipedia)
+// Format: { t: Titel (display + Wiki-Slug mit Unterstrichen), c: Kategorie }
+const ARTICLES = [
+  // Politik
+  {t:"Angela Merkel", c:"Politik", d:"dt. Bundeskanzlerin 2005–2021"},
+  {t:"Konrad Adenauer", c:"Politik", d:"erster Bundeskanzler der BRD"},
+  {t:"Willy Brandt", c:"Politik", d:"SPD-Kanzler, Friedensnobelpreis"},
+  {t:"Helmut Kohl", c:"Politik", d:"Kanzler der Einheit"},
+  {t:"Helmut Schmidt", c:"Politik", d:"SPD-Bundeskanzler 1974–82"},
+  {t:"Gerhard Schröder", c:"Politik", d:"SPD-Kanzler 1998–2005"},
+  {t:"Olaf Scholz", c:"Politik", d:"dt. Bundeskanzler (SPD)"},
+  {t:"Friedrich Merz", c:"Politik", d:"CDU-Vorsitzender"},
+  {t:"Otto von Bismarck", c:"Politik", d:"erster Reichskanzler"},
+  {t:"Barack Obama", c:"Politik", d:"44. US-Präsident"},
+  {t:"Donald Trump", c:"Politik", d:"45. & 47. US-Präsident"},
+  {t:"Joe Biden", c:"Politik", d:"46. US-Präsident"},
+  {t:"Kamala Harris", c:"Politik", d:"US-Vizepräsidentin"},
+  {t:"George W. Bush", c:"Politik", d:"43. US-Präsident"},
+  {t:"Bill Clinton", c:"Politik", d:"42. US-Präsident"},
+  {t:"Hillary Clinton", c:"Politik", d:"US-Außenministerin a.D."},
+  {t:"Wolodymyr Selenskyj", c:"Politik", d:"Präsident der Ukraine"},
+  {t:"Wladimir Putin", c:"Politik", d:"Präsident Russlands"},
+  {t:"Xi Jinping", c:"Politik", d:"Präsident der VR China"},
+  {t:"Emmanuel Macron", c:"Politik", d:"Präsident Frankreichs"},
+  {t:"Giorgia Meloni", c:"Politik", d:"Ministerpräsidentin Italiens"},
+  {t:"Rishi Sunak", c:"Politik", d:"brit. Ex-Premierminister"},
+  {t:"Keir Starmer", c:"Politik", d:"brit. Premierminister"},
+  {t:"Winston Churchill", c:"Politik", d:"brit. Premier im 2. WK"},
+  {t:"Charles de Gaulle", c:"Politik", d:"frz. Staatspräsident"},
+  {t:"Nelson Mandela", c:"Politik", d:"südafrik. Freiheitskämpfer"},
+  {t:"Mahatma Gandhi", c:"Politik", d:"Freiheitskämpfer Indiens"},
+  {t:"Martin Luther King", c:"Politik", d:"US-Bürgerrechtler"},
+  {t:"John F. Kennedy", c:"Politik", d:"35. US-Präsident"},
+  {t:"Ronald Reagan", c:"Politik", d:"40. US-Präsident"},
+  {t:"Michail Gorbatschow", c:"Politik", d:"sowjet. Staatschef"},
+  {t:"Adolf Hitler", c:"Politik", d:"dt. Diktator (NS-Zeit)"},
+  {t:"Josef Stalin", c:"Politik", d:"sowjetischer Diktator"},
+  {t:"Ursula von der Leyen", c:"Politik", d:"EU-Kommissionspräsidentin"},
+  {t:"Robert Habeck", c:"Politik", d:"Grünen-Politiker"},
+  {t:"Christian Lindner", c:"Politik", d:"FDP-Politiker"},
+  {t:"Alice Weidel", c:"Politik", d:"AfD-Vorsitzende"},
+  {t:"Sahra Wagenknecht", c:"Politik", d:"Parteichefin BSW"},
+  {t:"Kim Jong-un", c:"Politik", d:"nordkorean. Machthaber"},
+  {t:"Karl Marx", c:"Politik", d:"Philosoph, Kapitalismus-Kritik"},
+  {t:"Frank-Walter Steinmeier", c:"Politik", d:"dt. Bundespräsident"},
+  {t:"Wolfgang Schäuble", c:"Politik", d:"CDU-Politiker, † 2023"},
+  {t:"Recep Tayyip Erdoğan", c:"Politik", d:"Präsident der Türkei"},
+  {t:"Narendra Modi", c:"Politik", d:"Premierminister Indiens"},
+  // Geschichte
+  {t:"Julius Caesar", c:"Geschichte", d:"römischer Feldherr"},
+  {t:"Napoleon Bonaparte", c:"Geschichte", d:"französischer Kaiser"},
+  {t:"Alexander der Große", c:"Geschichte", d:"makedonischer Herrscher"},
+  {t:"Kleopatra VII.", c:"Geschichte", d:"ägyptische Königin"},
+  {t:"Karl der Große", c:"Geschichte", d:"Kaiser des Frankenreichs"},
+  {t:"Friedrich II. (Preußen)", c:"Geschichte", d:"preußischer König"},
+  {t:"Elisabeth II.", c:"Geschichte", d:"brit. Königin († 2022)"},
+  {t:"Ludwig XIV.", c:"Geschichte", d:"frz. Sonnenkönig"},
+  {t:"Marie Antoinette", c:"Geschichte", d:"letzte frz. Königin"},
+  {t:"Christoph Kolumbus", c:"Geschichte", d:"Entdecker Amerikas"},
+  {t:"Leonardo da Vinci", c:"Geschichte", d:"Universalgelehrter der Renaissance"},
+  {t:"Michelangelo", c:"Geschichte", d:"Renaissance-Künstler"},
+  {t:"Vincent van Gogh", c:"Geschichte", d:"niederländischer Maler"},
+  {t:"Pablo Picasso", c:"Geschichte", d:"Kubismus-Maler"},
+  {t:"Salvador Dalí", c:"Geschichte", d:"surrealistischer Maler"},
+  {t:"Frida Kahlo", c:"Geschichte", d:"mexikanische Malerin"},
+  {t:"Che Guevara", c:"Geschichte", d:"Revolutionär, Guerillakämpfer"},
+  {t:"Anne Frank", c:"Geschichte", d:"Tagebuchautorin"},
+  {t:"Sophie Scholl", c:"Geschichte", d:"Widerstand gegen NS-Regime"},
+  {t:"Martin Luther", c:"Geschichte", d:"Reformator"},
+  {t:"Wilhelm II. (Deutsches Reich)", c:"Geschichte", d:"letzter dt. Kaiser"},
+  {t:"Otto der Große", c:"Geschichte", d:"erster römisch-dt. Kaiser"},
+  {t:"Johannes Gutenberg", c:"Geschichte", d:"Erfinder des Buchdrucks"},
+  {t:"Karl May", c:"Geschichte", d:"dt. Abenteuerschriftsteller"},
+  {t:"Johann Wolfgang von Goethe", c:"Geschichte", d:"dt. Dichterfürst"},
+  {t:"Friedrich Schiller", c:"Geschichte", d:"dt. Dramatiker"},
+  {t:"William Shakespeare", c:"Geschichte", d:"engl. Dramatiker"},
+  // Musik
+  {t:"Wolfgang Amadeus Mozart", c:"Musik", d:"Klassik-Komponist"},
+  {t:"Ludwig van Beethoven", c:"Musik", d:"dt. Komponist"},
+  {t:"Johann Sebastian Bach", c:"Musik", d:"Barock-Komponist"},
+  {t:"Richard Wagner", c:"Musik", d:"dt. Opernkomponist"},
+  {t:"Taylor Swift", c:"Musik", d:"US-Popsängerin"},
+  {t:"Beyoncé", c:"Musik", d:"US-R&B-Sängerin"},
+  {t:"Rihanna", c:"Musik", d:"Sängerin aus Barbados"},
+  {t:"Ed Sheeran", c:"Musik", d:"brit. Sänger & Songwriter"},
+  {t:"Adele", c:"Musik", d:"brit. Soul-Sängerin"},
+  {t:"The Beatles", c:"Musik", d:"brit. Rockband der 60er"},
+  {t:"Michael Jackson", c:"Musik", d:"King of Pop"},
+  {t:"Elvis Presley", c:"Musik", d:"King of Rock’n’Roll"},
+  {t:"Queen (Band)", c:"Musik", d:"brit. Rockband"},
+  {t:"Madonna (Sängerin)", c:"Musik", d:"US-Pop-Ikone"},
+  {t:"Freddie Mercury", c:"Musik", d:"Queen-Frontsänger"},
+  {t:"Billie Eilish", c:"Musik", d:"US-Popsängerin"},
+  {t:"Dua Lipa", c:"Musik", d:"brit. Popsängerin"},
+  {t:"Lady Gaga", c:"Musik", d:"US-Popsängerin"},
+  {t:"Kanye West", c:"Musik", d:"US-Rapper"},
+  {t:"Drake (Rapper)", c:"Musik", d:"kanadischer Rapper"},
+  {t:"Justin Bieber", c:"Musik", d:"kanadischer Popsänger"},
+  {t:"Rammstein", c:"Musik", d:"dt. Industrial-Metal-Band"},
+  {t:"Helene Fischer", c:"Musik", d:"dt. Schlagerstar"},
+  {t:"Bruno Mars", c:"Musik", d:"US-Sänger"},
+  {t:"Bob Marley", c:"Musik", d:"Reggae-Ikone"},
+  {t:"Kurt Cobain", c:"Musik", d:"Nirvana-Frontmann"},
+  {t:"David Bowie", c:"Musik", d:"brit. Musik-Legende"},
+  {t:"ABBA", c:"Musik", d:"schwedische Popgruppe"},
+  {t:"Metallica", c:"Musik", d:"US-Metal-Band"},
+  {t:"AC/DC", c:"Musik", d:"australische Rockband"},
+  {t:"Pink Floyd", c:"Musik", d:"brit. Progressive-Rock-Band"},
+  {t:"Nirvana (Band)", c:"Musik", d:"US-Grunge-Band"},
+  {t:"Coldplay", c:"Musik", d:"brit. Rockband"},
+  {t:"Bob Dylan", c:"Musik", d:"US-Songwriter, Nobelpreis"},
+  {t:"Ariana Grande", c:"Musik", d:"US-Popsängerin"},
+  {t:"The Weeknd", c:"Musik", d:"kanadischer Sänger"},
+  {t:"Miley Cyrus", c:"Musik", d:"US-Popsängerin"},
+  {t:"Post Malone", c:"Musik", d:"US-Rapper"},
+  {t:"Cro (Rapper)", c:"Musik", d:"dt. Rapper mit Panda-Maske"},
+  {t:"Kraftwerk (Band)", c:"Musik", d:"dt. Elektronik-Pioniere"},
+  // Wissenschaft
+  {t:"Albert Einstein", c:"Wissenschaft", d:"Physiker, Relativitätstheorie"},
+  {t:"Isaac Newton", c:"Wissenschaft", d:"Physiker & Mathematiker"},
+  {t:"Nikola Tesla", c:"Wissenschaft", d:"Erfinder & Elektroingenieur"},
+  {t:"Marie Curie", c:"Wissenschaft", d:"2× Nobelpreisträgerin"},
+  {t:"Stephen Hawking", c:"Wissenschaft", d:"brit. Astrophysiker"},
+  {t:"Charles Darwin", c:"Wissenschaft", d:"Begründer der Evolutionstheorie"},
+  {t:"Sigmund Freud", c:"Wissenschaft", d:"Begründer der Psychoanalyse"},
+  {t:"Galileo Galilei", c:"Wissenschaft", d:"ital. Astronom"},
+  {t:"Alexander Fleming", c:"Wissenschaft", d:"Entdecker des Penicillins"},
+  {t:"Louis Pasteur", c:"Wissenschaft", d:"frz. Mikrobiologe"},
+  {t:"Max Planck", c:"Wissenschaft", d:"Begründer der Quantenphysik"},
+  {t:"Werner Heisenberg", c:"Wissenschaft", d:"Quantenphysiker"},
+  {t:"Alan Turing", c:"Wissenschaft", d:"Informatik-Pionier"},
+  {t:"Ada Lovelace", c:"Wissenschaft", d:"erste Programmiererin"},
+  {t:"Carl Friedrich Gauß", c:"Wissenschaft", d:"dt. Mathematiker"},
+  {t:"Alexander von Humboldt", c:"Wissenschaft", d:"dt. Naturforscher"},
+  {t:"Robert Koch", c:"Wissenschaft", d:"Bakteriologe, Nobelpreis"},
+  {t:"Erwin Schrödinger", c:"Wissenschaft", d:"Quantenphysiker"},
+  {t:"Wilhelm Conrad Röntgen", c:"Wissenschaft", d:"Entdecker der Röntgenstrahlung"},
+  {t:"Aristoteles", c:"Wissenschaft", d:"griech. Philosoph"},
+  {t:"Platon", c:"Wissenschaft", d:"griech. Philosoph"},
+  {t:"Sokrates", c:"Wissenschaft", d:"griech. Philosoph"},
+  {t:"Immanuel Kant", c:"Wissenschaft", d:"dt. Philosoph der Aufklärung"},
+  {t:"Friedrich Nietzsche", c:"Wissenschaft", d:"dt. Philosoph"},
+  // Tech
+  {t:"Elon Musk", c:"Tech", d:"Tesla- & SpaceX-Chef"},
+  {t:"Bill Gates", c:"Tech", d:"Microsoft-Mitgründer"},
+  {t:"Steve Jobs", c:"Tech", d:"Apple-Mitgründer († 2011)"},
+  {t:"Mark Zuckerberg", c:"Tech", d:"Meta-CEO"},
+  {t:"Jeff Bezos", c:"Tech", d:"Amazon-Gründer"},
+  {t:"Sam Altman", c:"Tech", d:"OpenAI-CEO"},
+  {t:"Larry Page", c:"Tech", d:"Google-Mitgründer"},
+  {t:"Sergey Brin", c:"Tech", d:"Google-Mitgründer"},
+  {t:"Tim Cook", c:"Tech", d:"Apple-CEO"},
+  {t:"Sundar Pichai", c:"Tech", d:"Google-CEO"},
+  {t:"Warren Buffett", c:"Tech", d:"US-Investor"},
+  {t:"Jack Ma", c:"Tech", d:"Alibaba-Gründer"},
+  {t:"Jensen Huang", c:"Tech", d:"Nvidia-CEO"},
+  {t:"Steve Wozniak", c:"Tech", d:"Apple-Mitgründer"},
+  {t:"Larry Ellison", c:"Tech", d:"Oracle-Mitgründer"},
+  // Sport
+  {t:"Lionel Messi", c:"Sport", d:"argent. Fußballstar"},
+  {t:"Cristiano Ronaldo", c:"Sport", d:"portug. Fußballstar"},
+  {t:"Neymar", c:"Sport", d:"brasil. Fußballer"},
+  {t:"LeBron James", c:"Sport", d:"US-Basketballer"},
+  {t:"Michael Jordan", c:"Sport", d:"Basketball-Legende"},
+  {t:"Roger Federer", c:"Sport", d:"Schweizer Tennisstar"},
+  {t:"Rafael Nadal", c:"Sport", d:"spanischer Tennisspieler"},
+  {t:"Novak Đoković", c:"Sport", d:"serbischer Tennisspieler"},
+  {t:"Serena Williams", c:"Sport", d:"US-Tennisspielerin"},
+  {t:"Muhammad Ali", c:"Sport", d:"US-Box-Legende"},
+  {t:"Usain Bolt", c:"Sport", d:"jamaik. Sprint-Ikone"},
+  {t:"Michael Schumacher", c:"Sport", d:"dt. Formel-1-Rekordweltmeister"},
+  {t:"Lewis Hamilton", c:"Sport", d:"brit. F1-Weltmeister"},
+  {t:"Manuel Neuer", c:"Sport", d:"dt. Nationaltorwart"},
+  {t:"Toni Kroos", c:"Sport", d:"dt. Fußball-Weltmeister"},
+  {t:"Jude Bellingham", c:"Sport", d:"engl. Fußballer"},
+  {t:"Kylian Mbappé", c:"Sport", d:"frz. Stürmerstar"},
+  {t:"Erling Haaland", c:"Sport", d:"norw. Torjäger"},
+  {t:"Pelé", c:"Sport", d:"brasil. Fußball-Legende"},
+  {t:"Diego Maradona", c:"Sport", d:"argent. Fußball-Legende"},
+  {t:"Zinédine Zidane", c:"Sport", d:"frz. Fußball-Legende"},
+  {t:"Franz Beckenbauer", c:"Sport", d:"„Kaiser“, dt. Fußball-Legende"},
+  {t:"Jürgen Klopp", c:"Sport", d:"dt. Fußballtrainer"},
+  {t:"Pep Guardiola", c:"Sport", d:"spanischer Startrainer"},
+  {t:"Thomas Müller", c:"Sport", d:"dt. Weltmeister 2014"},
+  {t:"Bastian Schweinsteiger", c:"Sport", d:"dt. Weltmeister 2014"},
+  {t:"Miroslav Klose", c:"Sport", d:"WM-Rekordschütze"},
+  {t:"Dirk Nowitzki", c:"Sport", d:"dt. NBA-Star"},
+  {t:"Tiger Woods", c:"Sport", d:"US-Golf-Legende"},
+  {t:"Max Verstappen", c:"Sport", d:"niederl. F1-Weltmeister"},
+  {t:"Sebastian Vettel", c:"Sport", d:"dt. F1-Champion"},
+  {t:"Kobe Bryant", c:"Sport", d:"US-Basketballer († 2020)"},
+  {t:"Stephen Curry", c:"Sport", d:"US-Basketballer"},
+  {t:"Boris Becker", c:"Sport", d:"dt. Tennisstar der 80er"},
+  {t:"Steffi Graf", c:"Sport", d:"dt. Tennis-Rekordhalterin"},
+  // Film
+  {t:"Star Wars", c:"Film", d:"Weltraum-Saga von George Lucas"},
+  {t:"Harry Potter", c:"Film", d:"Fantasy-Buch- & Filmreihe"},
+  {t:"Der Herr der Ringe", c:"Film", d:"Fantasy-Epos von J.R.R. Tolkien"},
+  {t:"Inception", c:"Film", d:"Traum-Thriller (Nolan, 2010)"},
+  {t:"Titanic (1997)", c:"Film", d:"Katastrophenfilm von James Cameron"},
+  {t:"Avatar – Aufbruch nach Pandora", c:"Film", d:"SF-Blockbuster (Cameron, 2009)"},
+  {t:"Game of Thrones", c:"Film", d:"HBO-Fantasyserie"},
+  {t:"Breaking Bad", c:"Film", d:"US-Drogen-Drama"},
+  {t:"Stranger Things", c:"Film", d:"Netflix-Mysteryserie"},
+  {t:"Die Simpsons", c:"Film", d:"US-Zeichentrick-Sitcom"},
+  {t:"SpongeBob Schwammkopf", c:"Film", d:"US-Zeichentrickserie"},
+  {t:"Oppenheimer (Film)", c:"Film", d:"Nolan-Biografiefilm 2023"},
+  {t:"Barbie (Film)", c:"Film", d:"Kino-Hit 2023"},
+  {t:"Der Pate", c:"Film", d:"Mafia-Klassiker (1972)"},
+  {t:"Pulp Fiction", c:"Film", d:"Tarantino-Film 1994"},
+  {t:"Forrest Gump", c:"Film", d:"Filmklassiker mit Tom Hanks"},
+  {t:"Matrix (Film)", c:"Film", d:"Sci-Fi-Klassiker 1999"},
+  {t:"Fight Club", c:"Film", d:"Kultfilm von David Fincher"},
+  {t:"The Dark Knight", c:"Film", d:"Batman-Film von Nolan"},
+  {t:"Interstellar", c:"Film", d:"Nolan-SF-Epos"},
+  {t:"Squid Game", c:"Film", d:"Netflix-Serie aus Südkorea"},
+  {t:"The Crown", c:"Film", d:"Serie über Elisabeth II."},
+  {t:"The Big Bang Theory", c:"Film", d:"US-Nerd-Sitcom"},
+  {t:"Friends", c:"Film", d:"US-Kult-Sitcom"},
+  {t:"How I Met Your Mother", c:"Film", d:"US-Sitcom"},
+  {t:"Tatort", c:"Film", d:"dt. Krimireihe"},
+  {t:"Dark (Fernsehserie)", c:"Film", d:"Netflix-Serie aus Deutschland"},
+  {t:"Fluch der Karibik", c:"Film", d:"Piraten-Filmreihe"},
+  {t:"Der König der Löwen", c:"Film", d:"Disney-Klassiker"},
+  {t:"James Bond", c:"Film", d:"brit. Agenten-Filmreihe"},
+  {t:"Marvel Cinematic Universe", c:"Film", d:"Superheldenfilm-Universum"},
+  {t:"Ted Lasso", c:"Film", d:"US-Fußball-Serie (AppleTV)"},
+  {t:"House of the Dragon", c:"Film", d:"GoT-Prequel-Serie"},
+  // Firma
+  {t:"Apple", c:"Firma", d:"US-Techkonzern (iPhone/Mac)"},
+  {t:"Google", c:"Firma", d:"US-Suchmaschine"},
+  {t:"Microsoft", c:"Firma", d:"US-Softwarekonzern"},
+  {t:"Amazon", c:"Firma", d:"US-Online-Händler"},
+  {t:"Meta Platforms", c:"Firma", d:"Konzern hinter Facebook/Instagram"},
+  {t:"Tesla, Inc.", c:"Firma", d:"US-E-Auto-Hersteller"},
+  {t:"Coca-Cola", c:"Firma", d:"US-Getränkemarke"},
+  {t:"McDonald’s", c:"Firma", d:"Fast-Food-Kette"},
+  {t:"Nike (Unternehmen)", c:"Firma", d:"US-Sportartikelhersteller"},
+  {t:"BMW", c:"Firma", d:"dt. Autobauer aus München"},
+  {t:"Volkswagen", c:"Firma", d:"dt. Autokonzern"},
+  {t:"Mercedes-Benz Group", c:"Firma", d:"dt. Premium-Autobauer"},
+  {t:"IKEA", c:"Firma", d:"schwed. Möbelriese"},
+  {t:"Adidas", c:"Firma", d:"dt. Sportartikelmarke"},
+  {t:"Netflix", c:"Firma", d:"US-Streamingdienst"},
+  {t:"Nvidia", c:"Firma", d:"US-Grafikchip-Hersteller"},
+  {t:"Samsung", c:"Firma", d:"südkorean. Elektronikkonzern"},
+  {t:"Sony", c:"Firma", d:"japan. Elektronikkonzern"},
+  {t:"Toyota", c:"Firma", d:"japan. Autohersteller"},
+  {t:"Ferrari S.p.A.", c:"Firma", d:"ital. Sportwagenmarke"},
+  {t:"Porsche AG", c:"Firma", d:"dt. Sportwagenhersteller"},
+  {t:"Aldi", c:"Firma", d:"dt. Discounter"},
+  {t:"Lidl", c:"Firma", d:"dt. Discounter"},
+  {t:"Rewe Group", c:"Firma", d:"dt. Handelskonzern"},
+  {t:"H&M", c:"Firma", d:"schwed. Modekette"},
+  {t:"Nestlé", c:"Firma", d:"Schweizer Lebensmittelriese"},
+  {t:"Spotify", c:"Firma", d:"schwed. Musik-Streamingdienst"},
+  {t:"Uber", c:"Firma", d:"US-Fahrdienstvermittler"},
+  {t:"Airbnb", c:"Firma", d:"US-Vermietungsplattform"},
+  {t:"Deutsche Bank", c:"Firma", d:"dt. Großbank"},
+  {t:"Siemens", c:"Firma", d:"dt. Industriekonzern"},
+  {t:"Boeing", c:"Firma", d:"US-Flugzeugbauer"},
+  {t:"Airbus", c:"Firma", d:"europ. Flugzeugbauer"},
+  {t:"Deutsche Bahn", c:"Firma", d:"dt. Bahnkonzern"},
+  {t:"Lufthansa", c:"Firma", d:"dt. Fluggesellschaft"},
+  {t:"PayPal", c:"Firma", d:"US-Online-Zahlungsdienst"},
+  {t:"SAP", c:"Firma", d:"dt. Software-Konzern"},
+  // Stadt
+  {t:"Berlin", c:"Stadt", d:"Hauptstadt Deutschlands"},
+  {t:"München", c:"Stadt", d:"bayer. Landeshauptstadt"},
+  {t:"Hamburg", c:"Stadt", d:"dt. Hafenstadt"},
+  {t:"Köln", c:"Stadt", d:"Domstadt am Rhein"},
+  {t:"Frankfurt am Main", c:"Stadt", d:"dt. Finanzmetropole"},
+  {t:"Paris", c:"Stadt", d:"Hauptstadt Frankreichs"},
+  {t:"London", c:"Stadt", d:"Hauptstadt Großbritanniens"},
+  {t:"Tokio", c:"Stadt", d:"Hauptstadt Japans"},
+  {t:"New York City", c:"Stadt", d:"US-Metropole an der Ostküste"},
+  {t:"Los Angeles", c:"Stadt", d:"US-Westküstenstadt"},
+  {t:"Rom", c:"Stadt", d:"Hauptstadt Italiens"},
+  {t:"Madrid", c:"Stadt", d:"Hauptstadt Spaniens"},
+  {t:"Barcelona", c:"Stadt", d:"katalanische Metropole"},
+  {t:"Wien", c:"Stadt", d:"Hauptstadt Österreichs"},
+  {t:"Zürich", c:"Stadt", d:"Schweizer Finanzstadt"},
+  {t:"Moskau", c:"Stadt", d:"Hauptstadt Russlands"},
+  {t:"Peking", c:"Stadt", d:"Hauptstadt Chinas"},
+  {t:"Dubai", c:"Stadt", d:"Wüstenmetropole am Golf"},
+  {t:"Istanbul", c:"Stadt", d:"türk. Millionenstadt"},
+  {t:"Biebergemünd", c:"Stadt", d:"Ort im Spessart (Hessen)"},
+  {t:"Stuttgart", c:"Stadt", d:"baden-württ. Landeshauptstadt"},
+  {t:"Düsseldorf", c:"Stadt", d:"NRW-Landeshauptstadt"},
+  {t:"Leipzig", c:"Stadt", d:"Messestadt in Sachsen"},
+  {t:"Dresden", c:"Stadt", d:"sächs. Landeshauptstadt"},
+  {t:"Nürnberg", c:"Stadt", d:"fränk. Großstadt"},
+  {t:"Bremen", c:"Stadt", d:"Hansestadt an der Weser"},
+  {t:"Hannover", c:"Stadt", d:"Landeshauptstadt Niedersachsens"},
+  {t:"Amsterdam", c:"Stadt", d:"Hauptstadt der Niederlande"},
+  {t:"Brüssel", c:"Stadt", d:"Hauptstadt Belgiens"},
+  {t:"Prag", c:"Stadt", d:"Hauptstadt Tschechiens"},
+  {t:"Warschau", c:"Stadt", d:"Hauptstadt Polens"},
+  {t:"Kopenhagen", c:"Stadt", d:"Hauptstadt Dänemarks"},
+  {t:"Stockholm", c:"Stadt", d:"Hauptstadt Schwedens"},
+  {t:"Athen", c:"Stadt", d:"Hauptstadt Griechenlands"},
+  {t:"Kairo", c:"Stadt", d:"Hauptstadt Ägyptens"},
+  {t:"Rio de Janeiro", c:"Stadt", d:"brasil. Metropole"},
+  {t:"Sydney", c:"Stadt", d:"australische Metropole"},
+  {t:"Singapur", c:"Stadt", d:"Stadtstaat in Südostasien"},
+  {t:"Bangkok", c:"Stadt", d:"Hauptstadt Thailands"},
+  {t:"Hongkong", c:"Stadt", d:"chines. Sonderverwaltungszone"},
+  {t:"Las Vegas", c:"Stadt", d:"Casino-Metropole in Nevada"},
+  {t:"Chicago", c:"Stadt", d:"US-Metropole am Michigansee"},
+  {t:"San Francisco", c:"Stadt", d:"Stadt in Kalifornien"},
+  {t:"Miami", c:"Stadt", d:"US-Stadt in Florida"},
+  {t:"Toronto", c:"Stadt", d:"größte Stadt Kanadas"},
+  {t:"Mexiko-Stadt", c:"Stadt", d:"Hauptstadt Mexikos"},
+  // Land
+  {t:"Deutschland", c:"Land", d:"mitteleurop. Bundesstaat"},
+  {t:"Frankreich", c:"Land", d:"westeurop. Republik"},
+  {t:"Vereinigte Staaten", c:"Land", d:"nordamerik. Bundesrepublik"},
+  {t:"Volksrepublik China", c:"Land", d:"ostasiat. Staat"},
+  {t:"Japan", c:"Land", d:"Inselstaat in Ostasien"},
+  {t:"Russland", c:"Land", d:"größtes Land der Erde"},
+  {t:"Brasilien", c:"Land", d:"größtes Land Südamerikas"},
+  {t:"Indien", c:"Land", d:"bevölkerungsreichstes Land"},
+  {t:"Vereinigtes Königreich", c:"Land", d:"Königreich in Europa"},
+  {t:"Australien", c:"Land", d:"Kontinent-Staat"},
+  {t:"Kanada", c:"Land", d:"Land in Nordamerika"},
+  {t:"Ägypten", c:"Land", d:"Land der Pyramiden"},
+  {t:"Griechenland", c:"Land", d:"Wiege Europas"},
+  {t:"Türkei", c:"Land", d:"zwischen Europa und Asien"},
+  {t:"Spanien", c:"Land", d:"iberische Halbinsel"},
+  {t:"Italien", c:"Land", d:"„Stiefel“ am Mittelmeer"},
+  {t:"Mexiko", c:"Land", d:"mittelamerik. Staat"},
+  {t:"Südafrika", c:"Land", d:"Land am Kap"},
+  {t:"Nordkorea", c:"Land", d:"abgeschottete Diktatur"},
+  {t:"Südkorea", c:"Land", d:"asiat. Industrienation"},
+  {t:"Ukraine", c:"Land", d:"osteurop. Staat"},
+  {t:"Polen", c:"Land", d:"Nachbarland Deutschlands"},
+  {t:"Österreich", c:"Land", d:"Alpenrepublik"},
+  {t:"Schweiz", c:"Land", d:"Alpenland, neutral"},
+  {t:"Niederlande", c:"Land", d:"westeurop. Königreich"},
+  {t:"Belgien", c:"Land", d:"Sitz der EU-Institutionen"},
+  {t:"Israel", c:"Land", d:"Staat im Nahen Osten"},
+  {t:"Iran", c:"Land", d:"islam. Republik in Vorderasien"},
+  {t:"Saudi-Arabien", c:"Land", d:"Königreich am Persischen Golf"},
+  {t:"Argentinien", c:"Land", d:"südamerik. Land"},
+  {t:"Norwegen", c:"Land", d:"skandinav. Königreich"},
+  {t:"Schweden", c:"Land", d:"skandinav. Königreich"},
+  {t:"Finnland", c:"Land", d:"nordisches Land"},
+  {t:"Dänemark", c:"Land", d:"skandinav. Königreich"},
+  {t:"Portugal", c:"Land", d:"iberische Halbinsel, Westen"},
+  {t:"Irland", c:"Land", d:"Insel im Atlantik"},
+  {t:"Neuseeland", c:"Land", d:"Inselstaat im Pazifik"},
+  {t:"Thailand", c:"Land", d:"Königreich in Südostasien"},
+  {t:"Vietnam", c:"Land", d:"Staat in Südostasien"},
+  {t:"Indonesien", c:"Land", d:"größter Inselstaat der Welt"},
+  // Internet
+  {t:"Bitcoin", c:"Internet", d:"erste Kryptowährung"},
+  {t:"Ethereum", c:"Internet", d:"Krypto-Plattform mit Smart Contracts"},
+  {t:"Instagram", c:"Internet", d:"Foto- & Video-App"},
+  {t:"TikTok", c:"Internet", d:"Kurzvideo-App aus China"},
+  {t:"YouTube", c:"Internet", d:"Video-Plattform von Google"},
+  {t:"ChatGPT", c:"Internet", d:"KI-Chatbot von OpenAI"},
+  {t:"Wikipedia", c:"Internet", d:"freie Online-Enzyklopädie"},
+  {t:"WhatsApp", c:"Internet", d:"Messenger-App (Meta)"},
+  {t:"Facebook", c:"Internet", d:"US-Social-Network"},
+  {t:"Reddit", c:"Internet", d:"US-Community-Forum"},
+  {t:"Discord", c:"Internet", d:"Chat-Plattform für Gruppen"},
+  {t:"Snapchat", c:"Internet", d:"Foto-Messenger"},
+  {t:"LinkedIn", c:"Internet", d:"berufliches Netzwerk"},
+  {t:"Twitch", c:"Internet", d:"Live-Streaming-Plattform"},
+  {t:"Pinterest", c:"Internet", d:"Bilder-Pinnwand-Netzwerk"},
+  {t:"Google Maps", c:"Internet", d:"Karten- und Navigationsdienst"},
+  {t:"Gmail", c:"Internet", d:"E-Mail-Dienst von Google"},
+  // Ereignis
+  {t:"Zweiter Weltkrieg", c:"Ereignis", d:"globaler Krieg 1939–1945"},
+  {t:"Erster Weltkrieg", c:"Ereignis", d:"globaler Krieg 1914–1918"},
+  {t:"Kalter Krieg", c:"Ereignis", d:"Ost-West-Konflikt bis 1991"},
+  {t:"Französische Revolution", c:"Ereignis", d:"Umwälzung ab 1789"},
+  {t:"Deutsche Wiedervereinigung", c:"Ereignis", d:"1990, Ende der DDR"},
+  {t:"Mondlandung", c:"Ereignis", d:"Apollo 11, Juli 1969"},
+  {t:"Nuklearkatastrophe von Tschernobyl", c:"Ereignis", d:"1986 in der Ukraine"},
+  {t:"COVID-19-Pandemie", c:"Ereignis", d:"Coronavirus-Ausbruch 2019"},
+  {t:"Terroranschläge am 11. September 2001", c:"Ereignis", d:"Angriff auf USA"},
+  {t:"Berliner Mauer", c:"Ereignis", d:"Trennung Berlins 1961–1989"},
+  {t:"Reformation", c:"Ereignis", d:"Luthers Kirchenreform"},
+  {t:"Industrielle Revolution", c:"Ereignis", d:"Umbruch im 18./19. Jh."},
+  {t:"Russischer Überfall auf die Ukraine 2022", c:"Ereignis", d:"seit Februar 2022"},
+  {t:"Holocaust", c:"Ereignis", d:"NS-Völkermord an Juden"},
+  {t:"Vietnamkrieg", c:"Ereignis", d:"1955–1975 in Südostasien"},
+  {t:"Attentat auf John F. Kennedy", c:"Ereignis", d:"1963 in Dallas"},
+  // Natur
+  {t:"Löwe", c:"Natur", d:"„König der Tiere“"},
+  {t:"Elefanten", c:"Natur", d:"größte lebende Landtiere"},
+  {t:"Delfine", c:"Natur", d:"intelligente Meeressäuger"},
+  {t:"Pinguine", c:"Natur", d:"flugunfähige Seevögel"},
+  {t:"Tyrannosaurus", c:"Natur", d:"Raubdinosaurier"},
+  {t:"Hauskatze", c:"Natur", d:"beliebtes Haustier"},
+  {t:"Haushund", c:"Natur", d:"domestizierter Wolf"},
+  {t:"Hauspferd", c:"Natur", d:"Reit- und Nutztier"},
+  {t:"Wolf", c:"Natur", d:"Raubtier, Ahn des Hundes"},
+  {t:"Große Pandas", c:"Natur", d:"Bambusbär aus China"},
+  {t:"Tiger", c:"Natur", d:"größte Raubkatze"},
+  {t:"Krokodile", c:"Natur", d:"Reptilien-Ordnung"},
+  {t:"Haie", c:"Natur", d:"Knorpelfische"},
+  {t:"Bienen", c:"Natur", d:"wichtige Bestäuber-Insekten"},
+  {t:"Amazonas-Regenwald", c:"Natur", d:"größter Regenwald der Erde"},
+  {t:"Mount Everest", c:"Natur", d:"höchster Berg der Erde"},
+  // Konzept
+  {t:"Relativitätstheorie", c:"Konzept", d:"Einsteins Raum-Zeit-Theorie"},
+  {t:"Evolution", c:"Konzept", d:"Entwicklung der Arten"},
+  {t:"Desoxyribonukleinsäure", c:"Konzept", d:"DNA – Trägerin der Erbinformation"},
+  {t:"Schwarzes Loch", c:"Konzept", d:"extrem dichtes Objekt im All"},
+  {t:"Urknall", c:"Konzept", d:"Modell zum Ursprung des Alls"},
+  {t:"Klimawandel", c:"Konzept", d:"globale Erderwärmung"},
+  {t:"Künstliche Intelligenz", c:"Konzept", d:"lernende Computersysteme"},
+  {t:"Quantenmechanik", c:"Konzept", d:"Physik des Allerkleinsten"},
+  {t:"Photosynthese", c:"Konzept", d:"Pflanzen wandeln Licht in Energie"},
+  {t:"Gravitation", c:"Konzept", d:"universelle Anziehungskraft"},
+  {t:"Kernfusion", c:"Konzept", d:"Energiequelle der Sonne"},
+  {t:"Kernspaltung", c:"Konzept", d:"Aufspalten schwerer Atomkerne"},
+  {t:"Impfung", c:"Konzept", d:"Immunisierung gegen Krankheiten"},
+  {t:"Antibiotikum", c:"Konzept", d:"Wirkstoff gegen Bakterien"},
+  {t:"Nachhaltigkeit", c:"Konzept", d:"Prinzip der Zukunftsfähigkeit"},
+  {t:"Blockchain", c:"Konzept", d:"verteilte, fälschungssichere Datenbank"},
+  {t:"Metaverse", c:"Konzept", d:"virtuelle 3D-Welten"},
+  {t:"Maschinelles Lernen", c:"Konzept", d:"KI lernt aus Daten"}
+];
+
+// Zeitraum: letzter kompletter Monat
+function computePeriod() {
+  const now = new Date();
+  // sicherheitshalber 3 Tage Abstand, damit die API sicher Daten hat
+  now.setUTCDate(1); // erster des aktuellen Monats
+  now.setUTCDate(0); // letzter des Vormonats
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  // Start = Erster des Vormonats, End = Erster des Folgemonats
+  const startY = end.getUTCFullYear();
+  const startM = end.getUTCMonth(); // 0-indexed = Monat, den wir messen
+  const endDate = new Date(Date.UTC(startY, startM + 1, 1));
+  const pad = n => String(n).padStart(2, '0');
+  const startStr = `${startY}${pad(startM+1)}0100`;
+  const endStr   = `${endDate.getUTCFullYear()}${pad(endDate.getUTCMonth()+1)}0100`;
+  const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  const label = `Wikipedia-Aufrufe · ${monthNames[startM]} ${startY}`;
+  return { startStr, endStr, label };
+}
+const PERIOD = computePeriod();
+document.getElementById('periodLabel').textContent = PERIOD.label;
+
+// Pageview-Cache
+const cache = new Map();
+async function fetchViews(article) {
+  if (cache.has(article.t)) return cache.get(article.t);
+  const slug = encodeURIComponent(article.t.replace(/ /g, '_'));
+  const url = `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/de.wikipedia/all-access/user/${slug}/monthly/${PERIOD.startStr}/${PERIOD.endStr}`;
+  try {
+    // WICHTIG: keine custom Header -> "simple GET" -> kein CORS-Preflight (Wikimedia lehnt sonst mit 405 ab)
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    // API liefert bei monthly-Granularitaet oft Start- UND End-Stichtag zurueck.
+    // Wir zaehlen ausschliesslich den Messmonat (Praefix YYYYMM).
+    let views = 0;
+    if (j.items && j.items.length) {
+      const target = PERIOD.startStr.slice(0, 6);
+      for (const it of j.items) {
+        if (it.timestamp && it.timestamp.startsWith(target)) views += it.views || 0;
+      }
+      if (!views) views = j.items[0].views || 0;
+    }
+    cache.set(article.t, views);
+    return views;
+  } catch(e) {
+    console.warn('Fetch failed for', article.t, e);
+    return null;
+  }
+}
+
+// Zufälligen validen Artikel mit Aufrufen > 0 ziehen, nicht wiederholen
+const usedIndices = new Set();
+async function pickRandomArticle() {
+  const maxTries = 15;
+  for (let i = 0; i < maxTries; i++) {
+    const idx = Math.floor(Math.random() * ARTICLES.length);
+    if (usedIndices.has(idx) && usedIndices.size < ARTICLES.length - 2) continue;
+    const art = ARTICLES[idx];
+    const views = await fetchViews(art);
+    if (views !== null && views > 0) {
+      usedIndices.add(idx);
+      return { ...art, views, idx };
+    }
+  }
+  // Fallback: irgendein Artikel
+  const idx = Math.floor(Math.random() * ARTICLES.length);
+  const art = ARTICLES[idx];
+  const views = await fetchViews(art);
+  usedIndices.add(idx);
+  return { ...art, views: views || 0, idx };
+}
+
+// State
+let state = {
+  A: null,
+  B: null,
+  streak: 0,
+  best: parseInt(localStorage.getItem('ms-hl-best') || '0', 10),
+  round: 1,
+  locked: false
+};
+
+function fmtNum(n) {
+  return n.toLocaleString('de-DE');
+}
+function wikiUrl(title) {
+  return `https://de.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
+}
+
+function updateScoreboard() {
+  $('#streakVal').textContent = state.streak;
+  $('#bestVal').textContent = state.best;
+  $('#roundVal').textContent = state.round;
+}
+
+function setLoader(txt) {
+  $('#loader').style.display = 'inline-block';
+  $('#verdictText').textContent = txt;
+  $('#verdict').className = 'verdict';
+}
+function clearLoader(txt) {
+  $('#loader').style.display = 'none';
+  $('#verdictText').textContent = txt;
+  $('#verdict').className = 'verdict';
+}
+function setVerdict(kind, msg) {
+  $('#loader').style.display = 'none';
+  $('#verdictText').innerHTML = msg;
+  $('#verdict').className = 'verdict ' + kind;
+}
+
+function renderA(a) {
+  $('#titleA').textContent = a.t;
+  $('#subA').textContent = a.d || a.c;
+  $('#valueA').innerHTML = `<em>${fmtNum(a.views)}</em>`;
+  const link = $('#linkA');
+  link.href = wikiUrl(a.t);
+  link.style.visibility = 'visible';
+}
+function renderBHidden(b) {
+  $('#titleB').textContent = b.t;
+  $('#subB').textContent = b.d || b.c;
+  $('#valueB').innerHTML = '?';
+  $('#valueLabelB').textContent = 'Aufrufe · verdeckt';
+  $('#badgeB').textContent = 'Rätsel';
+  const link = $('#linkB');
+  link.href = wikiUrl(b.t);
+  link.style.visibility = 'hidden';
+}
+function revealB(b) {
+  $('#valueB').innerHTML = `<em>${fmtNum(b.views)}</em>`;
+  $('#valueB').classList.remove('reveal');
+  void $('#valueB').offsetWidth; // reflow
+  $('#valueB').classList.add('reveal');
+  $('#valueLabelB').textContent = 'Aufrufe · enthüllt';
+  $('#linkB').style.visibility = 'visible';
+}
+
+async function initGame() {
+  state = { A:null, B:null, streak:0, best: state.best, round:1, locked:true };
+  updateScoreboard();
+  $('#finalPanel').classList.remove('show');
+  document.getElementById('btnHigher').disabled = true;
+  document.getElementById('btnLower').disabled = true;
+  setLoader('Kuratiert die Redaktion die Auflagenzahlen …');
+
+  usedIndices.clear();
+  const [a, b] = await Promise.all([pickRandomArticle(), pickRandomArticle()]);
+  state.A = a;
+  state.B = b;
+  renderA(a);
+  renderBHidden(b);
+  document.getElementById('btnHigher').disabled = false;
+  document.getElementById('btnLower').disabled = false;
+  state.locked = false;
+  clearLoader('Höher oder tiefer — deine Entscheidung.');
+}
+
+async function nextRound(prevB) {
+  // prevB wird zum neuen A, neuer B wird geholt
+  state.A = prevB;
+  renderA(prevB);
+  setLoader('Neuer Herausforderer wird gesetzt …');
+  const newB = await pickRandomArticle();
+  state.B = newB;
+
+  // View Transition beim Kartenwechsel
+  const swap = () => renderBHidden(newB);
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(swap);
+  } else {
+    swap();
+  }
+
+  document.getElementById('btnHigher').disabled = false;
+  document.getElementById('btnLower').disabled = false;
+  state.locked = false;
+  clearLoader('Höher oder tiefer — deine Entscheidung.');
+}
+
+function endGame() {
+  state.locked = true;
+  document.getElementById('btnHigher').disabled = true;
+  document.getElementById('btnLower').disabled = true;
+  if (state.streak > state.best) {
+    state.best = state.streak;
+    localStorage.setItem('ms-hl-best', String(state.best));
+  }
+  updateScoreboard();
+  $('#finalStreak').textContent = state.streak;
+  const panel = $('#finalPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+async function handleGuess(guess) {
+  if (state.locked) return;
+  state.locked = true;
+  document.getElementById('btnHigher').disabled = true;
+  document.getElementById('btnLower').disabled = true;
+
+  revealB(state.B);
+
+  const a = state.A.views;
+  const b = state.B.views;
+  let correct;
+  if (b === a) correct = true; // Gleichstand zählt
+  else if (guess === 'higher') correct = b > a;
+  else correct = b < a;
+
+  const diff = b - a;
+  const arrow = diff > 0 ? '↑' : (diff < 0 ? '↓' : '=');
+  const diffStr = diff === 0 ? 'Gleichstand' :
+                  `${arrow} ${fmtNum(Math.abs(diff))} Aufrufe`;
+
+  if (correct) {
+    state.streak++;
+    state.round++;
+    if (state.streak > state.best) {
+      state.best = state.streak;
+      localStorage.setItem('ms-hl-best', String(state.best));
+    }
+    updateScoreboard();
+    setVerdict('correct', `<span class="badge">Treffer</span> „${state.B.t}" liegt ${diffStr}.`);
+    setTimeout(() => nextRound(state.B), 1600);
+  } else {
+    setVerdict('wrong', `<span class="badge">Daneben</span> „${state.B.t}" liegt ${diffStr}.`);
+    setTimeout(endGame, 1800);
+  }
+}
+
+document.getElementById('btnHigher').addEventListener('click', () => handleGuess('higher'));
+document.getElementById('btnLower').addEventListener('click', () => handleGuess('lower'));
+document.getElementById('btnRestart').addEventListener('click', initGame);
+
+// Tastatur
+window.addEventListener('keydown', (e) => {
+  if (state.locked) return;
+  if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'h') handleGuess('higher');
+  if (e.key === 'ArrowDown' || e.key.toLowerCase() === 't') handleGuess('lower');
+});
+
+initGame();
+</script>
+</body>
+</html>
