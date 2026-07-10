@@ -9,14 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ==================== TOKENS (aus Vorlage) ==================== */
   :root {
     --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
     --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
     --accent:#c8442a; --accent-soft:#f2d9d1;
     --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
     --highlight:#f4d97a; --highlight-soft:#f9ecb8;
-    --shadow:0 1px 0 var(--ink);
+    --morning:#8a7d5a;
   }
   html[data-theme="dark"] {
     --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
@@ -24,15 +23,11 @@
     --accent:#e8623f; --accent-soft:#3a1f18;
     --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
     --highlight:#b09342; --highlight-soft:#5a4a24;
+    --morning:#7a6d4a;
   }
-
-  /* ==================== DESIGN-EFFECTS (Editorial) ==================== */
   @view-transition { navigation: auto; }
   ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: .45s;
-    animation-timing-function: cubic-bezier(.7,0,.2,1);
-  }
+  ::view-transition-new(root) { animation-duration: .45s; animation-timing-function: cubic-bezier(.7,0,.2,1); }
   ::view-transition-old(root) { animation-name: paper-fade-out; }
   ::view-transition-new(root) { animation-name: paper-fade-in; }
   @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
@@ -44,75 +39,40 @@
   ::view-transition-old(brand),
   ::view-transition-new(brand) { animation-duration: .35s; }
   @media (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) { animation: none; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
   }
-
-  /* Papier-Textur (SVG Noise Overlay) */
   body::after {
-    content: "";
-    position: fixed; inset: 0;
+    content: ""; position: fixed; inset: 0;
     pointer-events: none; z-index: 9998;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    opacity: .22;
-    mix-blend-mode: multiply;
+    opacity: .22; mix-blend-mode: multiply;
   }
-  html[data-theme="dark"] body::after {
-    opacity: .08;
-    mix-blend-mode: screen;
-  }
-  /* Feine Faserlinien */
+  html[data-theme="dark"] body::after { opacity: .08; mix-blend-mode: screen; }
   body::before {
-    content: "";
-    position: fixed; inset: 0;
+    content: ""; position: fixed; inset: 0;
     pointer-events: none; z-index: 9997;
     background-image:
       repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
       repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
     mix-blend-mode: multiply;
   }
-  html[data-theme="dark"] body::before {
-    opacity: .35;
-    mix-blend-mode: overlay;
-  }
-
-  /* Tinten-Bleed */
+  html[data-theme="dark"] body::before { opacity: .35; mix-blend-mode: overlay; }
   body { text-shadow: 0 0 .32px currentColor; }
-  .mast .brand,
-  .hero-title,
-  .now-time,
-  .ad-title,
-  .ad-hero,
-  .subhead a.back .arrow {
-    text-shadow:
-      0 0 .45px currentColor,
-      .18px .12px .55px rgba(0,0,0,.10);
+  .mast .brand, .hero-title, .now-time, .ad-title, .ad-hero, .subhead a.back .arrow {
+    text-shadow: 0 0 .45px currentColor, .18px .12px .55px rgba(0,0,0,.10);
   }
-  .mast .brand em,
-  .hero-title em,
-  .now-time em,
-  .ad--paypal .ad-hero,
-  .ad--kirche .ad-hero {
-    text-shadow:
-      0 0 .5px currentColor,
-      .3px .2px .8px rgba(200,68,42,.18);
+  .mast .brand em, .hero-title em, .now-time em, .ad--paypal .ad-hero, .ad--kirche .ad-hero {
+    text-shadow: 0 0 .5px currentColor, .3px .2px .8px rgba(200,68,42,.18);
   }
   html[data-theme="dark"] .mast .brand,
   html[data-theme="dark"] .hero-title,
   html[data-theme="dark"] .now-time,
   html[data-theme="dark"] .ad-title,
   html[data-theme="dark"] .ad-hero {
-    text-shadow:
-      0 0 .5px currentColor,
-      .15px .1px .6px rgba(255,235,200,.08);
+    text-shadow: 0 0 .5px currentColor, .15px .1px .6px rgba(255,235,200,.08);
   }
-  @media (prefers-reduced-motion: reduce) {
-    body { text-shadow: none; }
-  }
-
-  /* Wrap über dem Overlay */
+  @media (prefers-reduced-motion: reduce) { body { text-shadow: none; } }
   .wrap { position: relative; z-index: 1; }
-
   * { box-sizing:border-box; margin:0; padding:0; }
   html, body { background:var(--paper); color:var(--ink); }
   body {
@@ -122,8 +82,6 @@
     transition: background .25s ease, color .25s ease;
   }
   .wrap { max-width:1180px; margin:0 auto; padding:24px 28px 48px; }
-
-  /* ==================== MASTHEAD ==================== */
   .mast {
     border-top:2px solid var(--rule); border-bottom:1px solid var(--rule);
     padding:14px 0 10px; display:grid;
@@ -139,8 +97,6 @@
     letter-spacing:-.02em; white-space:nowrap;
   }
   .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
-
-  /* ==================== SUBHEAD ==================== */
   .subhead {
     border-bottom:1px solid var(--rule);
     display:flex; justify-content:space-between; align-items:center;
@@ -164,8 +120,6 @@
     .subhead { font-size:10px; letter-spacing:.12em; }
     .subhead .meta { display:none; }
   }
-
-  /* ==================== TOGGLES ==================== */
   .toggle {
     display:inline-flex; align-items:center; gap:8px;
     border:1px solid var(--rule); padding:6px 10px;
@@ -180,363 +134,287 @@
     background:var(--ink); border:1px solid var(--ink);
     box-sizing:border-box; display:inline-block;
   }
-
-  /* ==================== HERO ==================== */
   .hero {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 40px;
-    padding: 36px 0 30px;
-    border-bottom: 1px solid var(--rule-soft);
-    align-items: end;
+    display: grid; grid-template-columns: 3fr 2fr; gap: 40px;
+    padding: 36px 0 30px; border-bottom: 1px solid var(--rule-soft); align-items: end;
   }
   .hero-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: clamp(42px, 6vw, 78px);
-    line-height: .95;
-    letter-spacing: -.03em;
-    color: var(--ink);
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(42px, 6vw, 78px); line-height: .95;
+    letter-spacing: -.03em; color: var(--ink);
   }
   .hero-title em { font-style: italic; color: var(--accent); font-weight: 400; }
   .hero-lede {
-    font-family: 'Fraunces', serif;
-    font-size: 17px;
-    line-height: 1.5;
-    color: var(--ink-soft);
-    border-left: 2px solid var(--accent);
-    padding-left: 16px;
-    font-style: italic;
+    font-family: 'Fraunces', serif; font-size: 17px; line-height: 1.5;
+    color: var(--ink-soft); border-left: 2px solid var(--accent);
+    padding-left: 16px; font-style: italic;
   }
-
-  /* ==================== SECTION LABELS ==================== */
   .sec-label {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
+    display: flex; align-items: center; gap: 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
     margin: 36px 0 16px;
   }
   .sec-label .num { color: var(--accent); font-weight: 700; }
   .sec-label .line { flex: 1; height: 1px; background: var(--rule-soft); }
   .sec-label .meta { font-size: 10px; color: var(--muted); }
-
-  /* ==================== TIME INPUTS ==================== */
   .time-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0;
-    border: 1px solid var(--rule);
-    background: var(--paper-2);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border: 1px solid var(--rule); background: var(--paper-2);
   }
   .time-cell {
-    padding: 22px 22px 20px;
-    border-right: 1px solid var(--rule-soft);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    padding: 22px 22px 20px; border-right: 1px solid var(--rule-soft);
+    display: flex; flex-direction: column; gap: 10px;
   }
   .time-cell:last-child { border-right: none; }
   .time-cell .cell-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .time-cell .cell-label .badge {
-    color: var(--accent);
-    font-weight: 700;
-  }
+  .time-cell .cell-label .badge { color: var(--accent); font-weight: 700; }
   .time-cell input[type="time"] {
-    font-family: 'Fraunces', serif;
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -.01em;
-    background: var(--paper);
-    color: var(--ink);
-    border: 1px solid var(--rule);
-    padding: 8px 14px;
-    width: 100%;
-    outline: none;
-    transition: border-color .18s ease, background .18s ease;
-    font-variant-numeric: tabular-nums;
-    color-scheme: light;
+    font-family: 'Fraunces', serif; font-size: 40px; font-weight: 600;
+    letter-spacing: -.01em; background: var(--paper); color: var(--ink);
+    border: 1px solid var(--rule); padding: 8px 14px; width: 100%;
+    outline: none; transition: border-color .18s ease, background .18s ease;
+    font-variant-numeric: tabular-nums; color-scheme: light;
   }
   html[data-theme="dark"] .time-cell input[type="time"] { color-scheme: dark; }
-  .time-cell input[type="time"]:focus {
-    border-color: var(--accent);
-    background: var(--paper-2);
-  }
+  .time-cell input[type="time"]:focus { border-color: var(--accent); background: var(--paper-2); }
   .time-cell .cell-hint {
-    font-family: 'Inter', sans-serif;
-    font-size: 11.5px;
-    color: var(--muted);
-    font-style: italic;
+    font-family: 'Inter', sans-serif; font-size: 11.5px; color: var(--muted); font-style: italic;
   }
-
-  /* ==================== PROGRESS DISPLAY ==================== */
   .now-headline {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: baseline;
-    gap: 20px;
-    padding: 28px 0 22px;
+    display: grid; grid-template-columns: auto 1fr auto;
+    align-items: baseline; gap: 20px; padding: 28px 0 22px;
   }
   .now-time {
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-size: clamp(56px, 8vw, 96px);
-    letter-spacing: -.03em;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(56px, 8vw, 96px); letter-spacing: -.03em;
+    line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink);
   }
   .now-time em { font-style: italic; color: var(--accent); font-weight: 400; }
   .now-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-    border-top: 1px solid var(--rule-soft);
-    border-bottom: 1px solid var(--rule-soft);
-    padding: 8px 0;
-    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+    text-align: center; border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft); padding: 8px 0; margin-bottom: 8px;
   }
   .now-date {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: right;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-align: right;
   }
-
-  /* ==================== PROGRESS ROW ==================== */
   .progress-row {
-    display: grid;
-    grid-template-columns: 200px 1fr 200px;
-    align-items: center;
-    gap: 24px;
-    padding: 34px 0 22px;
+    display: grid; grid-template-columns: 200px 1fr 200px;
+    align-items: center; gap: 24px; padding: 34px 0 22px;
   }
   .side-stat { display: flex; flex-direction: column; gap: 4px; }
   .side-stat.right { text-align: right; align-items: flex-end; }
   .side-stat .stat-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
   }
   .side-stat .stat-value {
-    font-family: 'Fraunces', serif;
-    font-size: 30px;
-    font-weight: 600;
-    letter-spacing: -.01em;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.05;
+    font-family: 'Fraunces', serif; font-size: 30px; font-weight: 600;
+    letter-spacing: -.01em; color: var(--ink);
+    font-variant-numeric: tabular-nums; line-height: 1.05;
   }
   .side-stat .stat-value em { font-style: italic; color: var(--accent); font-weight: 400; }
-  .side-stat .stat-sub {
-    font-family: 'Inter', sans-serif;
-    font-size: 11.5px;
-    color: var(--muted);
-    font-style: italic;
+  .side-stat .stat-value .unit {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500;
+    letter-spacing: .1em; text-transform: lowercase; color: var(--muted);
+    margin-left: 6px; font-style: normal;
   }
-
-  /* ==================== BAR ==================== */
+  .side-stat .stat-sub { font-family: 'Inter', sans-serif; font-size: 11.5px; color: var(--muted); font-style: italic; }
   .bar-wrap { position: relative; }
   .bar-axis { position: relative; height: 24px; margin-bottom: 6px; }
-  .bar {
-    position: relative;
-    height: 44px;
-    background: var(--paper-2);
-    border: 1px solid var(--rule);
-    overflow: hidden;
-  }
+  .bar { position: relative; height: 44px; background: var(--paper-2); border: 1px solid var(--rule); overflow: hidden; }
   .bar-pause {
-    position: absolute;
-    top: 0; bottom: 0;
-    background: var(--highlight);
-    border-left: 1px solid var(--rule);
-    border-right: 1px solid var(--rule);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    color: var(--ink);
-    z-index: 1;
+    position: absolute; top: 0; bottom: 0;
+    background: var(--highlight); border-left: 1px solid var(--rule); border-right: 1px solid var(--rule);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    letter-spacing: .22em; text-transform: uppercase; color: var(--ink); z-index: 1;
   }
   .bar-fill {
-    position: absolute;
-    top: 0; bottom: 0; left: 0;
-    background: var(--accent);
-    mix-blend-mode: multiply;
-    transition: width .5s cubic-bezier(.4,0,.2,1);
+    position: absolute; top: 0; bottom: 0; left: 0;
+    background: var(--accent); mix-blend-mode: multiply;
+    transition: width .5s cubic-bezier(.4,0,.2,1), background-color .8s ease;
     z-index: 2;
   }
   html[data-theme="dark"] .bar-fill { mix-blend-mode: screen; opacity: .78; }
+  .bar-fill[data-phase="morning"]   { background: var(--morning); }
+  .bar-fill[data-phase="noon"]      { background: var(--highlight); }
+  .bar-fill[data-phase="afternoon"] { background: var(--accent); }
+  .bar-fill[data-phase="evening"]   { background: var(--ok); }
   .bar-now {
-    position: absolute;
-    top: -6px; bottom: -6px;
-    width: 2px;
-    background: var(--ink);
-    z-index: 4;
+    position: absolute; top: -6px; bottom: -6px;
+    width: 2px; background: var(--ink); z-index: 4;
     transition: left .5s cubic-bezier(.4,0,.2,1);
+    transform-origin: center;
+    animation: pulseNow 1s ease-in-out infinite;
   }
+  @keyframes pulseNow {
+    0%,100% { opacity: 1; transform: scaleY(1); }
+    50%     { opacity: .55; transform: scaleY(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce) { .bar-now { animation: none; } }
   .bar-now::before {
-    content: "";
-    position: absolute;
-    top: -4px; left: -4px;
-    width: 10px; height: 10px;
-    background: var(--ink);
-    transform: rotate(45deg);
+    content: ""; position: absolute; top: -4px; left: -4px;
+    width: 10px; height: 10px; background: var(--ink); transform: rotate(45deg);
   }
   .bar-now::after {
-    content: "";
-    position: absolute;
-    bottom: -4px; left: -4px;
-    width: 10px; height: 10px;
-    background: var(--ink);
-    transform: rotate(45deg);
+    content: ""; position: absolute; bottom: -4px; left: -4px;
+    width: 10px; height: 10px; background: var(--ink); transform: rotate(45deg);
   }
   .bar-ticks { position: relative; height: 20px; margin-top: 4px; }
   .bar-tick {
-    position: absolute;
-    top: 0;
-    transform: translateX(-50%);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .12em;
-    color: var(--muted);
-    text-align: center;
-    line-height: 1;
+    position: absolute; top: 0; transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    letter-spacing: .12em; color: var(--muted); text-align: center; line-height: 1;
   }
   .bar-tick::before {
-    content: "";
-    display: block;
-    width: 1px;
-    height: 5px;
-    background: var(--rule-soft);
-    margin: 0 auto 4px;
+    content: ""; display: block; width: 1px; height: 5px;
+    background: var(--rule-soft); margin: 0 auto 4px;
   }
-
-  /* Coffee marker */
   .coffee-marker {
-    position: absolute;
-    top: 0;
-    transform: translateX(-50%);
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    position: absolute; top: 0; transform: translateX(-50%);
+    z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 2px;
   }
   .coffee-marker .cup { font-size: 16px; line-height: 1; }
   .coffee-marker .stem { width: 1px; height: 6px; background: var(--rule); }
   .coffee-label {
-    position: absolute;
-    transform: translateX(-50%);
-    top: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8.5px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    white-space: nowrap;
+    position: absolute; transform: translateX(-50%); top: 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--muted); white-space: nowrap;
   }
-
-  /* ==================== INFO STRIP ==================== */
   .info-strip {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    border: 1px solid var(--rule);
-    background: var(--paper-2);
-    margin-top: 28px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--rule); background: var(--paper-2); margin-top: 28px;
   }
   .info-cell {
-    padding: 16px 20px;
-    border-right: 1px solid var(--rule-soft);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    padding: 16px 20px; border-right: 1px solid var(--rule-soft);
+    display: flex; flex-direction: column; gap: 4px;
   }
   .info-cell:last-child { border-right: none; }
   .info-cell .k {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
   }
   .info-cell .v {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--ink);
-    letter-spacing: -.01em;
-    font-variant-numeric: tabular-nums;
+    font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600;
+    color: var(--ink); letter-spacing: -.01em; font-variant-numeric: tabular-nums;
   }
   .info-cell .v em { font-style: italic; color: var(--accent); font-weight: 400; }
-  .info-cell .sub {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  /* ==================== CALLOUT ==================== */
+  .info-cell .sub { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--muted); font-style: italic; }
   .callout {
-    margin-top: 28px;
-    border: 1px solid var(--accent);
-    background: var(--accent-soft);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
+    margin-top: 28px; border: 1px solid var(--accent); background: var(--accent-soft);
+    padding: 20px 24px; display: flex; align-items: center; gap: 18px;
   }
   .callout .co-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    font-weight: 700;
-    white-space: nowrap;
-    padding-right: 18px;
-    border-right: 1px solid var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+    font-weight: 700; white-space: nowrap; padding-right: 18px; border-right: 1px solid var(--accent);
   }
   .callout .co-text {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 18px;
-    color: var(--ink);
-    line-height: 1.35;
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 18px;
+    color: var(--ink); line-height: 1.35;
   }
-
-  /* ==================== FOOTER ==================== */
+  .week-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--rule); background: var(--paper-2);
+  }
+  .week-day {
+    padding: 18px 16px 16px; border-right: 1px solid var(--rule-soft);
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative; min-height: 130px;
+  }
+  .week-day:last-of-type { border-right: none; }
+  .week-day.today { background: var(--paper); }
+  .week-day.today::before {
+    content: "HEUTE"; position: absolute; top: 10px; right: 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+    letter-spacing: .2em; color: var(--accent); font-weight: 700;
+  }
+  .week-day .wd-name {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+  }
+  .week-day .wd-hours {
+    font-family: 'Fraunces', serif; font-size: 30px; font-weight: 600;
+    color: var(--ink); font-variant-numeric: tabular-nums;
+    line-height: 1; letter-spacing: -.01em;
+  }
+  .week-day .wd-hours em { font-style: italic; color: var(--accent); font-weight: 400; }
+  .week-day .wd-hours .unit {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    color: var(--muted); margin-left: 4px; letter-spacing: .08em; text-transform: lowercase;
+  }
+  .week-day.empty .wd-hours { color: var(--muted); font-style: italic; font-size: 22px; }
+  .week-day .wd-sub {
+    font-family: 'Inter', sans-serif; font-size: 11px;
+    color: var(--muted); font-style: italic; margin-top: auto;
+  }
+  .week-day .wd-bar {
+    height: 4px; background: var(--rule-soft); position: relative; overflow: hidden;
+  }
+  .week-day .wd-bar-fill {
+    position: absolute; top: 0; left: 0; bottom: 0;
+    background: var(--accent); width: 0;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .week-total {
+    grid-column: 1 / -1; border-top: 1px solid var(--rule);
+    padding: 12px 18px; display: flex; justify-content: space-between; align-items: baseline;
+    background: var(--paper); font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); gap: 12px;
+  }
+  .week-total .total-right { display: flex; gap: 18px; align-items: baseline; }
+  .week-total .total-value {
+    font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink);
+    text-transform: none; font-variant-numeric: tabular-nums; letter-spacing: -.01em;
+  }
+  .week-total .total-value .unit {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
+    margin-left: 4px; letter-spacing: .08em;
+  }
+  .week-actions { display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+  .week-btn {
+    border: 1px solid var(--rule); background: transparent; color: var(--ink);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase; padding: 6px 12px;
+    cursor: pointer; transition: background .15s;
+  }
+  .week-btn:hover { background: var(--paper-2); }
+  .week-btn.danger:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .milestone-note {
+    position: fixed; top: 22px; left: 50%;
+    transform: translateX(-50%) translateY(-16px);
+    background: var(--paper); border: 1px solid var(--ink);
+    border-left: 4px solid var(--accent); padding: 12px 20px 12px 18px;
+    display: flex; align-items: baseline; gap: 14px;
+    box-shadow: 4px 4px 0 var(--ink); z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity .4s ease, transform .4s cubic-bezier(.7,0,.2,1);
+    max-width: min(560px, 92vw);
+  }
+  .milestone-note.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .milestone-note .m-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    letter-spacing: .22em; text-transform: uppercase; color: var(--accent);
+    font-weight: 700; white-space: nowrap;
+  }
+  .milestone-note .m-text {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 16px; line-height: 1.3; color: var(--ink);
+  }
   .foot {
     margin-top:60px; padding-top:20px; border-top:2px solid var(--rule);
     display:flex; justify-content:space-between;
     font-family:'JetBrains Mono', monospace; font-size:10.5px;
     letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   }
-
-  /* ==================== SIDE ADS ==================== */
   .ads-side {
     position:fixed; top:50%; transform:translateY(-50%);
     width:200px; z-index:40; display:none; pointer-events:none;
@@ -545,7 +423,6 @@
   .ads-side.right { right:20px; }
   @media (min-width:1560px) { .ads-side { display:block; } }
   body.ads-off .ads-side { display:none !important; }
-
   .ad-slot { position:relative; pointer-events:auto; }
   .ad-link { display:block; color:inherit; text-decoration:none; }
   .ad-link .ad { transition:transform .25s ease, box-shadow .25s ease, opacity .38s ease, background-color .3s ease; }
@@ -574,7 +451,6 @@
     display:flex; justify-content:space-between; align-items:center;
   }
   .ad-mark { color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
-
   .ad--paypal .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:22px; line-height:1.15; letter-spacing:-.01em; }
   .ad--paypal .ad-body  { font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
   .ad--paypal .ad-hero  { font-family:'Fraunces', serif; font-style:italic; font-size:42px; color:var(--accent); line-height:1; margin-bottom:2px; }
@@ -590,35 +466,27 @@
   }
   .ad--paypal .ad-cta:hover { background:var(--ink); border-color:var(--ink); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
   .ad--paypal .ad-cta:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
-
   .ad--kaffee { background:var(--paper-2); }
   .ad--kaffee .ad-title { font-style:italic; font-size:28px; }
   .ad--kaffee .ad-hero  { font-size:18px; letter-spacing:.35em; color:var(--muted); }
-
   .ad--stink .ad-title { font-family:'JetBrains Mono', monospace; font-size:16px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1.15; }
   .ad--stink .ad-hero  { font-size:28px; letter-spacing:.1em; }
   .ad--stink .ad-body  { font-style:italic; font-family:'Fraunces', serif; font-size:13px; }
-
   .ad--pfalz { border-width:2px; }
   .ad--pfalz .ad-title { font-family:'Fraunces', serif; font-size:17px; text-align:center; line-height:1.15; }
   .ad--pfalz .ad-hero  { text-align:center; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.3em; color:var(--accent); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:5px 0; }
   .ad--pfalz .ad-body  { text-align:center; font-style:italic; font-family:'Fraunces', serif; font-size:12.5px; }
-
   .ad--kirche .ad-hero  { font-family:'Fraunces', serif; font-size:34px; color:var(--accent); text-align:center; line-height:1; }
   .ad--kirche .ad-title { font-style:italic; font-size:20px; text-align:center; }
   .ad--kirche .ad-body  { text-align:center; }
-
   .ad--reise .ad-title { font-family:'JetBrains Mono', monospace; font-size:15px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
   .ad--reise .ad-hero  { font-size:22px; color:var(--accent); }
   .ad--reise .ad-body  { border-top:1px dashed var(--rule-soft); border-bottom:1px dashed var(--rule-soft); padding:6px 0; }
-
   .ad--schweig .ad-title { font-family:'Fraunces', serif; font-style:italic; font-size:30px; text-align:center; margin:8px 0 4px; }
   .ad--schweig .ad-hero  { text-align:center; font-size:28px; letter-spacing:.5em; color:var(--muted); line-height:1; }
   .ad--schweig .ad-body  { text-align:center; font-size:10.5px; letter-spacing:.02em; }
-
   .ad--gastro .ad-hero  { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.4em; color:var(--paper); background:var(--accent); padding:5px 10px; display:inline-block; align-self:flex-start; }
   .ad--gastro .ad-title { font-family:'Fraunces', serif; font-size:24px; font-style:italic; }
-
   .ad--minion { background:#f5d547; color:#1a1a1a; border-color:#1a1a1a; }
   .ad--minion .ad-eyebrow { color:#1a1a1a; }
   .ad--minion .ad-eyebrow::before { color:#1a1a1a; }
@@ -627,8 +495,6 @@
   .ad--minion .ad-body  { text-align:center; color:#1a1a1a; }
   .ad--minion .ad-foot  { color:#1a1a1a; border-top-color:rgba(26,26,26,.3); }
   .ad--minion .ad-mark  { color:#1a1a1a; font-style:italic; }
-
-  /* ==================== RESPONSIVE ==================== */
   @media (max-width: 980px) {
     .info-strip { grid-template-columns: repeat(2, 1fr); }
     .info-cell:nth-child(2n) { border-right: none; }
@@ -647,6 +513,12 @@
     .callout { flex-direction: column; align-items: flex-start; gap: 10px; }
     .callout .co-label { border-right: none; border-bottom: 1px solid var(--accent); padding-right: 0; padding-bottom: 8px; }
     .foot { flex-direction: column; gap: 6px; text-align: center; }
+    .week-day { padding: 12px 8px; min-height: 100px; }
+    .week-day .wd-hours { font-size: 20px; }
+    .week-day .wd-hours .unit { font-size: 9px; }
+    .week-day.today::before { font-size: 7px; top: 6px; right: 6px; }
+    .milestone-note { top: 12px; padding: 10px 14px; }
+    .milestone-note .m-text { font-size: 14px; }
   }
   @media (max-width: 620px) {
     .info-strip { grid-template-columns: 1fr; }
@@ -657,13 +529,12 @@
     .wrap { padding:20px 18px 60px; }
     .mast { grid-template-columns:1fr auto; }
     .mast .edition.left { display:none; }
+    .milestone-note { flex-direction: column; align-items: flex-start; gap: 6px; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <!-- ==================== MASTHEAD ==================== -->
   <header class="mast">
     <div class="edition left">Vol. I · 2026 · Nº 07</div>
     <div class="brand">Der Zeit<em>&amp;</em>Zähler</div>
@@ -678,8 +549,6 @@
       </button>
     </div>
   </header>
-
-  <!-- ==================== SUBHEAD ==================== -->
   <div class="subhead">
     <a class="back" href="index.html" aria-label="Zurück zur Startseite">
       <span class="arrow">&larr;</span>
@@ -687,21 +556,16 @@
     </a>
     <span class="meta">ZeitZähler · Editorial Edition</span>
   </div>
-
-  <!-- ==================== HERO ==================== -->
   <section class="hero">
     <h1 class="hero-title">Wie lange noch,<br>bis <em>Feierabend?</em></h1>
     <p class="hero-lede">Trage deine Zeiten ein — der Balken aktualisiert sich sofort. Kein Klick, keine zweite Seite. Kaffee um neun, Pause um zwölf, dann läuft der Tag. Und unten wartet jetzt auch der nächste hessische Feiertag.</p>
   </section>
-
-  <!-- ==================== 01 ZEITEN ==================== -->
   <div class="sec-label">
     <span class="num">01</span>
     <span>Deine Zeiten</span>
     <span class="line"></span>
     <span class="meta">Pause fix &middot; 60 min</span>
   </div>
-
   <div class="time-grid">
     <div class="time-cell">
       <div class="cell-label"><span>Ankunft</span><span class="badge">START</span></div>
@@ -719,28 +583,23 @@
       <div class="cell-hint">Dein geplanter Feierabend.</div>
     </div>
   </div>
-
-  <!-- ==================== 02 JETZT ==================== -->
   <div class="sec-label">
     <span class="num">02</span>
     <span>Der Tag im Verlauf</span>
     <span class="line"></span>
     <span class="meta" id="clockMeta">--:--:--</span>
   </div>
-
   <div class="now-headline">
     <div class="now-time" id="nowTime">--<em>:</em>--</div>
     <div class="now-label">— Jetzt —</div>
     <div class="now-date" id="nowDate">—</div>
   </div>
-
   <div class="progress-row">
     <div class="side-stat left">
       <div class="stat-label">Da seit</div>
       <div class="stat-value" id="statSince">—</div>
       <div class="stat-sub" id="statSinceSub">seit Ankunft</div>
     </div>
-
     <div class="bar-wrap">
       <div class="bar-axis" id="barAxis"></div>
       <div class="bar" id="bar">
@@ -750,64 +609,85 @@
       </div>
       <div class="bar-ticks" id="barTicks"></div>
     </div>
-
     <div class="side-stat right">
       <div class="stat-label">Noch zu tun</div>
       <div class="stat-value" id="statLeft">—</div>
       <div class="stat-sub" id="statLeftSub">bis Feierabend</div>
     </div>
   </div>
-
-  <!-- ==================== INFO STRIP ==================== -->
   <div class="info-strip">
-    <div class="info-cell">
-      <div class="k">Fortschritt</div>
-      <div class="v" id="infoPct">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="k">Netto-Arbeit</div>
-      <div class="v" id="infoNet">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="k">Pause</div>
-      <div class="v" id="infoPause">—</div>
-    </div>
-    <div class="info-cell">
-      <div class="k">Kaffee 09:00</div>
-      <div class="v" id="infoCoffee">—</div>
-    </div>
+    <div class="info-cell"><div class="k">Fortschritt</div><div class="v" id="infoPct">—</div></div>
+    <div class="info-cell"><div class="k">Netto-Arbeit</div><div class="v" id="infoNet">—</div></div>
+    <div class="info-cell"><div class="k">Pause</div><div class="v" id="infoPause">—</div></div>
+    <div class="info-cell"><div class="k">Kaffee 09:00</div><div class="v" id="infoCoffee">—</div></div>
     <div class="info-cell">
       <div class="k">Nächster Feiertag (HE)</div>
       <div class="v" id="infoHoliday">lädt…</div>
       <div class="sub" id="infoHolidaySub">Quelle: Nager.Date API</div>
     </div>
   </div>
-
-  <!-- ==================== CALLOUT ==================== -->
   <div class="callout">
     <div class="co-label">Status</div>
     <div class="co-text" id="calloutText">Trage deine Zeiten ein, um zu starten.</div>
   </div>
-
-  <!-- ==================== FOOTER ==================== -->
+  <div class="sec-label">
+    <span class="num">03</span>
+    <span>Die Woche im Rückblick</span>
+    <span class="line"></span>
+    <span class="meta" id="weekMeta">Kalenderwoche —</span>
+  </div>
+  <div class="week-grid" id="weekGrid">
+    <div class="week-day empty" data-day="1">
+      <div class="wd-name">Montag</div><div class="wd-hours">—</div>
+      <div class="wd-sub">noch nichts</div><div class="wd-bar"><div class="wd-bar-fill"></div></div>
+    </div>
+    <div class="week-day empty" data-day="2">
+      <div class="wd-name">Dienstag</div><div class="wd-hours">—</div>
+      <div class="wd-sub">noch nichts</div><div class="wd-bar"><div class="wd-bar-fill"></div></div>
+    </div>
+    <div class="week-day empty" data-day="3">
+      <div class="wd-name">Mittwoch</div><div class="wd-hours">—</div>
+      <div class="wd-sub">noch nichts</div><div class="wd-bar"><div class="wd-bar-fill"></div></div>
+    </div>
+    <div class="week-day empty" data-day="4">
+      <div class="wd-name">Donnerstag</div><div class="wd-hours">—</div>
+      <div class="wd-sub">noch nichts</div><div class="wd-bar"><div class="wd-bar-fill"></div></div>
+    </div>
+    <div class="week-day empty" data-day="5">
+      <div class="wd-name">Freitag</div><div class="wd-hours">—</div>
+      <div class="wd-sub">noch nichts</div><div class="wd-bar"><div class="wd-bar-fill"></div></div>
+    </div>
+    <div class="week-total">
+      <span>Wochensumme (netto)</span>
+      <div class="total-right">
+        <span>Ziel <span id="weekGoal">35:00 std</span></span>
+        <span class="total-value" id="weekTotal">0<span class="unit">std</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="week-actions">
+    <button class="week-btn" id="saveTodayBtn" title="Aktuelle Netto-Zeit für heute speichern">Heute speichern</button>
+    <button class="week-btn danger" id="resetWeekBtn" title="Ganze Woche zurücksetzen">Woche zurücksetzen</button>
+    <span style="font-family:'Inter',sans-serif;font-size:11.5px;color:var(--muted);font-style:italic;">
+      Speichert automatisch nach Feierabend · lokal im Browser
+    </span>
+  </div>
   <footer class="foot">
     <span>Strauss &middot; Biebergemünd</span>
     <span>© 2026 — Editorial edition &middot; ZeitZähler</span>
   </footer>
-
 </div>
-
-<!-- ==================== SIDE ADS ==================== -->
+<div class="milestone-note" id="milestoneNote" role="status" aria-live="polite">
+  <span class="m-eyebrow" id="mEyebrow">RANDNOTIZ</span>
+  <span class="m-text" id="mText">—</span>
+</div>
 <aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
 <aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
-
 <script>
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-/* =========================================================
-   THEME TOGGLE (aus Vorlage: data-theme + View Transitions)
-========================================================= */
+/* THEME */
 function initTheme() {
   const saved = localStorage.getItem("ms-theme");
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -826,14 +706,10 @@ $("#themeToggle").addEventListener("click", () => {
   const swap = () => setTheme(next);
   if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.startViewTransition(swap);
-  } else {
-    swap();
-  }
+  } else { swap(); }
 });
 
-/* =========================================================
-   ADS TOGGLE
-========================================================= */
+/* ADS TOGGLE */
 function setAds(on) {
   document.body.classList.toggle("ads-off", !on);
   localStorage.setItem("ms-ads", on ? "on" : "off");
@@ -849,13 +725,8 @@ $("#adsToggle").addEventListener("click", () => {
   setAds(!on);
 });
 
-/* =========================================================
-   TIME HELPERS
-========================================================= */
-function parseTime(str) {
-  const [h, m] = str.split(":").map(Number);
-  return h * 60 + m;
-}
+/* TIME HELPERS */
+function parseTime(str) { const [h, m] = str.split(":").map(Number); return h * 60 + m; }
 function fmtHM(mins) {
   mins = Math.max(0, Math.round(mins));
   const h = Math.floor(mins / 60);
@@ -870,116 +741,72 @@ function fmtHMShort(mins) {
   const m = mins % 60;
   return `${h}:${String(m).padStart(2,'0')}`;
 }
+function fmtHMShortWithUnit(mins) {
+  return `${fmtHMShort(mins)}<span class="unit">std</span>`;
+}
 function nowMinutes() {
   const n = new Date();
   return n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
 }
 function pad(n){ return String(n).padStart(2,'0'); }
-function startOfDay(date){
-  const d = new Date(date);
-  d.setHours(0,0,0,0);
-  return d;
-}
-function diffDays(from, to){
-  const ms = startOfDay(to) - startOfDay(from);
-  return Math.round(ms / 86400000);
-}
+function startOfDay(date){ const d = new Date(date); d.setHours(0,0,0,0); return d; }
+function diffDays(from, to){ return Math.round((startOfDay(to) - startOfDay(from)) / 86400000); }
 function formatGermanDate(dateStr){
   const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("de-DE", {
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
+  return d.toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" });
+}
+function isoWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+  return { week: weekNo, year: d.getUTCFullYear() };
 }
 
-/* =========================================================
-   HOLIDAY API (HESSEN)
-========================================================= */
+/* HOLIDAY */
 const HESSEN_CODE = "DE-HE";
 let holidayCache = null;
-
-function isHolidayInHessen(holiday) {
-  if (holiday.global) return true;
-  return Array.isArray(holiday.counties) && holiday.counties.includes(HESSEN_CODE);
-}
-
+function isHolidayInHessen(h) { if (h.global) return true; return Array.isArray(h.counties) && h.counties.includes(HESSEN_CODE); }
 function findNextHolidayForDate(holidays, now = new Date()) {
   const today = startOfDay(now);
-  return holidays
-    .filter(isHolidayInHessen)
+  return holidays.filter(isHolidayInHessen)
     .filter(h => startOfDay(new Date(h.date + "T00:00:00")) >= today)
     .sort((a, b) => a.date.localeCompare(b.date))[0] || null;
 }
-
 async function fetchHolidayYear(year) {
-  const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/DE`, {
-    headers: { "Accept": "application/json" }
-  });
+  const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/DE`, { headers: { "Accept": "application/json" } });
   if (!res.ok) throw new Error("Feiertage konnten nicht geladen werden.");
   return res.json();
 }
-
 async function loadNextHessenHoliday() {
-  const valueEl = $("#infoHoliday");
-  const subEl   = $("#infoHolidaySub");
-
+  const valueEl = $("#infoHoliday"); const subEl = $("#infoHolidaySub");
   try {
-    valueEl.textContent = "lädt…";
-    subEl.textContent = "Prüfe Hessen-Feiertage…";
-
-    const now = new Date();
-    const year = now.getFullYear();
-
-    const [currentYear, nextYear] = await Promise.all([
-      fetchHolidayYear(year),
-      fetchHolidayYear(year + 1)
-    ]);
-
+    valueEl.textContent = "lädt…"; subEl.textContent = "Prüfe Hessen-Feiertage…";
+    const now = new Date(); const year = now.getFullYear();
+    const [currentYear, nextYear] = await Promise.all([fetchHolidayYear(year), fetchHolidayYear(year + 1)]);
     const all = [...currentYear, ...nextYear];
     const nextHoliday = findNextHolidayForDate(all, now);
-
-    if (!nextHoliday) {
-      valueEl.textContent = "—";
-      subEl.textContent = "Kein Feiertag gefunden";
-      return;
-    }
-
+    if (!nextHoliday) { valueEl.textContent = "—"; subEl.textContent = "Kein Feiertag gefunden"; return; }
     holidayCache = nextHoliday;
-
     const daysLeft = diffDays(now, new Date(nextHoliday.date + "T00:00:00"));
     valueEl.textContent = nextHoliday.localName || nextHoliday.name;
-
-    if (daysLeft === 0) {
-      subEl.innerHTML = `<em>heute</em> · ${formatGermanDate(nextHoliday.date)}`;
-    } else if (daysLeft === 1) {
-      subEl.textContent = `morgen · ${formatGermanDate(nextHoliday.date)}`;
-    } else {
-      subEl.textContent = `in ${daysLeft} Tagen · ${formatGermanDate(nextHoliday.date)}`;
-    }
+    if (daysLeft === 0) subEl.innerHTML = `<em>heute</em> · ${formatGermanDate(nextHoliday.date)}`;
+    else if (daysLeft === 1) subEl.textContent = `morgen · ${formatGermanDate(nextHoliday.date)}`;
+    else subEl.textContent = `in ${daysLeft} Tagen · ${formatGermanDate(nextHoliday.date)}`;
   } catch (err) {
-    console.error(err);
-    valueEl.textContent = "nicht verfügbar";
-    subEl.textContent = "API aktuell nicht erreichbar";
+    console.error(err); valueEl.textContent = "nicht verfügbar"; subEl.textContent = "API aktuell nicht erreichbar";
   }
 }
 
-/* =========================================================
-   RENDER STATIC MARKERS (ticks + coffee)
-========================================================= */
+/* BAR STATICS */
 const COFFEE_MIN = 9 * 60;
 const PAUSE_LEN  = 60;
-
 function renderStatics(arrive, leave) {
-  const axis  = $("#barAxis");
-  const ticks = $("#barTicks");
-  axis.innerHTML  = "";
-  ticks.innerHTML = "";
-
+  const axis = $("#barAxis"); const ticks = $("#barTicks");
+  axis.innerHTML = ""; ticks.innerHTML = "";
   const span = leave - arrive;
   if (span <= 0) return;
-
   if (COFFEE_MIN >= arrive && COFFEE_MIN <= leave) {
     const pct = ((COFFEE_MIN - arrive) / span) * 100;
     const cm = document.createElement("div");
@@ -987,16 +814,14 @@ function renderStatics(arrive, leave) {
     cm.style.left = pct + "%";
     cm.innerHTML = `<div class="cup">☕</div><div class="stem"></div>`;
     axis.appendChild(cm);
-
     const cl = document.createElement("div");
     cl.className = "coffee-label";
     cl.style.left = pct + "%";
     cl.textContent = "09:00 · KAFFEE";
     ticks.appendChild(cl);
   }
-
   const startHour = Math.ceil(arrive / 60);
-  const endHour   = Math.floor(leave / 60);
+  const endHour = Math.floor(leave / 60);
   for (let h = startHour; h <= endHour; h++) {
     if (Math.abs(h * 60 - COFFEE_MIN) < 15) continue;
     const t = h * 60;
@@ -1008,164 +833,289 @@ function renderStatics(arrive, leave) {
     ticks.appendChild(tk);
   }
 }
-
-/* =========================================================
-   RENDER PAUSE OVERLAY
-========================================================= */
 function renderPause(arrive, leave, pauseStart) {
-  const bar    = $("#barPause");
-  const span   = leave - arrive;
+  const bar = $("#barPause"); const span = leave - arrive;
   if (span <= 0) { bar.style.display = "none"; return; }
   const pauseEnd = pauseStart + PAUSE_LEN;
   const s = Math.max(pauseStart, arrive);
   const e = Math.min(pauseEnd, leave);
   if (e <= s) { bar.style.display = "none"; return; }
   bar.style.display = "flex";
-  bar.style.left  = ((s - arrive) / span * 100) + "%";
+  bar.style.left = ((s - arrive) / span * 100) + "%";
   bar.style.width = ((e - s) / span * 100) + "%";
 }
 
-/* =========================================================
-   MAIN UPDATE
-========================================================= */
+/* PHASE */
+function phaseForMinutes(nowMin, pauseStart) {
+  const pauseEnd = pauseStart + PAUSE_LEN;
+  const noonStart = Math.min(pauseStart - 30, 11 * 60 + 30);
+  const noonEnd   = Math.max(pauseEnd + 30, 13 * 60 + 30);
+  if (nowMin < noonStart) return "morning";
+  if (nowMin < noonEnd)   return "noon";
+  if (nowMin < 17 * 60)   return "afternoon";
+  return "evening";
+}
+
+/* MILESTONES */
+const MILESTONES = [
+  { pct: 25, eyebrow: "RANDNOTIZ · 25 %", text: "Ein Viertel geschafft — der Vormittag nimmt Fahrt auf." },
+  { pct: 50, eyebrow: "RANDNOTIZ · HALBZEIT", text: "Halbzeit — der Nachmittag ruft." },
+  { pct: 75, eyebrow: "RANDNOTIZ · 75 %", text: "Nur noch ein Viertel. Die Zielgerade ist in Sicht." },
+  { pct:100, eyebrow: "SCHLAGZEILE · FEIERABEND", text: "Feierabend. Bildschirm zu, Licht aus, Tag geschafft." }
+];
+let milestoneShownToday = new Set();
+let milestoneTimer = null;
+function todayKey() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function loadShownMilestones() {
+  try {
+    const raw = localStorage.getItem("ms-milestones");
+    if (!raw) return;
+    const obj = JSON.parse(raw);
+    if (obj.date === todayKey() && Array.isArray(obj.shown)) milestoneShownToday = new Set(obj.shown);
+  } catch(e){}
+}
+function saveShownMilestones() {
+  localStorage.setItem("ms-milestones", JSON.stringify({ date: todayKey(), shown: Array.from(milestoneShownToday) }));
+}
+function showMilestone(m) {
+  const note = $("#milestoneNote");
+  $("#mEyebrow").textContent = m.eyebrow;
+  $("#mText").textContent = m.text;
+  note.classList.add("show");
+  clearTimeout(milestoneTimer);
+  milestoneTimer = setTimeout(() => note.classList.remove("show"), 4500);
+}
+function checkMilestones(pct) {
+  MILESTONES.forEach(m => {
+    if (pct >= m.pct && !milestoneShownToday.has(m.pct)) {
+      milestoneShownToday.add(m.pct);
+      saveShownMilestones();
+      showMilestone(m);
+    }
+  });
+}
+loadShownMilestones();
+
+/* TAB TITLE */
+const BASE_TITLE = "Der Zeit&Zähler";
+function updateTabTitle(state) {
+  if (state.mode === "waiting")     document.title = `Warten · ${BASE_TITLE}`;
+  else if (state.mode === "done")   document.title = `Feierabend ✓ · ${BASE_TITLE}`;
+  else if (state.mode === "pause")  document.title = `Pause · ${fmtHMShort(state.leftMin)} std · Feierabend`;
+  else                              document.title = `${fmtHMShort(state.leftMin)} std · Feierabend`;
+}
+
+/* WEEK CALENDAR */
+const WEEK_KEY = "ms-week";
+const DAY_GOAL_MIN = 7 * 60;
+const WEEK_GOAL_MIN = 5 * DAY_GOAL_MIN;
+const WEEK_MAX_BAR = 10 * 60;
+function currentWeekId() { const { week, year } = isoWeek(new Date()); return `${year}-W${pad(week)}`; }
+function loadWeek() {
+  try {
+    const raw = localStorage.getItem(WEEK_KEY);
+    if (!raw) return { id: currentWeekId(), days: {} };
+    const obj = JSON.parse(raw);
+    if (obj.id !== currentWeekId()) return { id: currentWeekId(), days: {} };
+    return obj;
+  } catch(e) { return { id: currentWeekId(), days: {} }; }
+}
+function saveWeek(week) { localStorage.setItem(WEEK_KEY, JSON.stringify(week)); }
+function setDayMinutes(dayIndex, minutes) {
+  const week = loadWeek();
+  week.days[String(dayIndex)] = Math.max(0, Math.round(minutes));
+  saveWeek(week);
+  renderWeek();
+}
+function renderWeek() {
+  const week = loadWeek();
+  const { week: weekNum } = isoWeek(new Date());
+  $("#weekMeta").textContent = `Kalenderwoche ${weekNum}`;
+  const todayIdx = new Date().getDay();
+  let total = 0;
+  $$('.week-day').forEach(cell => {
+    const day = Number(cell.dataset.day);
+    const min = Number(week.days[String(day)] || 0);
+    const hoursEl = cell.querySelector('.wd-hours');
+    const subEl   = cell.querySelector('.wd-sub');
+    const fill    = cell.querySelector('.wd-bar-fill');
+    cell.classList.toggle('today', day === todayIdx);
+    if (min > 0) {
+      cell.classList.remove('empty');
+      hoursEl.innerHTML = fmtHMShortWithUnit(min);
+      const goalPct = Math.round((min / DAY_GOAL_MIN) * 100);
+      subEl.textContent = `${goalPct}% vom Tagesziel`;
+      fill.style.width = Math.min(100, (min / WEEK_MAX_BAR) * 100) + '%';
+      total += min;
+    } else {
+      cell.classList.add('empty');
+      hoursEl.textContent = day === todayIdx ? "läuft" : "—";
+      subEl.textContent   = day === todayIdx ? "heute noch offen" : "kein Eintrag";
+      fill.style.width = '0%';
+    }
+  });
+  $("#weekTotal").innerHTML  = `${fmtHMShort(total)}<span class="unit">std</span>`;
+  $("#weekGoal").textContent = `${fmtHMShort(WEEK_GOAL_MIN)} std`;
+}
+function saveTodayNet() {
+  const now = new Date();
+  const dow = now.getDay();
+  if (dow < 1 || dow > 5) { alert("Nur Wochentage (Mo–Fr) werden im Kalender erfasst."); return; }
+  const arrive = parseTime($("#tArrive").value || "07:00");
+  const pause  = parseTime($("#tPause").value  || "12:00");
+  const leave  = parseTime($("#tLeave").value  || "16:00");
+  const nowMin = nowMinutes();
+  const totalSpan = leave - arrive;
+  if (totalSpan <= 0) return;
+  const useEnd = Math.min(nowMin, leave);
+  const elapsed = Math.max(0, useEnd - arrive);
+  const pauseEnd = pause + PAUSE_LEN;
+  let pauseDone;
+  if (useEnd < pause) pauseDone = 0;
+  else if (useEnd > pauseEnd) pauseDone = PAUSE_LEN;
+  else pauseDone = useEnd - pause;
+  const netElapsed = Math.max(0, elapsed - pauseDone);
+  setDayMinutes(dow, netElapsed);
+}
+$("#saveTodayBtn").addEventListener("click", saveTodayNet);
+$("#resetWeekBtn").addEventListener("click", () => {
+  if (confirm("Ganze Woche wirklich zurücksetzen?")) {
+    localStorage.removeItem(WEEK_KEY);
+    renderWeek();
+  }
+});
+function maybeAutoSave(nowMin, leave) {
+  const dow = new Date().getDay();
+  if (dow < 1 || dow > 5) return;
+  if (nowMin < leave) return;
+  const key = `ms-autosave-${todayKey()}`;
+  if (localStorage.getItem(key)) return;
+  saveTodayNet();
+  localStorage.setItem(key, "1");
+}
+
+/* MAIN UPDATE */
 function update() {
   const arriveStr = $("#tArrive").value || "07:00";
   const pauseStr  = $("#tPause").value  || "12:00";
   const leaveStr  = $("#tLeave").value  || "16:00";
-
   const arrive = parseTime(arriveStr);
   const pause  = parseTime(pauseStr);
   const leave  = parseTime(leaveStr);
   const now    = nowMinutes();
-
   const n = new Date();
   $("#nowTime").innerHTML = `${pad(n.getHours())}<em>:</em>${pad(n.getMinutes())}`;
   $("#clockMeta").textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
   const days = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
   const months = ["Jan","Feb","März","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
   $("#nowDate").textContent = `${days[n.getDay()]} · ${n.getDate()}. ${months[n.getMonth()]} ${n.getFullYear()}`;
-
   const totalSpan = leave - arrive;
   if (totalSpan <= 0) {
     $("#calloutText").textContent = "Feierabend muss nach der Ankunft liegen.";
-    $("#barFill").style.width = "0%";
-    $("#barNow").style.left = "0%";
-    $("#statSince").textContent = "—";
-    $("#statLeft").textContent  = "—";
-    $("#infoPct").textContent   = "—";
-    $("#infoNet").textContent   = "—";
-    $("#infoPause").textContent = "—";
-    $("#infoCoffee").textContent= "—";
+    $("#barFill").style.width = "0%"; $("#barNow").style.left = "0%";
+    $("#statSince").textContent = "—"; $("#statLeft").textContent  = "—";
+    $("#infoPct").textContent = "—"; $("#infoNet").textContent = "—";
+    $("#infoPause").textContent = "—"; $("#infoCoffee").textContent= "—";
+    document.title = `⚠ Zeiten prüfen · ${BASE_TITLE}`;
     return;
   }
-
   renderStatics(arrive, leave);
   renderPause(arrive, leave, pause);
-
   const elapsed = now - arrive;
   const clampedElapsed = Math.max(0, Math.min(elapsed, totalSpan));
   const pct = (clampedElapsed / totalSpan) * 100;
-  $("#barFill").style.width = pct + "%";
-  $("#barNow").style.left   = pct + "%";
-
+  const fill = $("#barFill");
+  fill.style.width = pct + "%";
+  fill.dataset.phase = phaseForMinutes(now, pause);
+  $("#barNow").style.left = pct + "%";
   const pauseEnd = pause + PAUSE_LEN;
   let pauseDone;
   if (now < pause) pauseDone = 0;
   else if (now > pauseEnd) pauseDone = PAUSE_LEN;
   else pauseDone = now - pause;
-
   const grossElapsed = clampedElapsed;
   const netElapsed = Math.max(0, grossElapsed - pauseDone);
   const netTotal   = totalSpan - PAUSE_LEN;
-
   if (now < arrive) {
     $("#statSince").innerHTML = `<em>—</em>`;
     $("#statSinceSub").textContent = `Ankunft um ${arriveStr}`;
   } else if (now >= leave) {
-    $("#statSince").textContent = fmtHMShort(totalSpan);
+    $("#statSince").innerHTML = fmtHMShortWithUnit(totalSpan);
     $("#statSinceSub").textContent = "Feierabend erreicht";
   } else {
-    $("#statSince").textContent = fmtHMShort(grossElapsed);
+    $("#statSince").innerHTML = fmtHMShortWithUnit(grossElapsed);
     $("#statSinceSub").textContent = "seit Ankunft";
   }
-
   const leftMin = leave - now;
   if (now < arrive) {
-    $("#statLeft").textContent = fmtHMShort(totalSpan);
+    $("#statLeft").innerHTML = fmtHMShortWithUnit(totalSpan);
     $("#statLeftSub").textContent = "gesamter Tag";
   } else if (now >= leave) {
-    $("#statLeft").innerHTML = `<em>0:00</em>`;
+    $("#statLeft").innerHTML = `<em>0:00</em><span class="unit">std</span>`;
     $("#statLeftSub").textContent = "geschafft ✓";
   } else {
-    $("#statLeft").textContent = fmtHMShort(leftMin);
+    $("#statLeft").innerHTML = fmtHMShortWithUnit(leftMin);
     $("#statLeftSub").textContent = "bis Feierabend";
   }
-
   $("#infoPct").innerHTML  = `${pct.toFixed(1).replace('.',',')}<em>%</em>`;
-  $("#infoNet").textContent = `${fmtHMShort(netElapsed)} / ${fmtHMShort(netTotal)}`;
-
+  $("#infoNet").innerHTML  = `${fmtHMShort(netElapsed)} / ${fmtHMShort(netTotal)}<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-left:4px;">std</span>`;
   if (now < pause) $("#infoPause").textContent = `um ${pauseStr}`;
   else if (now < pauseEnd) $("#infoPause").innerHTML = `<em>läuft</em>`;
   else $("#infoPause").textContent = "erledigt";
-
   if (now < COFFEE_MIN) $("#infoCoffee").textContent = `in ${fmtHM(COFFEE_MIN - now)}`;
   else if (now < COFFEE_MIN + 15) $("#infoCoffee").innerHTML = `<em>jetzt ☕</em>`;
   else $("#infoCoffee").textContent = "genossen";
-
   let msg = "";
-  if (now < arrive) {
-    msg = `Der Tag hat noch nicht begonnen — Ankunft geplant um ${arriveStr}.`;
-  } else if (now < COFFEE_MIN) {
-    msg = "Früher Vormittag. Der Kaffee wartet um neun.";
-  } else if (now < COFFEE_MIN + 15) {
-    msg = "Kaffeezeit. Kurz aufstehen, kurz durchatmen.";
-  } else if (now < pause) {
-    msg = "Vormittag läuft. Halt' das Tempo bis zur Mittagspause.";
-  } else if (now < pauseEnd) {
-    msg = "Mittagspause. Der Balken wartet — du auch.";
-  } else if (now < leave) {
-    msg = "Nachmittag. Der Ziel-Balken kommt in Sicht.";
-  } else {
-    msg = "Feierabend. Bildschirm zu, Licht aus.";
-  }
-
+  if (now < arrive) msg = `Der Tag hat noch nicht begonnen — Ankunft geplant um ${arriveStr}.`;
+  else if (now < COFFEE_MIN) msg = "Früher Vormittag. Der Kaffee wartet um neun.";
+  else if (now < COFFEE_MIN + 15) msg = "Kaffeezeit. Kurz aufstehen, kurz durchatmen.";
+  else if (now < pause) msg = "Vormittag läuft. Halt' das Tempo bis zur Mittagspause.";
+  else if (now < pauseEnd) msg = "Mittagspause. Der Balken wartet — du auch.";
+  else if (now < leave) msg = "Nachmittag. Der Ziel-Balken kommt in Sicht.";
+  else msg = "Feierabend. Bildschirm zu, Licht aus.";
   if (holidayCache) {
     const dLeft = diffDays(new Date(), new Date(holidayCache.date + "T00:00:00"));
-    if (dLeft === 0) {
-      msg += ` Außerdem: Heute ist in Hessen ${holidayCache.localName || holidayCache.name}.`;
-    } else {
-      msg += ` Nächster hessischer Feiertag: ${holidayCache.localName || holidayCache.name}.`;
+    if (dLeft === 0) msg += ` Außerdem: Heute ist in Hessen ${holidayCache.localName || holidayCache.name}.`;
+    else msg += ` Nächster hessischer Feiertag: ${holidayCache.localName || holidayCache.name}.`;
+  }
+  $("#calloutText").textContent = msg;
+  if (now < arrive)                          updateTabTitle({ mode: "waiting" });
+  else if (now >= leave)                     updateTabTitle({ mode: "done" });
+  else if (now >= pause && now < pauseEnd)   updateTabTitle({ mode: "pause", leftMin });
+  else                                       updateTabTitle({ mode: "work", leftMin });
+  if (now >= arrive) checkMilestones(pct);
+  const dow = n.getDay();
+  if (dow >= 1 && dow <= 5 && now >= arrive) {
+    const cell = document.querySelector(`.week-day[data-day="${dow}"]`);
+    if (cell) {
+      cell.classList.remove('empty');
+      cell.querySelector('.wd-hours').innerHTML = fmtHMShortWithUnit(netElapsed);
+      cell.querySelector('.wd-sub').textContent = `heute · live`;
+      cell.querySelector('.wd-bar-fill').style.width = Math.min(100, (netElapsed / WEEK_MAX_BAR) * 100) + '%';
     }
   }
-
-  $("#calloutText").textContent = msg;
+  maybeAutoSave(now, leave);
 }
 
-/* =========================================================
-   BIND & LOOP
-========================================================= */
+/* BIND & LOOP */
 ["tArrive","tPause","tLeave"].forEach(id => {
   $("#" + id).addEventListener("input", update);
   $("#" + id).addEventListener("change", update);
 });
+renderWeek();
 update();
 setInterval(update, 1000);
-
+setInterval(renderWeek, 60 * 1000);
 loadNextHessenHoliday();
 setInterval(loadNextHessenHoliday, 1000 * 60 * 60 * 24);
 
-/* =========================================================
-   SIDE ADS
-========================================================= */
+/* SIDE ADS */
 const PAYPAL_AD = {
-  cls: "paypal",
-  eyebrow: "UNTERSTÜTZUNG",
-  hero: "☕",
+  cls: "paypal", eyebrow: "UNTERSTÜTZUNG", hero: "☕",
   title: "Ein Kaffee für Maiko?",
   body: "Wenn dir die App hilft — kleine Geste, große Freude.",
   cta: { label: "paypal.me/maiggooo →", url: "https://paypal.me/maiggooo" },
-  foot: "PAYPAL · DANKE",
-  mark: "♡"
+  foot: "PAYPAL · DANKE", mark: "♡"
 };
 const ADS = [
   { cls:"kaffee", eyebrow:"CAMPUS", hero:"· · ·", title:"Linas Kaffee",
@@ -1192,9 +1142,7 @@ const ADS = [
     foot:"Buchbar für Events", mark:"S" }
 ];
 function renderAd(slotEl, ad) {
-  const ctaHTML = ad.cta
-    ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>`
-    : ``;
+  const ctaHTML = ad.cta ? `<a class="ad-cta" href="${ad.cta.url}" target="_blank" rel="noopener">${ad.cta.label}</a>` : ``;
   const inner = `
     <div class="ad ad--${ad.cls}">
       <div class="ad-eyebrow"><span class="sep">·</span><span>${ad.eyebrow}</span></div>
@@ -1204,13 +1152,8 @@ function renderAd(slotEl, ad) {
       ${ctaHTML}
       <div class="ad-foot"><span>${ad.foot}</span><span class="ad-mark">${ad.mark}</span></div>
     </div>`;
-  slotEl.innerHTML = ad.link
-    ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>`
-    : inner;
-  requestAnimationFrame(() => {
-    const el = slotEl.querySelector('.ad');
-    if (el) el.classList.add('show');
-  });
+  slotEl.innerHTML = ad.link ? `<a class="ad-link" href="${ad.link}" target="_blank" rel="noopener">${inner}</a>` : inner;
+  requestAnimationFrame(() => { const el = slotEl.querySelector('.ad'); if (el) el.classList.add('show'); });
 }
 function swapAd(slotEl, ad) {
   const current = slotEl.querySelector('.ad');
