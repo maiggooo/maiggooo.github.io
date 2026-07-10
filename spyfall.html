@@ -206,6 +206,78 @@
   .setting-label .hint { display:block; font-family:'Inter', sans-serif; font-weight:400; font-size:12px; color:var(--muted); letter-spacing:0; text-transform:none; margin-top:2px; }
   .setting-controls { display:flex; flex-wrap:wrap; gap:6px; }
 
+  /* Places: overview + collapsible categories */
+  #placesControls { flex-direction:column; gap:8px; align-items:stretch; }
+  .places-overview {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; padding:6px 10px;
+    background:var(--paper-2); border:1px dashed var(--rule-soft);
+  }
+  .places-count {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .places-quick { display:flex; gap:6px; }
+  .mini-btn {
+    background:var(--paper); border:1px solid var(--rule);
+    color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:10px;
+    letter-spacing:.14em; text-transform:uppercase;
+    padding:4px 8px; cursor:pointer; transition:background .15s, color .15s;
+  }
+  .mini-btn:hover { background:var(--ink); color:var(--paper); }
+
+  .place-category { border:1px solid var(--rule-soft); background:var(--paper); }
+  .cat-header {
+    width:100%; display:flex; align-items:center; gap:10px;
+    padding:10px 12px; background:transparent; border:none;
+    cursor:pointer; text-align:left; color:var(--ink);
+    font-family:'Fraunces', serif; font-size:15px; font-weight:600;
+    border-bottom:1px dashed transparent;
+    transition:background .15s;
+  }
+  .cat-header:hover { background:var(--paper-2); }
+  .place-category.open .cat-header { border-bottom-color:var(--rule-soft); background:var(--paper-2); }
+  .cat-icon { font-size:16px; }
+  .cat-name { flex:1; }
+  .cat-count {
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; color:var(--muted);
+    padding:2px 8px; border:1px solid var(--rule-soft);
+    background:var(--paper);
+  }
+  .cat-toggle {
+    font-family:'JetBrains Mono', monospace; font-size:14px;
+    color:var(--accent); min-width:14px; text-align:right;
+  }
+  .cat-body { display:none; padding:10px 12px 12px; }
+  .place-category.open .cat-body { display:block; }
+  .cat-quick { display:flex; gap:6px; margin-bottom:8px; }
+  .cat-places { display:flex; flex-wrap:wrap; gap:6px; }
+
+  /* Section toggle (whole "Orte" block collapsible) */
+  .places-setting { flex-direction:column; align-items:stretch; gap:0; padding:0; border-bottom:1px dashed var(--rule-soft); }
+  .section-toggle {
+    width:100%; display:flex; align-items:center; gap:10px;
+    padding:14px 4px; background:transparent; border:none;
+    cursor:pointer; text-align:left; color:var(--ink);
+    font-family:'Fraunces', serif; font-size:17px; font-weight:600;
+  }
+  .section-toggle:hover { color:var(--accent); }
+  .section-toggle-label { flex:1; }
+  .section-toggle-label .hint {
+    display:block; font-family:'Inter', sans-serif; font-weight:400;
+    font-size:12px; color:var(--muted); letter-spacing:0;
+    text-transform:none; margin-top:2px;
+  }
+  .section-toggle-icon {
+    font-family:'JetBrains Mono', monospace; font-size:16px;
+    color:var(--accent); min-width:16px; text-align:right;
+  }
+  .places-body { display:flex; flex-direction:column; gap:8px; padding:0 0 14px; }
+  .places-body[hidden] { display:none; }
+
+
   /* Cards phase */
   .card-stage { display:flex; flex-direction:column; align-items:center; gap:18px; padding:20px 0; }
   .card-stage .hand-msg {
@@ -462,12 +534,15 @@
     </div>
 
     <div class="section-title">Orte</div>
-    <div class="setting">
-      <div class="setting-label">
-        Aktive Orte im Pool
-        <span class="hint">Mehr Orte folgen später — hier erst ein Platzhalter-Set</span>
-      </div>
-      <div class="setting-controls" id="placesControls"></div>
+    <div class="setting places-setting" id="placesSection">
+      <button type="button" class="section-toggle" id="placesToggle" aria-expanded="false">
+        <span class="section-toggle-label">
+          Aktive Orte im Pool
+          <span class="hint" id="placesSummary">60 / 60 aktiv · tippe zum Ausklappen</span>
+        </span>
+        <span class="section-toggle-icon" id="placesToggleIcon">▸</span>
+      </button>
+      <div class="setting-controls places-body" id="placesControls" hidden></div>
     </div>
 
     <div class="section-title">Extra-Modi</div>
@@ -659,12 +734,111 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 initTheme();
 
 /* ================= DATEN: ORTE & ROLLEN ================= */
-// Platzhalter-Set (später erweiterbar zum großen Raster)
-const PLACES = [
-  { name: "Strand", roles: ["Rettungsschwimmer", "Touristin", "Surfer", "Eisverkäufer", "Sandburgen-Kind", "Strandkellner"] },
-  { name: "Casino", roles: ["Croupier", "Highroller", "Sicherheitsmann", "Barkeeperin", "Kartenzähler", "Anfänger"] },
-  { name: "U-Boot", roles: ["Kapitän", "Navigator", "Koch", "Techniker", "Funker", "Neuling"] }
+// 60 Orte in 10 Kategorien — jeder Ort hat 6 passende Rollen
+const PLACE_CATEGORIES = [
+  {
+    name: "Freizeit & Urlaub", icon: "🏖", places: [
+      { name: "Strand",           roles: ["Rettungsschwimmer","Touristin","Surfer","Eisverkäufer","Sandburgen-Kind","Strandkellner"] },
+      { name: "Freizeitpark",     roles: ["Achterbahn-Operator","Maskottchen","Zuckerwatte-Verkäufer","Gestresste Mutter","Fotograf","Sicherheitspersonal"] },
+      { name: "Zoo",              roles: ["Tierpfleger","Kartenverkäufer","Schulklassen-Lehrer","Zoologe","Reinigungskraft","Souvenir-Verkäufer"] },
+      { name: "Campingplatz",     roles: ["Platzwart","Wohnmobil-Rentner","Pfadfinder","Grillmeister","Angler","Gitarrenspieler"] },
+      { name: "Kreuzfahrtschiff", roles: ["Kapitän","Animateur","Barkeeper","Steward","Passagier","Küchenchef"] },
+      { name: "Skigebiet",        roles: ["Skilehrer","Liftwart","Après-Ski-DJ","Rettungssanitäter","Snowboarder","Hüttenwirt"] },
+      { name: "Escape Room",      roles: ["Spielleiter","Rätselknacker","Nervöser Neuling","Gruppenchef","Techniker","Foto-Fotograf"] }
+    ]
+  },
+  {
+    name: "Kultur & Unterhaltung", icon: "🎭", places: [
+      { name: "Kino",             roles: ["Kartenabreißer","Popcorn-Verkäufer","Filmvorführer","Kinogänger","Reinigungskraft","Flyer-Verteiler"] },
+      { name: "Theater",          roles: ["Regisseur","Souffleuse","Hauptdarsteller","Bühnenbildner","Beleuchter","Platzanweiser"] },
+      { name: "Konzert / Festival", roles: ["Rockstar","Roadie","Security","Fan in erster Reihe","Bierverkäufer","Ton-Techniker"] },
+      { name: "Museum",           roles: ["Kurator","Wachmann","Schulklassen-Führer","Restaurator","Kassenwart","Kunststudent"] },
+      { name: "Zirkus",           roles: ["Zirkusdirektor","Clown","Trapezkünstler","Löwenbändiger","Kartenverkäufer","Kind mit Ballon"] },
+      { name: "Kunstgalerie",     roles: ["Galerist","Künstler","Kritiker","Sammler","Praktikant","Vernissage-Barkeeper"] }
+    ]
+  },
+  {
+    name: "Essen & Trinken", icon: "🍽", places: [
+      { name: "Restaurant",       roles: ["Kellner","Chefkoch","Sommelier","Gast","Spülkraft","Restaurantkritiker"] },
+      { name: "Fast-Food-Restaurant", roles: ["Kassierer","Fritteusen-Mitarbeiter","Drive-Thru-Personal","Hungriger Kunde","Reinigungskraft","Filialleiter"] },
+      { name: "Bar / Kneipe",     roles: ["Barkeeper","Türsteher","Stammgast","DJ","Cocktail-Kellnerin","Betrunkener Tourist"] },
+      { name: "Bäckerei",         roles: ["Bäckermeister","Verkäuferin","Lehrling","Frühkunde","Auslieferungsfahrer","Konditor"] },
+      { name: "Weingut",          roles: ["Winzer","Sommelier","Erntehelfer","Touristenführer","Weinkritiker","Fassbinder"] },
+      { name: "Weihnachtsmarkt",  roles: ["Glühwein-Verkäufer","Weihnachtsmann","Frierendes Kind","Marktleiter","Handwerker mit Stand","Krippenspieler"] }
+    ]
+  },
+  {
+    name: "Transport & Reise", icon: "🚂", places: [
+      { name: "Flughafen",        roles: ["Check-in-Personal","Sicherheitskontrolleur","Gepäckabfertiger","Wartender Passagier","Duty-Free-Verkäufer","Reinigungskraft"] },
+      { name: "Flugzeug",         roles: ["Kapitän","Stewardess","Business-Class-Passagier","Nervöser Erstflieger","Air Marshal","Schlafendes Baby"] },
+      { name: "Zug / ICE",        roles: ["Zugführer","Schaffner","Bordbistro-Mitarbeiter","Pendler","Tourist mit Riesenkoffer","Kontrolleur"] },
+      { name: "U-Bahn-Station",   roles: ["U-Bahn-Fahrer","Straßenmusiker","Pendler","Ticketkontrolleur","Obdachloser","Tourist mit Karte"] },
+      { name: "Segelboot / Yacht", roles: ["Skipper","Matrose","Millionär","Sonnendeck-Gast","Bordkoch","Steward"] },
+      { name: "Raststätte Autobahn", roles: ["Kassierer","LKW-Fahrer","Familienvater","Kellnerin","Tankwart","Reinigungskraft"] }
+    ]
+  },
+  {
+    name: "Arbeit & Büro", icon: "🏢", places: [
+      { name: "Bürogebäude",      roles: ["Chef","Praktikant","Empfangsdame","IT-Support","Putzkraft","Kaffeeküchen-Plauderer"] },
+      { name: "Baustelle",        roles: ["Polier","Kranführer","Maurer","Architekt","Sicherheitsbeauftragter","Lehrling"] },
+      { name: "Fabrik",           roles: ["Fließbandarbeiter","Schichtleiter","Qualitätsprüfer","Gabelstaplerfahrer","Ingenieur","Reinigungspersonal"] },
+      { name: "Bank",             roles: ["Filialleiter","Kassierer","Kundenberater","Sicherheitsdienst","Kunde","Geldbote"] },
+      { name: "Anwaltskanzlei",   roles: ["Star-Anwalt","Junior-Anwalt","Sekretärin","Mandant","Praktikant","Empfang"] },
+      { name: "Radiostation",     roles: ["Moderator","Producer","Nachrichtensprecher","Tontechniker","Studiogast","Praktikant"] }
+    ]
+  },
+  {
+    name: "Gesundheit & Notfall", icon: "🏥", places: [
+      { name: "Krankenhaus",      roles: ["Chefarzt","Krankenschwester","Patient","Besucher","Sanitäter","Reinigungskraft"] },
+      { name: "Feuerwache",       roles: ["Feuerwehrhauptmann","Neuling","Fahrzeugmechaniker","Notrufannahme","Dalmatiner-Besitzer","Kochdienst"] },
+      { name: "Polizeistation",   roles: ["Kommissar","Streifenpolizist","Verdächtiger","Anwalt","Empfang","Zeuge"] },
+      { name: "Apotheke",         roles: ["Apotheker","PTA","Kunde mit Rezept","Pharma-Vertreter","Praktikant","Rentner-Stammkunde"] }
+    ]
+  },
+  {
+    name: "Bildung", icon: "🏫", places: [
+      { name: "Schule",           roles: ["Lehrer","Schüler","Direktor","Hausmeister","Sekretärin","Kantinenmitarbeiter"] },
+      { name: "Universität",      roles: ["Professor","Student","Bibliothekar","Mensa-Personal","Tutor","Erstsemester"] },
+      { name: "Fahrschule",       roles: ["Fahrlehrer","Fahrschüler","Prüfer","Theorieschüler","Sekretärin","Fahrzeugmechaniker"] },
+      { name: "Kindergarten",     roles: ["Erzieherin","Kind","Praktikantin","Abholender Elternteil","Koch","Leitung"] }
+    ]
+  },
+  {
+    name: "Shopping & Dienstleistung", icon: "🛒", places: [
+      { name: "Supermarkt",       roles: ["Kassierer","Regalauffüller","Kunde mit XXL-Einkauf","Metzger","Bäckereipersonal","Marktleiter"] },
+      { name: "Einkaufszentrum",  roles: ["Ladendetektiv","Verkäufer","Teenager-Clique","Reinigungskraft","Weihnachtsmann-Darsteller","Info-Personal"] },
+      { name: "Friseursalon",     roles: ["Chef-Friseur","Auszubildende","Stammkundin","Färbe-Spezialist","Empfang","Lehrling am Kehren"] },
+      { name: "Autowerkstatt",    roles: ["Mechaniker-Meister","Lehrling","Kunde","Werkstattleiter","Ersatzteil-Verkäufer","TÜV-Prüfer"] },
+      { name: "Tankstelle",       roles: ["Kassierer","Autofahrer","LKW-Fahrer","Reinigungskraft","Waschstraßen-Personal","Bierkäufer"] }
+    ]
+  },
+  {
+    name: "Geheim & Spektakulär", icon: "🕵", places: [
+      { name: "Casino",           roles: ["Croupier","Highroller","Pit-Boss","Kartenmischer","Kartenzähler","Anfänger"] },
+      { name: "Bankraub (im Gange)", roles: ["Anführer","Fluchtwagenfahrer","Techniker","Geisel","Verhandlungsführer","Sniper"] },
+      { name: "Geheimlabor",      roles: ["Chef-Wissenschaftler","Assistent","Testperson","Sicherheitschef","Reinigungspersonal","Spionage-Verdächtiger"] },
+      { name: "Militärbasis",     roles: ["General","Rekrut","Ausbilder","Koch","Wachposten","Techniker"] },
+      { name: "U-Boot",           roles: ["Kapitän","Navigator","Koch","Techniker","Funker","Neuling"] },
+      { name: "Raumstation",      roles: ["Kommandant","Wissenschaftler","Ingenieur","Weltraumtourist","Roboter-Techniker","Bordarzt"] }
+    ]
+  },
+  {
+    name: "Sonstiges", icon: "🏛", places: [
+      { name: "Hotel-Lobby",      roles: ["Rezeptionist","Concierge","Page","Gast","Hoteldirektor","Reinigungskraft"] },
+      { name: "Fitnessstudio",    roles: ["Trainer","Bodybuilder","Anfänger","Rezeptionist","Reinigungskraft","Sauna-Gast"] },
+      { name: "Schwimmbad",       roles: ["Bademeister","Schwimmschüler","Rentner beim Bahnenziehen","Rutschen-Kind","Kassierer","Kioskbetreiber"] },
+      { name: "Kirche / Hochzeit", roles: ["Pfarrer","Braut","Bräutigam","Trauzeuge","Fotograf","Organist"] },
+      { name: "Standesamt",       roles: ["Standesbeamter","Braut","Bräutigam","Trauzeuge","Fotograf","Wartendes Paar"] },
+      { name: "Gerichtssaal",     roles: ["Richter","Staatsanwalt","Verteidiger","Angeklagter","Zeuge","Protokollantin"] },
+      { name: "Gefängnis",        roles: ["Wärter","Häftling","Direktor","Küchenpersonal","Anwaltsbesuch","Neuzugang"] },
+      { name: "Fußballstadion",   roles: ["Spieler","Trainer","Ordner","Fan","Bierverkäufer","TV-Kommentator"] },
+      { name: "Filmset",          roles: ["Regisseur","Hauptdarsteller","Kameramann","Maskenbildner","Statist","Catering"] },
+      { name: "Tierarztpraxis",   roles: ["Tierarzt","Sprechstundenhilfe","Besorgter Hundebesitzer","Katzenbesitzer","Praktikant","Futterlieferant"] }
+    ]
+  }
 ];
+// Flache Liste für schnelle Lookups
+const PLACES = PLACE_CATEGORIES.flatMap(c => c.places);
 
 /* ================= EREIGNISSE ================= */
 const EVENTS = [
@@ -804,25 +978,143 @@ $$("#durationControls .chip").forEach(c => {
   });
 });
 
-/* ================= SETUP: PLACES ================= */
+/* ================= SETUP: PLACES (kategorisiert, ausklappbar) ================= */
+const openCats = new Set(); // welche Kategorien aufgeklappt sind
+
+function togglePlace(name) {
+  if (state.activePlaces.includes(name)) {
+    state.activePlaces = state.activePlaces.filter(x => x !== name);
+  } else {
+    state.activePlaces.push(name);
+  }
+  renderPlaces();
+}
+function setCategoryActive(catIdx, active) {
+  const cat = PLACE_CATEGORIES[catIdx];
+  cat.places.forEach(p => {
+    const isOn = state.activePlaces.includes(p.name);
+    if (active && !isOn) state.activePlaces.push(p.name);
+    if (!active && isOn) state.activePlaces = state.activePlaces.filter(x => x !== p.name);
+  });
+  renderPlaces();
+}
+
 function renderPlaces() {
   const wrap = $("#placesControls");
   wrap.innerHTML = "";
-  PLACES.forEach(p => {
-    const b = document.createElement("button");
-    b.className = "chip" + (state.activePlaces.includes(p.name) ? " active" : "");
-    b.textContent = p.name;
-    b.addEventListener("click", () => {
-      if (state.activePlaces.includes(p.name)) {
-        state.activePlaces = state.activePlaces.filter(x => x !== p.name);
-      } else {
-        state.activePlaces.push(p.name);
-      }
+
+  // Übersichts-Zeile: Alle / Keine + Zähler
+  const totalCount = PLACES.length;
+  const activeCount = state.activePlaces.length;
+  const overview = document.createElement("div");
+  overview.className = "places-overview";
+  overview.innerHTML = `
+    <div class="places-count">${activeCount} / ${totalCount} aktiv</div>
+    <div class="places-quick">
+      <button type="button" class="mini-btn" id="placesAllBtn">Alle an</button>
+      <button type="button" class="mini-btn" id="placesNoneBtn">Alle aus</button>
+    </div>
+  `;
+  wrap.appendChild(overview);
+
+  PLACE_CATEGORIES.forEach((cat, ci) => {
+    const activeInCat = cat.places.filter(p => state.activePlaces.includes(p.name)).length;
+    const isOpen = openCats.has(ci);
+
+    const catEl = document.createElement("div");
+    catEl.className = "place-category" + (isOpen ? " open" : "");
+
+    catEl.innerHTML = `
+      <button type="button" class="cat-header" data-cat="${ci}">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${activeInCat}/${cat.places.length}</span>
+        <span class="cat-toggle">${isOpen ? "▾" : "▸"}</span>
+      </button>
+      <div class="cat-body">
+        <div class="cat-quick">
+          <button type="button" class="mini-btn" data-cat-all="${ci}">Alle</button>
+          <button type="button" class="mini-btn" data-cat-none="${ci}">Keine</button>
+        </div>
+        <div class="cat-places">
+          ${cat.places.map(p => `
+            <button type="button" class="chip${state.activePlaces.includes(p.name) ? " active" : ""}" data-place="${p.name.replace(/"/g,'&quot;')}">${p.name}</button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+    wrap.appendChild(catEl);
+  });
+
+  // Handler: Kategorie-Header (aufklappen)
+  wrap.querySelectorAll(".cat-header").forEach(h => {
+    h.addEventListener("click", () => {
+      const ci = parseInt(h.dataset.cat, 10);
+      if (openCats.has(ci)) openCats.delete(ci); else openCats.add(ci);
       renderPlaces();
     });
-    wrap.appendChild(b);
   });
+  // Handler: Ort-Chip toggle
+  wrap.querySelectorAll(".cat-places .chip").forEach(b => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePlace(b.dataset.place);
+    });
+  });
+  // Handler: Kategorie Alle/Keine
+  wrap.querySelectorAll("[data-cat-all]").forEach(b => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setCategoryActive(parseInt(b.dataset.catAll,10), true);
+    });
+  });
+  wrap.querySelectorAll("[data-cat-none]").forEach(b => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setCategoryActive(parseInt(b.dataset.catNone,10), false);
+    });
+  });
+  // Handler: Globales Alle / Keine
+  const allBtn = wrap.querySelector("#placesAllBtn");
+  const noneBtn = wrap.querySelector("#placesNoneBtn");
+  if (allBtn) allBtn.addEventListener("click", () => {
+    state.activePlaces = PLACES.map(p => p.name);
+    renderPlaces();
+  });
+  if (noneBtn) noneBtn.addEventListener("click", () => {
+    state.activePlaces = [];
+    renderPlaces();
+  });
+
+  // Summary im Section-Toggle aktualisieren
+  const summary = document.getElementById("placesSummary");
+  if (summary) {
+    const isOpen = document.getElementById("placesControls") && !document.getElementById("placesControls").hasAttribute("hidden");
+    summary.textContent = `${activeCount} / ${totalCount} aktiv` + (isOpen ? "" : " · tippe zum Ausklappen");
+  }
 }
+
+// Section-Toggle: ganzen Orte-Block auf-/zuklappen
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("placesToggle");
+  const body = document.getElementById("placesControls");
+  const icon = document.getElementById("placesToggleIcon");
+  if (!btn || !body || !icon) return;
+  btn.addEventListener("click", () => {
+    const isHidden = body.hasAttribute("hidden");
+    if (isHidden) {
+      body.removeAttribute("hidden");
+      icon.textContent = "▾"; // ▾
+      btn.setAttribute("aria-expanded", "true");
+    } else {
+      body.setAttribute("hidden", "");
+      icon.textContent = "▸"; // ▸
+      btn.setAttribute("aria-expanded", "false");
+    }
+    // Summary neu rendern
+    if (typeof renderPlaces === "function") renderPlaces();
+  });
+});
 
 /* ================= SETUP: MODES ================= */
 $$("#modesControls .chip").forEach(c => {
