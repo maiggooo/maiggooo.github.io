@@ -461,9 +461,7 @@
     .mast .brand { font-size: 22px; }
   }
 
-  /* SECTION-LABEL — Mobile-Fix (Depeschen-Kopf mit Buttons)
-     Auf schmalen Screens wickelt sich der Header sauber um, damit
-     Pause/Reload-Buttons nicht rechts überlaufen. */
+  /* SECTION-LABEL — Mobile-Fix (Depeschen-Kopf mit Buttons) */
   @media (max-width:720px) {
     .section-label {
       flex-wrap: wrap;
@@ -501,11 +499,7 @@
     }
   }
 
-  /* =====================================================
-     MOBILE OPTIMIERUNG v2 — kompakter, weniger Scroll
-     ===================================================== */
-
-  /* --- Depeschen: 2x2 Grid mit kleineren Typos --- */
+  /* MOBILE OPTIMIERUNG v2 */
   @media (max-width:640px) {
     .depeschen { grid-template-columns: 1fr 1fr; }
     .dep-col {
@@ -539,7 +533,6 @@
     .dep-refresh { top: 12px; right: 10px; font-size: 10px; }
   }
 
-  /* --- Tools: kompakte Zeilenliste statt großer Kacheln --- */
   @media (max-width:720px) {
     .gallery {
       grid-template-columns: 1fr;
@@ -562,7 +555,6 @@
       row-gap: 2px;
       align-items: center;
     }
-    /* Nur Wrapper transparent machen, NICHT tile-foot */
     .tile > div:not(.tile-foot) { display: contents; }
     .tile-head { grid-area: no; margin: 0; display: block; align-self: center; }
     .tile-head .cat { display: none; }
@@ -595,7 +587,6 @@
     .tile::before { height: 1px; }
   }
 
-  /* --- Sehr schmale Screens: minimalistisch --- */
   @media (max-width:400px) {
     .dep-attr { display: none; }
     .tick-dots { display: none; }
@@ -793,19 +784,20 @@
     arrows:    '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v16M8 4l-2.5 2.8M8 4l2.5 2.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20V4M16 20l-2.5-2.8M16 20l2.5-2.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     swords:    '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l10 10-1.5 3.5L9 15 4 20 3 19 8 14 4.5 10.5 3 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M20 3L10 13l1.5 3.5L15 15l5 5 1-1-5-5 3.5-3.5L21 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     plane:     '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2L2 10l7 3 3 7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M22 2L9 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
-    spy:       '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c1.5-2.5 5-3.5 10-3.5S20.5 9.5 22 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7.5" cy="15" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="15" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.7 15.4c.5-.4 1.6-.4 2.6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 8.5c1.5-2 4-3 8-3s6.5 1 8 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+    spy:       '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c1.5-2.5 5-3.5 10-3.5S20.5 9.5 22 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7.5" cy="15" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="15" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.7 15.4c.5-.4 1.6-.4 2.6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 8.5c1.5-2 4-3 8-3s6.5 1 8 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    finger:    '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21V11.5a1.5 1.5 0 0 1 3 0V13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 13v-1.5a1.5 1.5 0 0 1 3 0V13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 13v-1a1.5 1.5 0 0 1 3 0v5.5a5.5 5.5 0 0 1-5.5 5.5H10a4 4 0 0 1-3.5-2L4 16.5a1.6 1.6 0 0 1 2.6-1.9L9 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 11.5V4.5a1.5 1.5 0 0 1 3 0v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
 
   /* ———— TOOL-REGISTER ———— */
   const TOOLS = [
-    { no: "I",    category: "Wissen",   icon: "quiz", title: "MarketingQuiz <em>Nº 01</em>",       desc: "Ein Quiz zum Fit werden in Marketing.",             path: "MarketingTeacher.html" },
-    { no: "II",   category: "Spiel",    icon: "scissors", title: "Schere Stein Papier <em>Nº 02</em>", desc: "Beweise dich gegen den Computer.",                  path: "RPS.html" },
+    { no: "I",    category: "Wissen",   icon: "quiz",      title: "MarketingQuiz <em>Nº 01</em>",       desc: "Ein Quiz zum Fit werden in Marketing.",             path: "MarketingTeacher.html" },
+    { no: "II",   category: "Spiel",    icon: "scissors",  title: "Schere Stein Papier <em>Nº 02</em>", desc: "Beweise dich gegen den Computer.",                  path: "RPS.html" },
     { no: "III",  category: "Werkzeug", icon: "hourglass", title: "ZeitZähler <em>Nº 03</em>",          desc: "Wie lange musst du dich heute noch durchbeißen?.", path: "ZeitZaehler.html" },
-    { no: "IV",   category: "Spiel",    icon: "arrows", title: "HigherLower <em>Nº 04</em>",         desc: "Errate, was häufiger bei Wikipedia gesucht wird — und komm so weit wie möglich.", path: "HL.html" },
-    { no: "V",    category: "Wissen",   icon: "swords", title: "MarketingDuell <em>Nº 05</em>",      desc: "Beweise dich gegen deine Freunde.",                 path: "quizduell.html" },
-    { no: "VI",   category: "Spiel",    icon: "plane", title: "Der Dümmste Fliegt <em>Nº 06</em>",  desc: "Wähle die Schwierigkeit und zeig was du drauf hast.", path: "derduemmstefliegt.html" },
-    { no: "VII",  category: "Spiel",   icon: "spy", title: "Spyfall <em>Nº 07</em>",             desc: "Entlarve den Spion — oder bleib selbst unerkannt.", path: "spyfall.html" },
-    { no: "VIII", category: "Tool", title: "Platzhalter <em>Nº 08</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" },
+    { no: "IV",   category: "Spiel",    icon: "arrows",    title: "HigherLower <em>Nº 04</em>",         desc: "Errate, was häufiger bei Wikipedia gesucht wird — und komm so weit wie möglich.", path: "HL.html" },
+    { no: "V",    category: "Wissen",   icon: "swords",    title: "MarketingDuell <em>Nº 05</em>",      desc: "Beweise dich gegen deine Freunde.",                 path: "quizduell.html" },
+    { no: "VI",   category: "Spiel",    icon: "plane",     title: "Der Dümmste Fliegt <em>Nº 06</em>",  desc: "Wähle die Schwierigkeit und zeig was du drauf hast.", path: "derduemmstefliegt.html" },
+    { no: "VII",  category: "Spiel",    icon: "spy",       title: "Spyfall <em>Nº 07</em>",             desc: "Entlarve den Spion — oder bleib selbst unerkannt.", path: "spyfall.html" },
+    { no: "VIII", category: "Werkzeug", icon: "finger",    title: "Chooser <em>Nº 08</em>",             desc: "Finger auflegen — der Zufall wählt einen aus.",     path: "Chooser.html" },
     { no: "IX",   category: "Tool", title: "Platzhalter <em>Nº 09</em>",         desc: "Kurze Notiz zum Zweck des Werkzeugs.",              path: "" }
   ];
 
@@ -846,14 +838,13 @@
   /* ———— Kategorie-Filter (auto) ———— */
   (function buildCategoryFilter(){
     const filterEl = document.getElementById('catFilter');
-    // Nur echte, nicht-platzhaltende Tools zählen
     const realTools = TOOLS.filter(t => {
       const hasPath = t.path && t.path.trim().length > 0;
       const isPlaceholder = /platzhalter/i.test(t.title);
       return hasPath && !isPlaceholder;
     });
     const cats = [...new Set(realTools.map(t => (t.category || '').trim()).filter(Boolean))];
-    if (cats.length < 2) return; // nur zeigen bei >= 2 Kategorien
+    if (cats.length < 2) return;
 
     filterEl.hidden = false;
     filterEl.innerHTML = '<span class="cf-label">Filter</span>';
@@ -876,7 +867,7 @@
       document.querySelectorAll('.gallery .tile').forEach(tile => {
         const tc = tile.dataset.cat || '';
         const isPlaceholder = tile.classList.contains('placeholder');
-        if (isPlaceholder) return; // bleibt versteckt
+        if (isPlaceholder) return;
         tile.style.display = (cat === '__all__' || tc === cat) ? '' : 'none';
       });
     });
