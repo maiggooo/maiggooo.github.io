@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Chooser — Marketing &amp; Sales</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
+    --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
+    --accent:#c8442a; --accent-soft:#f2d9d1;
+    --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
+    --shadow:0 1px 0 var(--ink);
+  }
+  html[data-theme="dark"] {
+    --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
+    --muted:#8a857a; --rule:#efe8d8; --rule-soft:#3a3a30;
+    --accent:#e8623f; --accent-soft:#3a1f18;
+    --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
+  }
+
+  /* View Transitions */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: .45s;
+    animation-timing-function: cubic-bezier(.7,0,.2,1);
+  }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity: 0; filter: blur(1.5px); } }
+  @keyframes paper-fade-in {
+    from { opacity: 0; filter: blur(1.5px); transform: translateY(4px); }
+    to   { opacity: 1; filter: blur(0);     transform: translateY(0); }
+  }
+  .mast .brand { view-transition-name: brand; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+  }
+
+  /* Papier-Textur */
+  body::after {
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .22; mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::after { opacity: .08; mix-blend-mode: screen; }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    pointer-events: none; z-index: 9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode: multiply;
+  }
+  html[data-theme="dark"] body::before { opacity: .35; mix-blend-mode: overlay; }
+
+  body { text-shadow: 0 0 .32px currentColor; }
+  .mast .brand, .headline, .stage-hint {
+    text-shadow: 0 0 .45px currentColor, .18px .12px .55px rgba(0,0,0,.10);
+  }
+  .mast .brand em, .headline em {
+    text-shadow: 0 0 .5px currentColor, .3px .2px .8px rgba(200,68,42,.18);
+  }
+  @media (prefers-reduced-motion: reduce) { body { text-shadow: none; } }
+
+  .wrap { position: relative; z-index: 1; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); }
+  body {
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    font-size:16px; line-height:1.5; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    transition: background .25s ease, color .25s ease;
+  }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 28px 48px; }
+
+  .mast {
+    border-top:2px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding:14px 0 10px; display:grid;
+    grid-template-columns:1fr auto 1fr; align-items:center; gap:20px;
+  }
+  .mast .edition {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .mast .edition.right { display:flex; gap:8px; justify-content:flex-end; align-items:center; text-align:right; }
+  .mast .brand {
+    font-family:'Fraunces', serif; font-weight:800; font-size:22px;
+    letter-spacing:-.02em; white-space:nowrap;
+  }
+  .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
+
+  .subhead {
+    border-bottom:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; gap:20px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+  .subhead a.back {
+    display:inline-flex; align-items:center; gap:10px;
+    color:var(--muted); text-decoration:none; transition:color .18s ease;
+  }
+  .subhead a.back:hover { color:var(--ink); }
+  .subhead a.back .arrow {
+    font-family:'Fraunces', serif; font-style:italic; font-size:15px;
+    letter-spacing:0; text-transform:none; line-height:1;
+    transition:transform .25s cubic-bezier(.7,0,.2,1); display:inline-block;
+  }
+  .subhead a.back:hover .arrow { transform:translateX(-3px); }
+  .subhead .meta { text-align:right; }
+  @media (max-width:560px) {
+    .subhead { font-size:10px; letter-spacing:.12em; }
+    .subhead .meta { display:none; }
+  }
+
+  .toggle {
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--rule); padding:6px 10px;
+    background:transparent; color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase;
+    cursor:pointer; transition:background .15s;
+  }
+  .toggle:hover { background:var(--paper-2); }
+  .toggle .dot {
+    width:10px; height:10px; border-radius:50%;
+    background:var(--ink); border:1px solid var(--ink);
+    box-sizing:border-box; display:inline-block;
+  }
+
+  /* ————————————— CHOOSER ————————————— */
+  .chooser-head { padding:28px 0 18px; text-align:center; }
+  .eyebrow {
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.28em; text-transform:uppercase; color:var(--accent);
+    margin-bottom:14px;
+  }
+  .headline {
+    font-family:'Fraunces', serif; font-weight:800;
+    font-size:clamp(38px, 7vw, 72px);
+    line-height:.95; letter-spacing:-.02em;
+    margin-bottom:14px;
+  }
+  .headline em { font-style:italic; font-weight:400; color:var(--accent); }
+  .lede {
+    max-width:640px; margin:0 auto;
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:17px; color:var(--ink-soft); line-height:1.5;
+  }
+
+  .stage-wrap {
+    margin:22px 0 18px;
+    border-top:2px solid var(--rule);
+    border-bottom:2px solid var(--rule);
+  }
+  .stage {
+    position:relative; width:100%;
+    height:min(70vh, 640px);
+    background:
+      radial-gradient(circle at 50% 50%, var(--paper-2) 0, var(--paper) 70%);
+    overflow:hidden;
+    touch-action:none;
+    -webkit-user-select:none; user-select:none;
+    cursor:crosshair;
+  }
+  .stage.locked { cursor:default; }
+
+  .stage-hint {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:20px;
+    font-family:'Fraunces', serif; font-style:italic;
+    color:var(--muted);
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .stage-hint .big {
+    font-size:clamp(28px, 5vw, 44px);
+    color:var(--ink-soft); margin-bottom:6px;
+  }
+  .stage-hint .small {
+    font-family:'JetBrains Mono', monospace; font-style:normal;
+    font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  .stage.has-fingers .stage-hint { opacity:0; }
+
+  .stage-status {
+    position:absolute; top:14px; left:0; right:0;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.22em; text-transform:uppercase;
+    color:var(--muted); pointer-events:none;
+    transition:color .2s ease;
+  }
+  .stage-status .count { color:var(--ink); font-weight:700; }
+  .stage.armed .stage-status { color:var(--accent); }
+
+  /* Finger-Kreise */
+  .finger {
+    position:absolute; top:0; left:0;
+    width:120px; height:120px;
+    margin:-60px 0 0 -60px;
+    border-radius:50%;
+    pointer-events:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .finger .core {
+    width:64px; height:64px; border-radius:50%;
+    background:var(--f-color, var(--accent));
+    border:2px solid var(--ink);
+    box-shadow:3px 3px 0 var(--ink);
+    transition:transform .25s ease;
+  }
+  .finger .ring {
+    position:absolute; inset:0; border-radius:50%;
+    border:2px solid var(--f-color, var(--accent));
+    opacity:.75;
+    animation:idle-pulse 1.6s ease-out infinite;
+  }
+  .finger .ring.r2 { animation-delay:.55s; }
+  @keyframes idle-pulse {
+    0%   { transform:scale(.55); opacity:.85; }
+    100% { transform:scale(1.15); opacity:0; }
+  }
+
+  .stage.armed .finger .ring {
+    animation:arm-pulse .9s ease-out infinite;
+    border-width:3px;
+  }
+  @keyframes arm-pulse {
+    0%   { transform:scale(.55); opacity:1; }
+    100% { transform:scale(1.35); opacity:0; }
+  }
+
+  .stage.picking .finger {
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .stage.picking .finger:not(.winner) {
+    opacity:.12; transform:scale(.6);
+  }
+  .stage.picking .finger:not(.winner) .ring { animation:none; opacity:0; }
+  .finger.winner .core {
+    animation:winner-pop .6s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .finger.winner .ring {
+    animation:winner-ring 1.4s ease-out infinite !important;
+    border-width:3px;
+  }
+  @keyframes winner-pop {
+    0%   { transform:scale(1); }
+    50%  { transform:scale(1.6); }
+    100% { transform:scale(1.35); }
+  }
+  @keyframes winner-ring {
+    0%   { transform:scale(.5);  opacity:1; }
+    100% { transform:scale(2.2); opacity:0; }
+  }
+  .finger.winner .label {
+    position:absolute; top:100%; left:50%;
+    transform:translate(-50%, 10px);
+    font-family:'Fraunces', serif; font-style:italic; font-weight:600;
+    font-size:22px; color:var(--ink);
+    white-space:nowrap;
+    background:var(--paper); padding:4px 12px;
+    border:1px solid var(--ink); box-shadow:2px 2px 0 var(--accent);
+    animation:winner-label .35s ease .3s both;
+  }
+  @keyframes winner-label {
+    from { opacity:0; transform:translate(-50%, 4px); }
+    to   { opacity:1; transform:translate(-50%, 10px); }
+  }
+
+  /* Controls */
+  .controls {
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+    padding:16px 0 8px;
+  }
+  .btn {
+    border:1px solid var(--rule); background:var(--paper);
+    color:var(--ink); padding:10px 16px;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; font-weight:700;
+    cursor:pointer; transition:background .15s, transform .1s, box-shadow .15s;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .btn:hover { background:var(--paper-2); transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+  .btn--accent { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .btn--accent:hover { background:var(--ink); border-color:var(--ink); }
+
+  .rules {
+    max-width:780px; margin:22px auto 0;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+    border-top:1px solid var(--rule-soft);
+    border-bottom:1px solid var(--rule-soft);
+  }
+  .rule {
+    padding:14px 16px; text-align:center;
+    border-right:1px dashed var(--rule-soft);
+  }
+  .rule:last-child { border-right:none; }
+  .rule .n {
+    font-family:'Fraunces', serif; font-style:italic; font-weight:800;
+    font-size:28px; color:var(--accent); line-height:1;
+  }
+  .rule .t {
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+    margin-top:6px;
+  }
+  @media (max-width:560px) {
+    .rules { grid-template-columns:1fr; }
+    .rule { border-right:none; border-bottom:1px dashed var(--rule-soft); }
+    .rule:last-child { border-bottom:none; }
+    .stage { height:min(65vh, 520px); }
+    .finger { width:100px; height:100px; margin:-50px 0 0 -50px; }
+    .finger .core { width:56px; height:56px; }
+  }
+
+  .foot {
+    margin-top:36px; padding:14px 0;
+    border-top:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  }
+
+  .ads-side { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="edition left">Vol. I · SS 2026 · Nº 03</div>
+    <div class="brand">Marketing<em>&amp;</em>Sales</div>
+    <div class="edition right">
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta">Tool · Finger Chooser</span>
+  </div>
+
+  <main>
+    <section class="chooser-head">
+      <div class="eyebrow">· Multi-Touch Chooser ·</div>
+      <h1 class="headline">Wer <em>zahlt</em>?</h1>
+      <p class="lede">
+        Alle legen einen Finger auf die Bühne. Sobald für drei Sekunden nichts passiert,
+        entscheidet der Zufall — und der Rest schaut zu.
+      </p>
+    </section>
+
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <div class="stage-status" id="stageStatus">
+          <span class="count" id="fingerCount">0</span> · Finger
+        </div>
+        <div class="stage-hint" id="stageHint">
+          <div class="big">Finger auflegen …</div>
+          <div class="small">Multi-Touch aktiv</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="btnReset">Neue Runde</button>
+      <button class="btn btn--accent" id="btnDemo">Demo (Maus-Klick)</button>
+    </div>
+
+    <div class="rules">
+      <div class="rule">
+        <div class="n">1</div>
+        <div class="t">Finger auflegen</div>
+      </div>
+      <div class="rule">
+        <div class="n">2</div>
+        <div class="t">3 Sek. warten</div>
+      </div>
+      <div class="rule">
+        <div class="n">3</div>
+        <div class="t">Zufall entscheidet</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>Strauss · Biebergemünd</span>
+    <span>© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<script>
+const $ = sel => document.querySelector(sel);
+
+/* Theme */
+function initTheme() {
+  const saved = localStorage.getItem("ms-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(saved || (prefersDark ? "dark" : "light"));
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("ms-theme", theme);
+  $("#themeLabel").textContent = theme === "dark" ? "Light" : "Dark";
+}
+$("#themeToggle").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : "dark";
+  const swap = () => setTheme(next);
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(swap);
+  } else swap();
+});
+initTheme();
+
+/* ————————————— Chooser Logic ————————————— */
+const stage       = $("#stage");
+const stageHint   = $("#stageHint");
+const stageStatus = $("#stageStatus");
+const fingerCount = $("#fingerCount");
+const btnReset    = $("#btnReset");
+const btnDemo     = $("#btnDemo");
+
+const COLORS = [
+  "#c8442a", "#2f6b3a", "#1e5f8a", "#a8541a",
+  "#7a2e8a", "#c9a227", "#0e8074", "#b03a5b",
+  "#405d27", "#5a3f9c"
+];
+const COUNTDOWN_MS = 3000;
+
+let fingers = new Map();  // id -> {el, color}
+let armTimer = null;
+let armStart = 0;
+let phase = "idle"; // idle | armed | picked
+
+function colorForIndex(i) {
+  return COLORS[i % COLORS.length];
+}
+function updateStatus() {
+  fingerCount.textContent = fingers.size;
+  stage.classList.toggle("has-fingers", fingers.size > 0);
+}
+
+function addFinger(id, x, y) {
+  if (phase === "picked") return;
+  const el = document.createElement("div");
+  el.className = "finger";
+  const color = colorForIndex(fingers.size);
+  el.style.setProperty("--f-color", color);
+  el.style.transform = `translate(${x}px, ${y}px)`;
+  el.innerHTML = `
+    <div class="ring"></div>
+    <div class="ring r2"></div>
+    <div class="core"></div>
+  `;
+  stage.appendChild(el);
+  fingers.set(id, { el, color });
+  updateStatus();
+  scheduleArm();
+}
+function moveFinger(id, x, y) {
+  const f = fingers.get(id);
+  if (!f) return;
+  f.el.style.transform = `translate(${x}px, ${y}px)`;
+}
+function removeFinger(id) {
+  const f = fingers.get(id);
+  if (!f) return;
+  f.el.remove();
+  fingers.delete(id);
+  updateStatus();
+  if (phase !== "picked") {
+    if (fingers.size === 0) cancelArm();
+    else scheduleArm();
+  }
+}
+
+function scheduleArm() {
+  if (phase === "picked") return;
+  cancelArm();
+  if (fingers.size < 1) return;
+  phase = "armed";
+  stage.classList.add("armed");
+  stageStatus.querySelector("#fingerCount").textContent = fingers.size;
+  armStart = performance.now();
+  armTimer = setTimeout(pickWinner, COUNTDOWN_MS);
+}
+function cancelArm() {
+  clearTimeout(armTimer);
+  armTimer = null;
+  if (phase === "armed") {
+    phase = "idle";
+    stage.classList.remove("armed");
+  }
+}
+function pickWinner() {
+  if (fingers.size === 0) return;
+  phase = "picked";
+  stage.classList.remove("armed");
+  stage.classList.add("picking", "locked");
+
+  const ids = [...fingers.keys()];
+  const winnerId = ids[Math.floor(Math.random() * ids.length)];
+  const winner = fingers.get(winnerId);
+  winner.el.classList.add("winner");
+
+  const label = document.createElement("div");
+  label.className = "label";
+  label.textContent = "GEWINNER";
+  winner.el.appendChild(label);
+
+  // Haptics
+  if (navigator.vibrate) navigator.vibrate([40, 80, 200]);
+}
+
+function resetRound() {
+  cancelArm();
+  fingers.forEach(f => f.el.remove());
+  fingers.clear();
+  stage.classList.remove("armed", "picking", "locked", "has-fingers");
+  phase = "idle";
+  updateStatus();
+}
+btnReset.addEventListener("click", resetRound);
+
+/* ————— Touch Events ————— */
+function stagePos(clientX, clientY) {
+  const r = stage.getBoundingClientRect();
+  return { x: clientX - r.left, y: clientY - r.top };
+}
+
+stage.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    const { x, y } = stagePos(t.clientX, t.clientY);
+    addFinger("t" + t.identifier, x, y);
+  }
+}, { passive:false });
+
+stage.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    const { x, y } = stagePos(t.clientX, t.clientY);
+    moveFinger("t" + t.identifier, x, y);
+  }
+}, { passive:false });
+
+function endTouch(e) {
+  e.preventDefault();
+  if (phase === "picked") return; // Nach Auswahl: Kreise erst per Reset weg
+  for (const t of e.changedTouches) removeFinger("t" + t.identifier);
+}
+stage.addEventListener("touchend",    endTouch, { passive:false });
+stage.addEventListener("touchcancel", endTouch, { passive:false });
+
+/* ————— Demo per Maus (Desktop) ————— */
+/* Jeder Klick fügt/entfernt einen "Finger" für Testen ohne Touch */
+let demoIdx = 0;
+btnDemo.addEventListener("click", () => {
+  // Beim ersten Klick: Modus einschalten -> Klick auf Bühne = Finger
+  stage.dataset.demo = "1";
+  btnDemo.textContent = "Demo aktiv · Klick auf Bühne";
+});
+stage.addEventListener("mousedown", (e) => {
+  if (stage.dataset.demo !== "1") return;
+  const { x, y } = stagePos(e.clientX, e.clientY);
+  const id = "m" + (demoIdx++);
+  addFinger(id, x, y);
+});
+</script>
+</body>
+</html>
