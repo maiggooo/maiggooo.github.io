@@ -901,8 +901,8 @@ const BASE_TITLE = "Der Zeit&Zähler";
 function updateTabTitle(state) {
   if (state.mode === "waiting")     document.title = `Warten · ${BASE_TITLE}`;
   else if (state.mode === "done")   document.title = `Feierabend ✓ · ${BASE_TITLE}`;
-  else if (state.mode === "pause")  document.title = `Pause · ${fmtHMShort(state.leftMin)} std · Feierabend`;
-  else                              document.title = `${fmtHMShort(state.leftMin)} std · Feierabend`;
+  else if (state.mode === "pause")  document.title = `Pause · ${fmtHMShort(state.leftMin)} std `;
+  else                              document.title = `${fmtHMShort(state.leftMin)} std `;
 }
 
 /* WEEK CALENDAR */
