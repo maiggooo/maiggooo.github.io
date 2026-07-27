@@ -284,6 +284,7 @@
         <button class="chip accent active" data-role="hexe">Hexe</button>
         <button class="chip accent active" data-role="jaeger">Jäger</button>
         <button class="chip accent active" data-role="maedchen">Lunsenmädchen</button>
+        <button class="chip accent active" data-role="amor">Amor</button>
       </div>
     </div>
 
@@ -465,12 +466,14 @@ const ROLE_INFO = {
   jaeger: { label:"Jäger", team:"dorf", color:"#3e7d3f", desc:"Stirbst du, darfst du sofort einen weiteren Spieler mit dir nehmen.",
     icon:`<svg class="cf-icon" viewBox="0 0 100 100"><rect x="46" y="10" width="8" height="80" fill="currentColor"/><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="4"/></svg>` },
   maedchen: { label:"Lunsenmädchen", team:"dorf", color:"#c9a02a", desc:"Du hast keine feste Aktion — aber du darfst heimlich lunsen, wenn die Werwölfe erwachen.",
-    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="38" ry="18" fill="none" stroke="currentColor" stroke-width="5"/><ellipse cx="50" cy="50" rx="9" ry="9" fill="currentColor"/><path d="M20 50 Q10 40 6 50" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>` }
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="38" ry="18" fill="none" stroke="currentColor" stroke-width="5"/><ellipse cx="50" cy="50" rx="9" ry="9" fill="currentColor"/><path d="M20 50 Q10 40 6 50" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>` },
+  amor: { label:"Amor", team:"dorf", color:"#e0459c", desc:"In der ersten Nacht verliebst du zwei Spieler ineinander — stirbt einer, stirbt auch der andere.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><path d="M50 88 C20 66 6 46 6 28 C6 12 18 4 32 4 C42 4 48 10 50 16 C52 10 58 4 68 4 C82 4 94 12 94 28 C94 46 80 66 50 88 Z" fill="currentColor"/></svg>` }
 };
 
 /* ================= STATE ================= */
 let players = [];
-let settings = { wolfCount:1, roles:new Set(["seherin","hexe","jaeger","maedchen"]), mayor:false, reveal:true };
+let settings = { wolfCount:1, roles:new Set(["seherin","hexe","jaeger","maedchen","amor"]), mayor:false, reveal:true };
 let game = null;
 
 /* ================= SETUP UI ================= */
@@ -556,7 +559,8 @@ function startGame() {
     revealEnabled: settings.reveal,
     witchHeal:false, witchPoisonTarget:null,
     witchHealAvailable:true, witchPoisonAvailable:true,
-    firstNightDone:false
+    firstNightDone:false,
+    lovers:[]
   };
 
   cardQueueIndex = 0;
@@ -753,6 +757,12 @@ let nightWolfTarget = null;
 function buildNightQueue() {
   const q = [];
   q.push({type:"announce", phase:"Nacht "+game.day, title:"Das Dorf <em>schläft ein</em>.", desc:"Alle Spieler schließen die Augen. Der Erzähler übernimmt."});
+  if (game.day === 1 && settings.roles.has("amor") && game.state.some(p=>p.role==="amor" && p.alive)) {
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"<em>Amor</em> erwacht.", desc:"Amor öffnet die Augen und verliebt zwei Spieler.", roleName: findRoleHolderName("amor")});
+    q.push({type:"action", role:"amor"});
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"Die <em>Verliebten</em> öffnen die Augen.", desc:"Beide Verliebten öffnen kurz die Augen und schauen sich an, damit sie wissen, wer der andere ist. Danach schließen sie die Augen wieder."});
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"Amor <em>schläft wieder ein</em>.", desc:"Amor schließt die Augen."});
+  }
   const wolfNames = game.state.filter(p=>p.role==="werwolf" && p.alive).map(p=>p.name).join(", ");
   q.push({type:"announce", phase:"Nacht "+game.day, title:"Die <em>Werwölfe</em> erwachen.", desc:"Die Wölfe öffnen heimlich die Augen und erkennen sich.", roleName: wolfNames});
   q.push({type:"action", role:"werwolf"});
@@ -820,7 +830,46 @@ function runNightStep() {
     };
   } else if (step.role === "hexe") {
     runHexeHealStep();
+  } else if (step.role === "amor") {
+    runAmorStep();
   }
+}
+
+/* --- Amor: verliebt zwei Spieler in einem Screen (nur erste Nacht, kann sich selbst wählen) --- */
+let amorPicks = [];
+function runAmorStep() {
+  const amorName = findRoleHolderName("amor");
+  amorPicks = [];
+  setNarr("Nacht "+game.day, "Wen <em>verliebt</em> Amor?", "Wähle genau zwei Spieler aus, die sich verlieben. Amor darf sich selbst wählen.", "0/2 ausgewählt", amorName);
+  const grid = $("#narrGrid");
+  retriggerAnim(grid);
+  const list = alivePlayers();
+  grid.innerHTML = list.map(p=>`
+    <div class="player-choice" data-name="${p.name}">
+      ${p.name}${p.isMayor?'<span class="mark">★</span>':''}
+    </div>`).join("");
+  $$(".player-choice").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const name = el.dataset.name;
+      if (el.classList.contains("selected")) {
+        el.classList.remove("selected");
+        amorPicks = amorPicks.filter(n=>n!==name);
+      } else {
+        if (amorPicks.length >= 2) return;
+        el.classList.add("selected");
+        amorPicks.push(name);
+      }
+      $("#narrNote").textContent = `${amorPicks.length}/2 ausgewählt`;
+      $("#narrConfirmBtn").disabled = amorPicks.length !== 2;
+    });
+  });
+  $("#narrConfirmBtn").disabled = true;
+  $("#narrConfirmBtn").textContent = "Weiter";
+  $("#narrSkipBtn").style.display = "none";
+  $("#narrConfirmBtn").onclick = ()=>{
+    game.lovers = amorPicks.slice();
+    nightIndex++; runNightStep();
+  };
 }
 
 function resolveNight() {
@@ -852,7 +901,23 @@ function resolveNight() {
 }
 
 /* ================= DEATH REVEAL SEQUENCE ================= */
+function expandLoversDeaths(deaths) {
+  if (!game.lovers || game.lovers.length < 2) return deaths;
+  const extra = [];
+  deaths.forEach(d=>{
+    if (game.lovers.includes(d.name)) {
+      const otherName = game.lovers.find(n=>n!==d.name);
+      const other = game.state.find(p=>p.name===otherName);
+      if (other && other.alive && !deaths.includes(other) && !extra.includes(other)) {
+        other.alive = false;
+        extra.push(other);
+      }
+    }
+  });
+  return deaths.concat(extra);
+}
 function processDeathQueue(deaths, onDone) {
+  deaths = expandLoversDeaths(deaths);
   if (!deaths.length) { onDone(); return; }
   if (!game.revealEnabled) { handleJaegerChain(deaths, onDone); return; }
   let idx = 0;
