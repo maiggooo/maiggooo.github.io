@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Werwölfe — Maiko's Spiele &amp; Tools</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#f4efe6; --paper-2:#ebe4d6; --ink:#1a1a1a; --ink-soft:#3a3a38;
+    --muted:#6b6b66; --rule:#1a1a1a; --rule-soft:#d4cbb6;
+    --accent:#c8442a; --accent-soft:#f2d9d1;
+    --ok:#2f6b3a; --ok-soft:#d6e5d3; --warn:#a8541a;
+  }
+  html[data-theme="dark"] {
+    --paper:#24241d; --paper-2:#2e2e26; --ink:#efe8d8; --ink-soft:#cdc6b6;
+    --muted:#8a857a; --rule:#efe8d8; --rule-soft:#3a3a30;
+    --accent:#e8623f; --accent-soft:#3a1f18;
+    --ok:#9dc48b; --ok-soft:#24301f; --warn:#d68f4a;
+  }
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration:.45s; animation-timing-function: cubic-bezier(.7,0,.2,1); }
+  ::view-transition-old(root) { animation-name: paper-fade-out; }
+  ::view-transition-new(root) { animation-name: paper-fade-in; }
+  @keyframes paper-fade-out { to { opacity:0; filter:blur(1.5px); } }
+  @keyframes paper-fade-in { from { opacity:0; filter:blur(1.5px); transform:translateY(4px); } to { opacity:1; filter:blur(0); transform:translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation:none; } }
+
+  body::after {
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:9998;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity:.22; mix-blend-mode:multiply;
+  }
+  html[data-theme="dark"] body::after { opacity:.08; mix-blend-mode:screen; }
+  body::before {
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:9997;
+    background-image:
+      repeating-linear-gradient( 23deg, transparent 0 42px, rgba(0,0,0,.015) 42px 43px),
+      repeating-linear-gradient(-67deg, transparent 0 57px, rgba(0,0,0,.012) 57px 58px);
+    mix-blend-mode:multiply;
+  }
+  html[data-theme="dark"] body::before { opacity:.35; mix-blend-mode:overlay; }
+
+  body { text-shadow:0 0 .32px currentColor; }
+  .mast .brand, .hero h1, .card-face { text-shadow:0 0 .45px currentColor, .18px .12px .55px rgba(0,0,0,.10); }
+  .mast .brand em { text-shadow:0 0 .5px currentColor, .3px .2px .8px rgba(200,68,42,.18); }
+  @media (prefers-reduced-motion: reduce) { body { text-shadow:none; } }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); }
+  body { font-family:'Inter', system-ui, -apple-system, sans-serif; font-size:16px; line-height:1.5; min-height:100vh; -webkit-font-smoothing:antialiased; transition:background .35s ease, color .35s ease; }
+  .wrap { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:24px 22px 48px; }
+
+  .mast { border-top:2px solid var(--rule); border-bottom:1px solid var(--rule); padding:14px 0 10px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:20px; }
+  .mast .edition { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .mast .edition.right { display:flex; gap:8px; justify-content:flex-end; align-items:center; text-align:right; }
+  .mast .brand { font-family:'Fraunces', serif; font-weight:800; font-size:22px; letter-spacing:-.02em; white-space:nowrap; }
+  .mast .brand em { font-style:italic; font-weight:400; color:var(--accent); }
+
+  .subhead { border-bottom:1px solid var(--rule); display:flex; justify-content:space-between; align-items:center; padding:10px 0; gap:20px; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .subhead a.back { display:inline-flex; align-items:center; gap:10px; color:var(--muted); text-decoration:none; transition:color .18s ease; }
+  .subhead a.back:hover { color:var(--ink); }
+  .subhead a.back .arrow { font-family:'Fraunces', serif; font-style:italic; font-size:15px; letter-spacing:0; text-transform:none; line-height:1; transition:transform .25s cubic-bezier(.7,0,.2,1); display:inline-block; }
+  .subhead a.back:hover .arrow { transform:translateX(-3px); }
+  .subhead .meta { text-align:right; }
+  @media (max-width:560px) { .subhead { font-size:10px; letter-spacing:.12em; } .subhead .meta { display:none; } }
+
+  .toggle { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--rule); padding:6px 10px; background:transparent; color:var(--ink); font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; transition:background .15s; }
+  .toggle:hover { background:var(--paper-2); }
+  .toggle .dot { width:10px; height:10px; border-radius:50%; background:var(--ink); border:1px solid var(--ink); display:inline-block; }
+
+  .hero { padding:26px 0 18px; border-bottom:1px solid var(--rule); text-align:center; }
+  .hero .eyebrow { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .hero h1 { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(42px, 8vw, 72px); letter-spacing:-.02em; line-height:.95; margin-top:8px; }
+  .hero h1 em { font-style:italic; font-weight:400; color:var(--accent); }
+  .hero .lede { margin-top:10px; font-family:'Fraunces', serif; font-style:italic; font-size:15px; color:var(--muted); }
+
+  .screen { display:none; padding:24px 0; }
+  .screen.active { display:block; animation: screen-in .38s cubic-bezier(.4,0,.2,1); }
+  @keyframes screen-in {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .screen.active { animation:none; }
+  }
+
+  .section-title { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); border-top:1px solid var(--rule-soft); padding-top:10px; margin-top:18px; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .section-title::before { content:"§"; color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
+
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  input[type="text"] { flex:1; min-width:0; padding:11px 12px; background:var(--paper); color:var(--ink); border:1px solid var(--rule); border-radius:0; font-family:'Inter', sans-serif; font-size:15px; outline:none; transition:border-color .15s; }
+  input[type="text"]:focus { border-color:var(--accent); }
+
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; background:var(--ink); color:var(--paper); border:1px solid var(--ink); font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; cursor:pointer; text-decoration:none; box-shadow:3px 3px 0 var(--accent); transition:transform .12s ease, box-shadow .18s ease, background .18s; }
+  .btn:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--accent); }
+  .btn.ghost { background:transparent; color:var(--ink); box-shadow:2px 2px 0 var(--rule); }
+  .btn.ghost:hover { box-shadow:3px 3px 0 var(--rule); background:var(--paper-2); }
+  .btn.accent { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:3px 3px 0 var(--ink); }
+  .btn.accent:hover { box-shadow:4px 4px 0 var(--ink); }
+  .btn.big { padding:15px 22px; font-size:13px; }
+  .btn.block { display:flex; width:100%; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:2px 2px 0 var(--rule-soft) !important; }
+
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:1px solid var(--rule); background:var(--paper); cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); transition:background .18s ease, color .18s ease, transform .15s ease; user-select:none; }
+  .chip:active { transform:scale(.96); }
+  .chip:hover { background:var(--paper-2); }
+  .chip.active { background:var(--ink); color:var(--paper); }
+  .chip.accent.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .players { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .player-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--rule-soft); background:var(--paper-2); font-family:'Inter', sans-serif; }
+  .player-item .num { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); min-width:22px; }
+  .player-item .name { flex:1; font-weight:500; }
+  .player-item .rm { background:transparent; border:none; color:var(--accent); font-family:'Fraunces', serif; font-style:italic; font-size:20px; cursor:pointer; line-height:1; padding:0 6px; }
+  .player-item .rm:hover { color:var(--ink); }
+
+  .count-badge { display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+
+  .setting { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 0; border-bottom:1px dashed var(--rule-soft); }
+  .setting-label { flex:1; min-width:140px; font-family:'Fraunces', serif; font-size:17px; font-weight:600; }
+  .setting-label .hint { display:block; font-family:'Inter', sans-serif; font-weight:400; font-size:12px; color:var(--muted); letter-spacing:0; text-transform:none; margin-top:2px; }
+  .setting-controls { display:flex; flex-wrap:wrap; gap:6px; }
+
+  /* ===== Card stage ===== */
+  .card-stage { display:flex; flex-direction:column; align-items:center; gap:18px; padding:20px 0; }
+  .card-stage .btn { width:100%; max-width:340px; justify-content:center; }
+  .card-stage .hand-msg { text-align:center; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+  .card-stage .hand-msg .player-name { display:block; margin-top:8px; font-family:'Fraunces', serif; font-style:italic; font-size:28px; letter-spacing:-.01em; color:var(--ink); text-transform:none; }
+  .card-instr { text-align:center; font-family:'Fraunces', serif; font-style:italic; color:var(--muted); font-size:14px; }
+
+  .flip-card { width:min(88vw, 340px); aspect-ratio:3/4.4; perspective:1600px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .flip-inner { position:relative; width:100%; height:100%; transition:transform .7s cubic-bezier(.7,0,.2,1); transform-style:preserve-3d; transform-origin:center center; }
+  .flip-card.revealed .flip-inner { transform:rotateY(180deg); }
+
+  .card-face {
+    position:absolute; inset:0; backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:10px; overflow:hidden;
+    display:flex; flex-direction:column; padding:24px 20px;
+    will-change: transform;
+  }
+  .card-back {
+    background:
+      radial-gradient(circle at 50% 22%, rgba(244,239,230,.85) 0%, rgba(244,239,230,.5) 8%, rgba(244,239,230,0) 22%),
+      linear-gradient(165deg, #23232e 0%, #14141b 55%, #0a0a0d 100%);
+    border:3px solid #050505;
+    box-shadow: 8px 8px 0 #000;
+    align-items:center; justify-content:center; text-align:center; gap:8px;
+    color:#e7e1cc;
+  }
+  .card-back .moon { width:70px; height:70px; border-radius:50%; margin-top:2px; flex-shrink:0;
+    background:radial-gradient(circle at 35% 32%, #fbf7ec 0%, #e7ddba 55%, #b9ac7f 100%);
+    box-shadow:0 0 40px 12px rgba(244,239,230,.25);
+  }
+  .card-back .wolf-icon { width:62%; max-width:160px; height:auto; margin-top:-34px; color:#050506; filter:drop-shadow(0 3px 4px rgba(0,0,0,.7)); }
+  .card-back .back-label { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:#a89f86; }
+  .card-back .back-title { font-family:'Fraunces', serif; font-style:italic; font-weight:800; font-size:30px; letter-spacing:-.01em; color:#f1ebd8; }
+  .card-back .tap-hint { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); }
+
+  .card-front {
+    transform:rotateY(180deg); justify-content:space-between; align-items:center; text-align:center;
+    background:var(--paper); border:3px solid var(--ink); box-shadow:8px 8px 0 var(--role-color, var(--accent));
+    border-top:8px solid var(--role-color, var(--accent));
+  }
+  .card-front .cf-icon { width:64px; height:64px; margin-top:6px; color:var(--role-color, var(--accent)); }
+  .card-front .cf-eyebrow { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .card-front .cf-role { font-family:'Fraunces', serif; font-weight:800; font-size:30px; line-height:1; letter-spacing:-.02em; margin-top:8px; }
+  .card-front .cf-divider { width:36px; height:2px; background:var(--role-color, var(--accent)); margin:10px auto 0; }
+  .card-front .cf-team { margin-top:10px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; padding:5px 10px; border:1px solid var(--role-color, var(--rule-soft)); color:var(--role-color, var(--ink)); }
+  .card-front .cf-desc { margin-top:14px; font-family:'Fraunces', serif; font-style:italic; font-size:13.5px; line-height:1.35; color:var(--ink-soft); }
+  .card-front .cf-mates { margin-top:14px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--role-color, var(--accent)); }
+
+  /* Narrator */
+  .narr-box { border:2px solid var(--rule); background:var(--paper-2); padding:26px 22px; text-align:center; margin:14px 0 20px; animation: narr-fade .32s ease; }
+  @keyframes narr-fade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .narr-box { animation:none; } }
+  .narr-phase { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--accent); }
+  .narr-rolename { font-family:'Fraunces', serif; font-style:italic; font-size:20px; color:var(--ink); margin-top:6px; padding:4px 14px; border:1px solid var(--rule-soft); display:inline-block; background:var(--paper); }
+  .narr-title { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(28px,6vw,42px); letter-spacing:-.02em; margin-top:10px; line-height:1.05; }
+  .narr-title em { font-style:italic; color:var(--accent); font-weight:400; }
+  .narr-desc { margin-top:10px; font-family:'Fraunces', serif; font-style:italic; font-size:15px; color:var(--ink-soft); }
+  .narr-note { margin-top:14px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .narr-actions { display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:18px; }
+  .narr-actions .btn { width:100%; max-width:420px; }
+  .narr-actions .btn.primary-action { padding:18px 22px; font-size:14px; }
+
+  .player-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px; margin-top:14px; animation: narr-fade .34s ease .04s backwards; }
+  @media (prefers-reduced-motion: reduce) { .player-grid { animation:none; } }
+  .player-choice { padding:16px 12px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center; font-family:'Fraunces', serif; font-size:17px; font-weight:600; transition:background .2s ease, transform .18s cubic-bezier(.4,0,.2,1), box-shadow .2s ease; position:relative; }
+  .player-choice:hover { background:var(--paper-2); box-shadow:3px 3px 0 var(--rule); transform:translate(-1px,-1px); }
+  .player-choice:active { transform:scale(.97); }
+  .player-choice.selected { background:var(--ink); color:var(--paper); transform:scale(1.02); }
+  .player-choice.dead { opacity:.35; text-decoration:line-through; cursor:not-allowed; }
+  .player-choice .mark { position:absolute; top:4px; right:6px; font-size:12px; }
+
+  .survivors-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr)); gap:10px; margin-top:12px; }
+  .survivor-tile { border:2px solid var(--role-color); background:var(--paper-2); padding:14px 8px 12px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .survivor-icon { width:38px; height:38px; color:var(--role-color); }
+  .survivor-icon svg { width:100%; height:100%; }
+  .survivor-name { font-family:'Fraunces', serif; font-weight:700; font-size:13.5px; line-height:1.1; }
+  .survivor-role { font-family:'JetBrains Mono', monospace; font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--role-color); }
+  .reveal-card { border:2px solid var(--rule); background:var(--paper-2); padding:18px 20px; margin-top:14px; }
+  .reveal-card h3 { font-family:'Fraunces', serif; font-size:24px; letter-spacing:-.01em; }
+  .reveal-card h3 em { font-style:italic; color:var(--accent); }
+  .reveal-list { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+  .reveal-row { display:flex; justify-content:space-between; gap:10px; padding:8px 10px; background:var(--paper); border:1px solid var(--rule-soft); font-family:'Inter', sans-serif; font-size:14px; }
+  .reveal-row .who { font-weight:600; }
+  .reveal-row .what { color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+  .reveal-row.wolf .who { color:var(--accent); }
+  .reveal-row.wolf .what { color:var(--accent); }
+
+  .foot { margin-top:36px; padding:16px 0; border-top:1px solid var(--rule); display:flex; justify-content:space-between; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+  @media (max-width:560px) {
+    .wrap { padding:20px 16px 60px; }
+    .mast { grid-template-columns:1fr auto; }
+    .mast .edition.left { display:none; }
+    .hero { padding:18px 0 12px; }
+    .setting-label { min-width:100%; }
+    .card-stage .btn { width:100%; max-width:340px; padding:17px 18px; font-size:13px; }
+    .card-stage #nextPlayerBtn, .card-stage #startMayorOrNightBtn, .card-stage #deathNextBtn { margin-top:6px; }
+    .narr-actions .btn { max-width:100%; }
+    .narr-actions .btn.primary-action { padding:19px 20px; font-size:14.5px; }
+    .player-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="edition left" id="phaseIndicator">Vol. I · SS 2026 · Nº 05</div>
+    <div class="brand">Werw<em>ö</em>lfe</div>
+    <div class="edition right">
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta">Editorial Edition · Werwölfe</span>
+  </div>
+
+  <!-- ============= SETUP ============= -->
+  <section id="screen-setup" class="screen active">
+    <div class="hero">
+      <div class="eyebrow">Ein Dorf. Ein Feind. Keine Zeitmessung.</div>
+      <h1>Werw<em>ö</em>lfe</h1>
+      <div class="lede">Der Erzähler führt, das Dorf entscheidet.</div>
+    </div>
+
+    <div class="section-title">Mitspieler <span class="count-badge" id="playerCount" style="margin-left:auto;">0 Spieler</span></div>
+    <div class="row">
+      <input type="text" id="playerInput" placeholder="Name eingeben …" maxlength="20" autocomplete="off">
+      <button class="btn" id="addPlayerBtn">Hinzufügen</button>
+    </div>
+    <div class="players" id="playersList"></div>
+
+    <div class="section-title">Werwölfe</div>
+    <div class="setting">
+      <div class="setting-label">
+        Anzahl Werwölfe
+        <span class="hint">Empfehlung: ca. 1 Wolf pro 4 Spieler</span>
+      </div>
+      <div class="setting-controls" id="wolfCountControls"></div>
+    </div>
+
+    <div class="section-title">Sonderrollen</div>
+    <div class="setting">
+      <div class="setting-label">Aktive Rollen<span class="hint">Dorfbewohner &amp; Werwolf sind immer aktiv</span></div>
+      <div class="setting-controls" id="rolesControls">
+        <button class="chip accent active" data-role="seherin">Seherin</button>
+        <button class="chip accent active" data-role="hexe">Hexe</button>
+        <button class="chip accent active" data-role="jaeger">Jäger</button>
+        <button class="chip accent active" data-role="maedchen">Lunsenmädchen</button>
+      </div>
+    </div>
+
+    <div class="section-title">Bürgermeister</div>
+    <div class="setting">
+      <div class="setting-label">Wahl nach der ersten Nacht<span class="hint">Stimme des Bürgermeisters zählt doppelt</span></div>
+      <div class="setting-controls" id="mayorControls">
+        <button class="chip accent" data-toggle="mayor">Bürgermeister aktiv</button>
+      </div>
+    </div>
+
+    <div class="section-title">Aufdeckung</div>
+    <div class="setting">
+      <div class="setting-label">Rollen bei Tod zeigen<span class="hint">Bei „Aus“ wird beim Tod keine Rolle aufgedeckt</span></div>
+      <div class="setting-controls" id="revealControls">
+        <button class="chip accent active" data-toggle="reveal">Aufdeckung aktiv</button>
+      </div>
+    </div>
+
+    <div style="margin-top:22px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn accent big block" id="startGameBtn">Rollen verteilen</button>
+    </div>
+    <div id="setupError" style="color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-top:10px; min-height:16px;"></div>
+  </section>
+
+  <!-- ============= CARDS PHASE (Rollenverteilung) ============= -->
+  <section id="screen-cards" class="screen">
+    <div class="card-stage">
+      <div class="hand-msg" id="handMsgWrap">
+        <div>Handy weitergeben an</div>
+        <div class="player-name" id="handTo">—</div>
+      </div>
+
+      <div class="flip-card" id="flipCard" role="button" aria-label="Karte umdrehen">
+        <div class="flip-inner">
+          <div class="card-face card-back">
+            <div class="back-label">Streng geheim</div>
+            <div class="moon"></div>
+            <svg class="wolf-icon" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M100 150 C95 120 80 118 78 95 C76 78 70 60 78 45 C70 40 66 28 70 15 C78 22 82 30 88 26 C92 18 98 12 100 4 C102 12 108 18 112 26 C118 30 122 22 130 15 C134 28 130 40 122 45 C130 60 124 78 122 95 C120 118 105 120 100 150 Z" fill="currentColor"/>
+            </svg>
+            <div class="back-title">Werwölfe</div>
+            <div class="tap-hint">Tippen zum Aufdecken</div>
+          </div>
+          <div class="card-face card-front" id="cardFront"></div>
+        </div>
+      </div>
+
+      <div class="card-instr" id="cardInstr">Nur du solltest die Karte sehen.</div>
+
+      <button class="btn ghost" id="nextPlayerBtn" style="display:none;">Karte verdecken &amp; Handy weitergeben</button>
+      <button class="btn accent" id="startMayorOrNightBtn" style="display:none;">Weiter zur ersten Nacht</button>
+    </div>
+  </section>
+
+  <!-- ============= NARRATOR ============= -->
+  <section id="screen-narr" class="screen">
+    <div class="narr-box">
+      <div class="narr-phase" id="narrPhase">—</div>
+      <div class="narr-rolename" id="narrRoleName" style="display:none;">—</div>
+      <div class="narr-title" id="narrTitle">—</div>
+      <div class="narr-desc" id="narrDesc">—</div>
+      <div class="narr-note" id="narrNote" style="display:none;"></div>
+    </div>
+    <div class="player-grid" id="narrGrid"></div>
+
+    <!-- Seherin: Ergebnis-Kartenreveal -->
+    <div class="card-stage" id="seherinReveal" style="display:none; padding-top:10px;">
+      <div class="flip-card" id="seherinFlipCard" role="button" aria-label="Karte umdrehen">
+        <div class="flip-inner">
+          <div class="card-face card-back">
+            <div class="back-label">Streng geheim</div>
+            <div class="moon"></div>
+            <svg class="wolf-icon" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M100 150 C95 120 80 118 78 95 C76 78 70 60 78 45 C70 40 66 28 70 15 C78 22 82 30 88 26 C92 18 98 12 100 4 C102 12 108 18 112 26 C118 30 122 22 130 15 C134 28 130 40 122 45 C130 60 124 78 122 95 C120 118 105 120 100 150 Z" fill="currentColor"/>
+            </svg>
+            <div class="back-title">Werwölfe</div>
+            <div class="tap-hint">Tippen zum Aufdecken</div>
+          </div>
+          <div class="card-face card-front" id="seherinCardFront"></div>
+        </div>
+      </div>
+      <div class="card-instr">Zeige diese Karte nur der Seherin.</div>
+    </div>
+
+    <div class="narr-actions">
+      <button class="btn accent primary-action" id="narrConfirmBtn">Weiter</button>
+      <button class="btn ghost" id="narrSkipBtn" style="display:none;">Niemanden wählen</button>
+    </div>
+  </section>
+
+  <!-- ============= DEATH REVEAL ============= -->
+  <section id="screen-death" class="screen">
+    <div class="hero" style="border-bottom:none;">
+      <div class="eyebrow">Das Dorf trauert</div>
+      <h1>Auflösung</h1>
+      <div class="lede" id="deathLede"></div>
+    </div>
+    <div class="card-stage">
+      <div class="hand-msg"><div id="deathPlayerLabel">—</div></div>
+      <div class="flip-card" id="deathFlipCard" role="button" aria-label="Karte umdrehen">
+        <div class="flip-inner">
+          <div class="card-face card-back">
+            <div class="back-label">Streng geheim</div>
+            <div class="moon"></div>
+            <svg class="wolf-icon" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M100 150 C95 120 80 118 78 95 C76 78 70 60 78 45 C70 40 66 28 70 15 C78 22 82 30 88 26 C92 18 98 12 100 4 C102 12 108 18 112 26 C118 30 122 22 130 15 C134 28 130 40 122 45 C130 60 124 78 122 95 C120 118 105 120 100 150 Z" fill="currentColor"/>
+            </svg>
+            <div class="back-title">Werwölfe</div>
+            <div class="tap-hint">Tippen zum Aufdecken</div>
+          </div>
+          <div class="card-face card-front" id="deathCardFront"></div>
+        </div>
+      </div>
+      <button class="btn accent" id="deathNextBtn">Nächste Auflösung</button>
+    </div>
+  </section>
+
+  <!-- ============= RESULT ============= -->
+  <section id="screen-result" class="screen">
+    <div class="hero" style="border-bottom:none;">
+      <div class="eyebrow" id="resultEyebrow">Spiel beendet</div>
+      <h1 id="resultHeadline">—</h1>
+      <div class="lede" id="resultLede"></div>
+    </div>
+    <div class="section-title">Überlebende</div>
+    <div class="survivors-grid" id="survivorsGrid"></div>
+    <div class="reveal-card">
+      <h3>Alle Rollen</h3>
+      <div class="reveal-list" id="resultList"></div>
+    </div>
+    <div style="margin-top:22px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn accent" id="newRoundBtn">Neue Runde (gleiche Spieler)</button>
+      <button class="btn ghost" id="backMenuBtn">Zurück zum Menü</button>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Strauss · Biebergemünd</span>
+    <span>© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<script>
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+/* ================= THEME ================= */
+let autoPhaseTheme = true;
+function setTheme(theme, manual=false) {
+  document.documentElement.setAttribute("data-theme", theme);
+  $("#themeLabel").textContent = theme === "dark" ? "Light" : "Dark";
+  if (manual) autoPhaseTheme = false;
+}
+function applyPhaseTheme(isNight) {
+  if (!autoPhaseTheme) return;
+  const swap = () => setTheme(isNight ? "dark" : "light");
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(swap);
+  } else swap();
+}
+$("#themeToggle").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : "dark";
+  setTheme(next, true);
+});
+setTheme("light");
+
+/* ================= ROLLEN-DATEN ================= */
+const ROLE_INFO = {
+  dorfbewohner: { label:"Dorfbewohner", team:"dorf", color:"#7a5230", desc:"Du hast keine besonderen Fähigkeiten. Beobachte, diskutiere, überlebe.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><circle cx="50" cy="34" r="18" fill="currentColor"/><path d="M20 90 Q50 60 80 90 Z" fill="currentColor"/></svg>` },
+  werwolf: { label:"Werwolf", team:"wolf", color:"#c8442a", desc:"Wähle nachts gemeinsam mit den anderen Wölfen ein Opfer aus dem Dorf.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><path d="M50 8 C36 8 30 20 30 20 C22 16 12 16 8 20 C13 26 16 34 16 34 C10 42 10 54 16 62 L14 88 L30 78 C36 82 44 84 50 84 C56 84 64 82 70 78 L86 88 L84 62 C90 54 90 42 84 34 C84 34 87 26 92 20 C88 16 78 16 70 20 C70 20 64 8 50 8 Z" fill="currentColor"/><path d="M38 46 L44 54 L38 58 Z" fill="var(--paper)"/><path d="M62 46 L56 54 L62 58 Z" fill="var(--paper)"/><path d="M46 62 L50 70 L54 62 Z" fill="var(--paper)"/></svg>` },
+  seherin: { label:"Seherin", team:"dorf", color:"#2f5d8a", desc:"Wähle nachts einen Spieler und erfahre heimlich dessen Rolle.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="40" ry="24" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="50" cy="50" r="12" fill="currentColor"/></svg>` },
+  hexe: { label:"Hexe", team:"dorf", color:"#7a4a9c", desc:"Du besitzt einen Heiltrank und einen Gifttrank — jeweils einmalig im Spiel.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><path d="M40 20 L60 20 L55 55 L70 90 L30 90 L45 55 Z" fill="currentColor"/><circle cx="50" cy="42" r="5" fill="var(--paper)"/></svg>` },
+  jaeger: { label:"Jäger", team:"dorf", color:"#3e7d3f", desc:"Stirbst du, darfst du sofort einen weiteren Spieler mit dir nehmen.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><rect x="46" y="10" width="8" height="80" fill="currentColor"/><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="4"/></svg>` },
+  maedchen: { label:"Lunsenmädchen", team:"dorf", color:"#c9a02a", desc:"Du hast keine feste Aktion — aber du darfst heimlich lunsen, wenn die Werwölfe erwachen.",
+    icon:`<svg class="cf-icon" viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="38" ry="18" fill="none" stroke="currentColor" stroke-width="5"/><ellipse cx="50" cy="50" rx="9" ry="9" fill="currentColor"/><path d="M20 50 Q10 40 6 50" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>` }
+};
+
+/* ================= STATE ================= */
+let players = [];
+let settings = { wolfCount:1, roles:new Set(["seherin","hexe","jaeger","maedchen"]), mayor:false, reveal:true };
+let game = null;
+
+/* ================= SETUP UI ================= */
+function renderPlayers() {
+  const list = $("#playersList");
+  list.innerHTML = players.map((p,i)=>`
+    <div class="player-item">
+      <span class="num">${i+1}.</span>
+      <span class="name">${p}</span>
+      <button class="rm" data-idx="${i}">×</button>
+    </div>`).join("");
+  $("#playerCount").textContent = `${players.length} Spieler`;
+  $$(".rm").forEach(b=>b.addEventListener("click", e=>{
+    players.splice(+e.target.dataset.idx,1); renderPlayers(); renderWolfControls();
+  }));
+}
+$("#addPlayerBtn").addEventListener("click", addPlayer);
+$("#playerInput").addEventListener("keydown", e=>{ if(e.key==="Enter") addPlayer(); });
+function addPlayer() {
+  const inp = $("#playerInput");
+  const v = inp.value.trim();
+  if (!v) return;
+  players.push(v); inp.value="";
+  renderPlayers(); renderWolfControls();
+}
+function renderWolfControls() {
+  const max = Math.max(1, players.length-1);
+  const wrap = $("#wolfCountControls");
+  let html = "";
+  for (let i=1;i<=Math.max(max,1);i++){
+    html += `<button class="chip${i===settings.wolfCount?' active':''}" data-wolf="${i}">${i}</button>`;
+  }
+  wrap.innerHTML = html;
+  $$("[data-wolf]").forEach(b=>b.addEventListener("click", e=>{
+    settings.wolfCount = +e.target.dataset.wolf; renderWolfControls();
+  }));
+}
+renderWolfControls();
+
+$$("#rolesControls .chip").forEach(chip=>{
+  chip.addEventListener("click", ()=>{
+    const r = chip.dataset.role;
+    chip.classList.toggle("active");
+    if (chip.classList.contains("active")) settings.roles.add(r); else settings.roles.delete(r);
+  });
+});
+$("[data-toggle='mayor']").addEventListener("click", e=>{
+  e.target.classList.toggle("active"); settings.mayor = e.target.classList.contains("active");
+});
+$("[data-toggle='reveal']").addEventListener("click", e=>{
+  e.target.classList.toggle("active"); settings.reveal = e.target.classList.contains("active");
+});
+
+$("#startGameBtn").addEventListener("click", ()=>{
+  const err = $("#setupError");
+  const minNeeded = settings.wolfCount + 1;
+  if (players.length < 5) { err.textContent = "Mindestens 5 Spieler nötig."; return; }
+  if (players.length < minNeeded) { err.textContent = "Zu wenige Spieler für die Wolfsanzahl."; return; }
+  err.textContent = "";
+  startGame();
+});
+
+/* ================= GAME SETUP / ROLLENVERTEILUNG ================= */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function startGame() {
+  const roleList = [];
+  for (let i=0;i<settings.wolfCount;i++) roleList.push("werwolf");
+  settings.roles.forEach(r=>roleList.push(r));
+  while (roleList.length < players.length) roleList.push("dorfbewohner");
+  const shuffledRoles = shuffle(roleList);
+
+  const state = players.map((name,i)=>({
+    name, role: shuffledRoles[i], alive:true, isMayor:false
+  }));
+
+  game = {
+    state, day:1, isNight:false,
+    mayorEnabled: settings.mayor, mayorDone:false,
+    revealEnabled: settings.reveal,
+    witchHeal:false, witchPoisonTarget:null,
+    witchHealAvailable:true, witchPoisonAvailable:true,
+    firstNightDone:false
+  };
+
+  cardQueueIndex = 0;
+  showCardsScreen();
+}
+
+/* ================= CARD PASS-AROUND ================= */
+let cardQueueIndex = 0;
+const FLIP_MS = 700;
+function showCardsScreen() {
+  switchScreen("screen-cards");
+  applyPhaseTheme(false);
+  $("#flipCard").style.display = "";
+  $("#cardInstr").style.display = "";
+  $("#handMsgWrap").style.display = "";
+  $("#handMsgWrap").innerHTML = `
+    <div>Handy weitergeben an</div>
+    <div class="player-name" id="handTo">—</div>`;
+  presentCard();
+}
+function presentCard() {
+  const flip = $("#flipCard");
+  flip.classList.remove("revealed");
+  $("#nextPlayerBtn").style.display = "none";
+  $("#startMayorOrNightBtn").style.display = "none";
+  const p = game.state[cardQueueIndex];
+  $("#handTo").textContent = p.name;
+  const info = ROLE_INFO[p.role];
+  const wolfNames = p.role === "werwolf" ? game.state.filter(x=>x.role==="werwolf" && x.name!==p.name).map(x=>x.name) : [];
+  const frontEl = $("#cardFront");
+  frontEl.className = "card-face card-front";
+  frontEl.style.setProperty("--role-color", info.color);
+  frontEl.innerHTML = `
+    <div class="cf-eyebrow">Deine Rolle</div>
+    ${info.icon}
+    <div class="cf-role">${info.label}</div>
+    <div class="cf-divider"></div>
+    <div class="cf-team">${p.role==='werwolf' ? 'Team Werwölfe' : 'Team Dorf'}</div>
+    <div class="cf-desc">${info.desc}</div>
+    ${wolfNames.length ? `<div class="cf-mates">Mit dir: ${wolfNames.join(", ")}</div>` : ``}
+  `;
+}
+$("#flipCard").addEventListener("click", ()=>{
+  const flip = $("#flipCard");
+  const revealed = flip.classList.toggle("revealed");
+  if (revealed) {
+    setTimeout(()=>{ $("#nextPlayerBtn").style.display = "inline-flex"; }, 500);
+  }
+});
+$("#nextPlayerBtn").addEventListener("click", ()=>{
+  const flip = $("#flipCard");
+  $("#nextPlayerBtn").style.display = "none";
+  flip.classList.remove("revealed");
+  // Wichtig: Inhalt erst NACH vollständiger Zudreh-Animation wechseln, damit man nie die nächste Karte sieht
+  setTimeout(()=>{
+    cardQueueIndex++;
+    if (cardQueueIndex < game.state.length) {
+      presentCard();
+    } else {
+      $("#flipCard").style.display = "none";
+      $("#cardInstr").style.display = "none";
+      $("#handMsgWrap").innerHTML = `<div>Alle Rollen wurden verteilt.</div>`;
+      $("#startMayorOrNightBtn").style.display = "inline-flex";
+      cardQueueIndex = 0;
+    }
+  }, FLIP_MS + 40);
+});
+$("#startMayorOrNightBtn").addEventListener("click", ()=>{
+  startNight();
+});
+
+/* ================= NARRATOR ENGINE ================= */
+function switchScreen(id) {
+  $$(".screen").forEach(s=>s.classList.remove("active"));
+  $("#"+id).classList.add("active");
+}
+function alivePlayers() { return game.state.filter(p=>p.alive); }
+function renderNarrGrid(selectable) {
+  const grid = $("#narrGrid");
+  retriggerAnim(grid);
+  grid.innerHTML = selectable.map(p=>`
+    <div class="player-choice" data-name="${p.name}">
+      ${p.name}${p.isMayor?'<span class="mark">★</span>':''}
+    </div>`).join("");
+  $$(".player-choice").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      $$(".player-choice").forEach(x=>x.classList.remove("selected"));
+      el.classList.add("selected");
+      $("#narrConfirmBtn").disabled = false;
+      $("#narrConfirmBtn").dataset.selected = el.dataset.name;
+    });
+  });
+}
+function setNarr(phase, title, desc, note, roleName) {
+  $("#narrPhase").textContent = phase;
+  $("#narrTitle").innerHTML = title;
+  $("#narrDesc").textContent = desc;
+  const noteEl = $("#narrNote");
+  if (note) { noteEl.style.display=""; noteEl.textContent = note; } else { noteEl.style.display="none"; }
+  const roleEl = $("#narrRoleName");
+  if (roleName) { roleEl.style.display=""; roleEl.textContent = roleName; } else { roleEl.style.display="none"; }
+  retriggerAnim($(".narr-box"));
+}
+function retriggerAnim(el) {
+  if (!el) return;
+  el.style.animation = "none";
+  void el.offsetHeight;
+  el.style.animation = "";
+}
+function findRoleHolderName(roleKey) {
+  const p = game.state.find(x=>x.role===roleKey && x.alive);
+  return p ? p.name : null;
+}
+function showSeherinCard(target) {
+  const info = ROLE_INFO[target.role];
+  const wrap = $("#seherinReveal");
+  wrap.style.display = "flex";
+  const flip = $("#seherinFlipCard");
+  flip.classList.remove("revealed");
+  const frontEl = $("#seherinCardFront");
+  frontEl.className = "card-face card-front";
+  frontEl.style.setProperty("--role-color", info.color);
+  frontEl.innerHTML = `
+    <div class="cf-eyebrow">${target.name}</div>
+    ${info.icon}
+    <div class="cf-role">${info.label}</div>
+    <div class="cf-divider"></div>
+    <div class="cf-team">${target.role==='werwolf' ? 'Team Werwölfe' : 'Team Dorf'}</div>
+  `;
+  flip.onclick = ()=>{ flip.classList.toggle("revealed"); };
+  wrap.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+function runHexeHealStep() {
+  const hexeName = findRoleHolderName("hexe");
+  const healLeft = game.witchHealAvailable ? 1 : 0;
+  const poisonLeft = game.witchPoisonAvailable ? 1 : 0;
+  const canHeal = game.witchHealAvailable && !!nightWolfTarget;
+
+  if (!canHeal) { runHexePoisonStep(); return; }
+
+  setNarr("Nacht "+game.day, "Soll die Hexe <em>heilen</em>?", `Das Opfer der Wölfe: ${nightWolfTarget}.`, `Heiltrank: ${healLeft}/1 übrig · Gifttrank: ${poisonLeft}/1 übrig`, hexeName);
+  $("#narrGrid").innerHTML = "";
+  $("#narrConfirmBtn").disabled = false;
+  $("#narrConfirmBtn").textContent = "Ja, heilen";
+  $("#narrSkipBtn").style.display = "inline-flex";
+  $("#narrSkipBtn").textContent = "Nein, nicht heilen";
+  $("#narrSkipBtn").onclick = ()=>{ runHexePoisonStep(); };
+  $("#narrConfirmBtn").onclick = ()=>{
+    game.witchHeal = true;
+    game.witchHealAvailable = false;
+    runHexePoisonStep();
+  };
+}
+
+function runHexePoisonStep() {
+  const hexeName = findRoleHolderName("hexe");
+  const healLeft = game.witchHealAvailable ? 1 : 0;
+  const poisonLeft = game.witchPoisonAvailable ? 1 : 0;
+
+  if (!game.witchPoisonAvailable) { nightIndex++; runNightStep(); return; }
+
+  const alreadyDyingName = (nightWolfTarget && !game.witchHeal) ? nightWolfTarget : null;
+  const poisonTargets = alivePlayers().filter(p => p.name !== alreadyDyingName);
+
+  setNarr("Nacht "+game.day, "Will die Hexe <em>vergiften</em>?", "Wähle ein lebendes Ziel oder verzichte auf den Gifttrank.", `Heiltrank: ${healLeft}/1 übrig · Gifttrank: ${poisonLeft}/1 übrig`, hexeName);
+  renderNarrGrid(poisonTargets);
+  $("#narrConfirmBtn").disabled = true;
+  $("#narrConfirmBtn").textContent = "Vergiften";
+  $("#narrSkipBtn").style.display = "inline-flex";
+  $("#narrSkipBtn").textContent = "Nein, Gift behalten";
+  $("#narrSkipBtn").onclick = ()=>{ nightIndex++; runNightStep(); };
+  $("#narrConfirmBtn").onclick = ()=>{
+    game.witchPoisonTarget = $("#narrConfirmBtn").dataset.selected;
+    game.witchPoisonAvailable = false;
+    nightIndex++; runNightStep();
+  };
+}
+function resetNarrButtons() {
+  $("#narrGrid").innerHTML = "";
+  $("#narrConfirmBtn").disabled = false;
+  $("#narrConfirmBtn").textContent = "Weiter";
+  $("#narrConfirmBtn").dataset.selected = "";
+  $("#narrSkipBtn").style.display = "none";
+  $("#narrSkipBtn").textContent = "Niemanden wählen";
+  $("#seherinReveal").style.display = "none";
+}
+
+/* --- Nacht-Ablauf mit Ansage-Zwischenschritten --- */
+let nightQueue = [];
+let nightIndex = 0;
+let nightWolfTarget = null;
+
+function buildNightQueue() {
+  const q = [];
+  q.push({type:"announce", phase:"Nacht "+game.day, title:"Das Dorf <em>schläft ein</em>.", desc:"Alle Spieler schließen die Augen. Der Erzähler übernimmt."});
+  const wolfNames = game.state.filter(p=>p.role==="werwolf" && p.alive).map(p=>p.name).join(", ");
+  q.push({type:"announce", phase:"Nacht "+game.day, title:"Die <em>Werwölfe</em> erwachen.", desc:"Die Wölfe öffnen heimlich die Augen und erkennen sich.", roleName: wolfNames});
+  q.push({type:"action", role:"werwolf"});
+  q.push({type:"announce", phase:"Nacht "+game.day, title:"Die Werwölfe <em>schlafen wieder ein</em>.", desc:"Alle Wölfe schließen erneut die Augen."});
+  if (settings.roles.has("seherin") && game.state.some(p=>p.role==="seherin" && p.alive)) {
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"Die <em>Seherin</em> erwacht.", desc:"Sie öffnet die Augen und wählt einen Spieler.", roleName: findRoleHolderName("seherin")});
+    q.push({type:"action", role:"seherin"});
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"Die Seherin <em>schläft wieder ein</em>.", desc:"Sie schließt die Augen."});
+  }
+  const hexeHasPotions = game.witchHealAvailable || game.witchPoisonAvailable;
+  if (settings.roles.has("hexe") && game.state.some(p=>p.role==="hexe" && p.alive) && hexeHasPotions) {
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"Die <em>Hexe</em> erwacht.", desc:"Sie öffnet die Augen und sieht das Opfer der Wölfe.", roleName: findRoleHolderName("hexe")});
+    q.push({type:"action", role:"hexe"});
+    q.push({type:"announce", phase:"Nacht "+game.day, title:"Die Hexe <em>schläft wieder ein</em>.", desc:"Sie schließt die Augen."});
+  }
+  q.push({type:"announce", phase:"Nacht "+game.day, title:"Die Nacht <em>geht zu Ende</em>.", desc:"Der Erzähler bereitet den Morgen vor."});
+  return q;
+}
+
+function startNight() {
+  game.isNight = true;
+  applyPhaseTheme(true);
+  nightQueue = buildNightQueue();
+  nightIndex = 0;
+  nightWolfTarget = null;
+  runNightStep();
+}
+function runNightStep() {
+  if (nightIndex >= nightQueue.length) { resolveNight(); return; }
+  const step = nightQueue[nightIndex];
+  switchScreen("screen-narr");
+  resetNarrButtons();
+
+  if (step.type === "announce") {
+    setNarr(step.phase, step.title, step.desc, null, step.roleName || null);
+    $("#narrConfirmBtn").textContent = "Weiter";
+    $("#narrConfirmBtn").onclick = ()=>{ nightIndex++; runNightStep(); };
+    return;
+  }
+
+  if (step.role === "werwolf") {
+    setNarr("Nacht "+game.day, "Wen <em>reißen</em> die Wölfe?", "Das Wolfsrudel einigt sich in echt auf ein Opfer. Trage es ein.", null, "Werwölfe");
+    renderNarrGrid(alivePlayers().filter(p=>p.role!=="werwolf"));
+    $("#narrConfirmBtn").disabled = true;
+    $("#narrConfirmBtn").onclick = ()=>{
+      nightWolfTarget = $("#narrConfirmBtn").dataset.selected;
+      nightIndex++; runNightStep();
+    };
+  } else if (step.role === "seherin") {
+    const seherinName = findRoleHolderName("seherin");
+    setNarr("Nacht "+game.day, "Wen <em>durchschaut</em> die Seherin?", "Wähle einen Spieler. Danach erscheint unten seine Karte — zeige sie nur der Seherin.", null, seherinName);
+    renderNarrGrid(alivePlayers().filter(p=>p.name !== seherinName));
+    $("#narrConfirmBtn").disabled = false;
+    $("#narrConfirmBtn").textContent = "Weiter";
+    $("#narrSkipBtn").style.display = "none";
+    $$(".player-choice").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        const name = el.dataset.name;
+        const target = game.state.find(p=>p.name===name);
+        showSeherinCard(target);
+      });
+    });
+    $("#narrConfirmBtn").onclick = ()=>{
+      nightIndex++; runNightStep();
+    };
+  } else if (step.role === "hexe") {
+    runHexeHealStep();
+  }
+}
+
+function resolveNight() {
+  const deaths = [];
+  if (nightWolfTarget && !game.witchHeal) {
+    const t = game.state.find(p=>p.name===nightWolfTarget);
+    if (t && t.alive) deaths.push(t);
+  }
+  if (game.witchPoisonTarget) {
+    const t = game.state.find(p=>p.name===game.witchPoisonTarget);
+    if (t && t.alive && !deaths.includes(t)) deaths.push(t);
+  }
+  game.witchHeal = false;
+  game.witchPoisonTarget = null;
+
+  deaths.forEach(d=>d.alive=false);
+  game.isNight = false;
+  applyPhaseTheme(false);
+
+  processDeathQueue(deaths, ()=>{
+    const winner = checkWin();
+    if (winner) { showResult(winner); return; }
+    if (game.mayorEnabled && !game.mayorDone) {
+      startMayorVote(()=>{ game.mayorDone = true; startDay(); });
+    } else {
+      startDay();
+    }
+  });
+}
+
+/* ================= DEATH REVEAL SEQUENCE ================= */
+function processDeathQueue(deaths, onDone) {
+  if (!deaths.length) { onDone(); return; }
+  if (!game.revealEnabled) { handleJaegerChain(deaths, onDone); return; }
+  let idx = 0;
+  switchScreen("screen-death");
+  $("#deathLede").textContent = deaths.length>1 ? "Mehrere Dorfmitglieder sind gestorben." : "Ein Dorfmitglied ist gestorben.";
+  function showNext() {
+    if (idx >= deaths.length) { handleJaegerChain(deaths, onDone); return; }
+    const p = deaths[idx];
+    $("#deathPlayerLabel").textContent = p.name;
+    $("#deathFlipCard").classList.remove("revealed");
+    const info = ROLE_INFO[p.role];
+    const deathFrontEl = $("#deathCardFront");
+    deathFrontEl.className = "card-face card-front";
+    deathFrontEl.style.setProperty("--role-color", info.color);
+    deathFrontEl.innerHTML = `
+      <div class="cf-eyebrow">Rolle aufgedeckt</div>
+      ${info.icon}
+      <div class="cf-role">${info.label}</div>
+      <div class="cf-divider"></div>
+      <div class="cf-team">${p.role==='werwolf' ? 'Team Werwölfe' : 'Team Dorf'}</div>
+    `;
+    idx++;
+  }
+  showNext();
+  $("#deathFlipCard").onclick = ()=>{ $("#deathFlipCard").classList.toggle("revealed"); };
+  $("#deathNextBtn").onclick = ()=>{ showNext(); };
+}
+function handleJaegerChain(deaths, onDone) {
+  const jaeger = deaths.find(p=>p.role==="jaeger");
+  if (jaeger) {
+    switchScreen("screen-narr");
+    resetNarrButtons();
+    setNarr("Rache", "Der <em>Jäger</em> feuert", `${jaeger.name} ist gestorben. Wer wird mitgenommen?`, null, jaeger.name);
+    renderNarrGrid(alivePlayers());
+    $("#narrConfirmBtn").disabled = true;
+    $("#narrSkipBtn").style.display = "inline-flex";
+    $("#narrSkipBtn").onclick = ()=>{ onDone(); };
+    $("#narrConfirmBtn").onclick = ()=>{
+      const name = $("#narrConfirmBtn").dataset.selected;
+      const t = game.state.find(p=>p.name===name);
+      t.alive = false;
+      processDeathQueue([t], onDone);
+    };
+  } else {
+    onDone();
+  }
+}
+
+/* ================= WIN CHECK ================= */
+function checkWin() {
+  const alive = alivePlayers();
+  const wolves = alive.filter(p=>p.role==="werwolf");
+  const villagers = alive.filter(p=>p.role!=="werwolf");
+  if (wolves.length === 0) return "dorf";
+  if (wolves.length >= villagers.length) return "wolf";
+  return null;
+}
+
+/* --- Bürgermeisterwahl (nach der ersten Nacht) --- */
+function startMayorVote(onDone) {
+  switchScreen("screen-narr");
+  applyPhaseTheme(false);
+  resetNarrButtons();
+  setNarr("Nach der ersten Nacht", "Wer wird <em>Bürgermeister</em>?", "Das Dorf stimmt in echt ab. Trage das Ergebnis ein.");
+  renderNarrGrid(alivePlayers());
+  $("#narrConfirmBtn").disabled = true;
+  $("#narrConfirmBtn").onclick = ()=>{
+    const name = $("#narrConfirmBtn").dataset.selected;
+    game.state.forEach(p=>p.isMayor = (p.name===name));
+    onDone();
+  };
+}
+
+/* ================= TAG-PHASE ================= */
+function startDay() {
+  applyPhaseTheme(false);
+  switchScreen("screen-narr");
+  resetNarrButtons();
+  const mutedNote = null;
+  setNarr("Tag "+game.day, "Das Dorf <em>erwacht</em>.", "Diskutiert offen: wer ist verdächtig? Bestimmt danach per Handzeichen, wer gehängt wird.");
+  renderNarrGrid(alivePlayers());
+  $("#narrConfirmBtn").disabled = true;
+  $("#narrConfirmBtn").textContent = "Gehängt";
+  $("#narrSkipBtn").style.display = "inline-flex";
+  $("#narrSkipBtn").textContent = "Niemand wird gehängt";
+  $("#narrSkipBtn").onclick = ()=>{
+    game.day++;
+    checkWinOrStartNight();
+  };
+  $("#narrConfirmBtn").onclick = ()=>{
+    const name = $("#narrConfirmBtn").dataset.selected;
+    const t = game.state.find(p=>p.name===name);
+    const wasMayor = t.isMayor;
+    t.alive = false;
+    game.day++;
+    processDeathQueue([t], ()=>{
+      if (wasMayor && game.mayorEnabled) {
+        chooseMayorSuccessor(()=>{
+          const winner = checkWin();
+          if (winner) showResult(winner); else startNight();
+        });
+      } else {
+        const winner = checkWin();
+        if (winner) showResult(winner); else startNight();
+      }
+    });
+  };
+}
+function checkWinOrStartNight() {
+  const winner = checkWin();
+  if (winner) showResult(winner); else startNight();
+}
+function chooseMayorSuccessor(onDone) {
+  switchScreen("screen-narr");
+  resetNarrButtons();
+  setNarr("Nachfolge", "Der <em>Bürgermeister</em> bestimmt", "Der verstorbene Bürgermeister wählt selbst seinen Nachfolger.");
+  renderNarrGrid(alivePlayers());
+  $("#narrConfirmBtn").disabled = true;
+  $("#narrConfirmBtn").onclick = ()=>{
+    const name = $("#narrConfirmBtn").dataset.selected;
+    game.state.forEach(p=>p.isMayor = (p.name===name));
+    onDone();
+  };
+}
+
+/* ================= RESULT ================= */
+function showResult(winner) {
+  switchScreen("screen-result");
+  applyPhaseTheme(false);
+  $("#resultHeadline").textContent = winner === "dorf" ? "Das Dorf gewinnt" : "Die Werwölfe gewinnen";
+  $("#resultLede").textContent = winner === "dorf" ? "Alle Werwölfe wurden gefunden." : "Die Wölfe haben das Dorf überwältigt.";
+  $("#resultList").innerHTML = game.state.map(p=>`
+    <div class="reveal-row${p.role==='werwolf'?' wolf':''}">
+      <span class="who">${p.name}${p.isMayor?' ★':''}</span>
+      <span class="what">${ROLE_INFO[p.role].label}${p.alive?'':' · gestorben'}</span>
+    </div>`).join("");
+
+  const survivors = alivePlayers();
+  const survivorsWrap = $("#survivorsGrid");
+  if (survivorsWrap) {
+    survivorsWrap.innerHTML = survivors.map(p=>{
+      const info = ROLE_INFO[p.role];
+      return `<div class="survivor-tile" style="--role-color:${info.color}">
+        <div class="survivor-icon">${info.icon}</div>
+        <div class="survivor-name">${p.name}${p.isMayor?' ★':''}</div>
+        <div class="survivor-role">${info.label}</div>
+      </div>`;
+    }).join("");
+  }
+}
+$("#newRoundBtn").addEventListener("click", ()=>{ startGame(); });
+$("#backMenuBtn").addEventListener("click", ()=>{ switchScreen("screen-setup"); applyPhaseTheme(false); });
+</script>
+</body>
+</html>
