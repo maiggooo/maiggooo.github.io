@@ -161,6 +161,17 @@
   .overlay h3 { font-family:'Fraunces', serif; font-size:24px; margin-bottom:8px; }
   .overlay p { color:var(--ink-soft); margin-bottom:16px; }
 
+  /* Admin mode (secret: tap the title 5×) */
+  .admin-only { display:none !important; }
+  body.admin .admin-only { display:revert !important; }
+  .admin-bar { position:fixed; left:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:9999; display:flex; gap:6px; align-items:center;
+    background:var(--ink); color:var(--paper); padding:6px 10px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; box-shadow:3px 3px 0 var(--accent); }
+  body.admin .admin-bar { display:flex !important; }
+  .admin-bar label { display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .admin-bar input { accent-color:var(--accent); width:16px; height:16px; }
+  .bot-row { gap:8px; margin-top:10px; }
+  body.admin .bot-row { display:flex !important; }
+  .bot-row .btn { flex:1; }
   details.rules { margin-top:22px; border-top:1px solid var(--rule-soft); padding-top:10px; }
   details.rules summary { cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
   details.rules ul { margin:10px 0 0 18px; display:grid; gap:6px; color:var(--ink-soft); font-size:15px; }
@@ -241,6 +252,11 @@
     <div class="section-title">Am Tisch <span class="count" id="lobbyCount"></span></div>
     <ul class="plist" id="lobbyPlayers"></ul>
 
+    <div class="bot-row admin-only">
+      <button class="btn ghost" id="addBotBtn">+ Bot</button>
+      <button class="btn ghost" id="removeBotsBtn">Bots entfernen</button>
+    </div>
+
     <div class="section-title">Regeln</div>
     <label class="switch"><input type="checkbox" id="optNoEven"> Ansagen dürfen nicht aufgehen <small style="color:var(--muted)">(der Geber darf nicht so ansagen, dass die Summe der Stichzahl entspricht)</small></label>
 
@@ -271,6 +287,7 @@
       <div class="hand" id="hand"></div>
       <div class="hint" id="hint"></div>
     </div>
+    <button class="btn ghost block" id="leaveGameBtn" style="margin-top:22px">Raum verlassen</button>
   </section>
 
   <!-- ============= ROUND / GAME END ============= -->
@@ -285,6 +302,11 @@
     <span>Strauss · Biebergemünd</span>
     <span>© SS 2026 — Editorial edition</span>
   </footer>
+</div>
+
+<div class="admin-bar admin-only" id="adminBar">
+  <span>Admin</span>
+  <label><input type="checkbox" id="autoMe"> Autoplay</label>
 </div>
 
 <div class="overlay" id="awayOverlay">
@@ -498,6 +520,7 @@ async function join(code) {
 }
 
 async function leaveRoom() {
+  await removeBots();
   store.del("wz-session");
   history.replaceState(null, "", location.pathname);
   room = null;
@@ -507,6 +530,7 @@ async function leaveRoom() {
   showScreen("screen-start");
 }
 $("#leaveLobbyBtn").addEventListener("click", leaveRoom);
+$("#leaveGameBtn").addEventListener("click", () => { if (confirm("Wirklich verlassen? Die Partie kann dann nicht weitergehen.")) leaveRoom(); });
 
 $("#shareBtn").addEventListener("click", async () => {
   const url = location.origin + location.pathname + "?r=" + getMp().code;
@@ -542,6 +566,7 @@ function onRoom(r) {
   if (!r) { leaveRoom(); $("#startError").textContent = "Der Raum wurde geschlossen."; return; }
   room = r;
   const s = norm(r.state || { phase: "lobby" });
+  if (admin && $("#autoMe").checked) { autoMe.mp = getMp(); autoMe.id = me(); botThink(autoMe, r); }
   $("#roomMeta").textContent = "Raum " + r.code;
   if (s.phase === "lobby") return renderLobby(r, s);
   if (s.phase === "roundEnd" || s.phase === "gameEnd") renderScore(r, s);
@@ -677,6 +702,98 @@ function renderAway(r, s) {
 }
 
 /* =========================================================
+   ADMIN MODE — secret: tap the "Wizard" title 5× (or open ?admin)
+   Bots join as real players from this page and play by themselves.
+========================================================= */
+let admin = false;
+try { admin = localStorage.getItem("wz-admin") === "1" || new URLSearchParams(location.search).has("admin"); } catch {}
+function setAdmin(on) {
+  admin = on;
+  document.body.classList.toggle("admin", on);
+  try { localStorage.setItem("wz-admin", on ? "1" : "0"); } catch {}
+  $("#roomMeta").textContent = on ? "Admin-Modus an" : (getMp().code ? "Raum " + getMp().code : "Online · 3–6 Spieler");
+  if (room) onRoom(room);
+}
+setAdmin(admin);
+let taps = [];
+document.querySelector(".mast .brand").addEventListener("click", () => {
+  const now = Date.now();
+  taps = taps.filter(t => now - t < 2500).concat(now);
+  if (taps.length >= 5) { taps = []; setAdmin(!admin); }
+});
+
+const autoMe = { key: "" };   // "Autoplay" lets the bot logic play your own seat
+const BOT_NAMES = ["Merlin", "Gandalf", "Morgana", "Dumbledore", "Saruman", "Circe"];
+let bots = [];
+
+async function addBot() {
+  if (!getMp().code) return;
+  const players = Object.keys(room?.players || {});
+  if (players.length >= 6) return;
+  const used = new Set(Object.values(room.players).map(p => p.name));
+  const name = "Bot " + (BOT_NAMES.find(n => !used.has("Bot " + n)) || bots.length + 1);
+  const id = "bot-" + Math.random().toString(36).slice(2, 8);
+  await spawnBot(getMp().code, id, name);
+  saveBots();
+}
+async function spawnBot(code, id, name) {
+  const bmp = Multiplayer.create("wizard", { maxPlayers: 6, playerId: id });
+  await bmp.join(code, name);
+  const bot = { id, name, mp: bmp, key: "" };
+  bmp.onChange(r => r && botThink(bot, r));
+  bots.push(bot);
+}
+async function removeBots() {
+  const list = bots; bots = [];
+  saveBots();
+  await Promise.all(list.map(b => b.mp.leave()));
+}
+function saveBots() { store.set("wz-bots", bots.map(b => ({ id: b.id, name: b.name }))); }
+async function restoreBots(code) {
+  for (const b of store.get("wz-bots") || []) { try { await spawnBot(code, b.id, b.name); } catch {} }
+}
+$("#addBotBtn").addEventListener("click", addBot);
+$("#removeBotsBtn").addEventListener("click", removeBots);
+
+// Simple but sensible play: bid on strong cards, chase tricks only while short of the bid
+function botThink(bot, r) {
+  const s = norm(JSON.parse(JSON.stringify(r.state || {})));
+  const id = bot.id, turnId = s.order?.[s.turn];
+  let move = null;
+  if (s.phase === "trumpPick" && s.order[s.dealer] === id) move = () => {
+    const count = k => s.hands[id].filter(c => suitOf(c) === k).length;
+    const best = "RBGY".split("").sort((a, b) => count(b) - count(a))[0];
+    return st => applyTrump(st, id, best);
+  };
+  else if (s.phase === "bidding" && turnId === id) move = () => {
+    const t = s.trump.suit, hand = s.hands[id];
+    let bid = hand.filter(c => isZ(c) || (t && suitOf(c) === t && valOf(c) >= 9) || (!isN(c) && !isZ(c) && suitOf(c) !== t && valOf(c) === 13)).length;
+    bid = Math.min(bid, s.round);
+    if (bid === forbiddenBid(s)) bid = bid > 0 ? bid - 1 : bid + 1;
+    return st => applyBid(st, id, bid);
+  };
+  else if (s.phase === "playing" && turnId === id) move = () => {
+    const hand = s.hands[id], t = s.trump.suit, ls = leadSuit(s.trick);
+    const legal = hand.filter(c => canPlay(hand, c, s.trick));
+    const power = c => isZ(c) ? 100 : isN(c) ? -1 : (suitOf(c) === t ? 50 : suitOf(c) === ls ? 25 : 0) + valOf(c);
+    legal.sort((a, b) => power(a) - power(b));
+    const want = (s.bids[id] || 0) > (s.tricksWon[id] || 0);
+    const card = want ? legal[legal.length - 1] : legal[0];
+    return st => applyPlay(st, id, card);
+  };
+  else if (s.phase === "roundEnd" && !s.ready[id]) move = () => st => applyReady(st, id);
+  if (!move) return;
+  // One decision per situation, with a short human-ish pause
+  const key = [s.phase, s.round, s.turn, s.trickNo, s.trick.length].join(":");
+  if (bot.key === key) return;
+  bot.key = key;
+  setTimeout(() => {
+    const fn = move();
+    bot.mp.transaction("state", st => { if (!st) return st; norm(st); return fn(st) === false ? undefined : st; });
+  }, 500 + Math.random() * 600);
+}
+
+/* =========================================================
    START-UP
 ========================================================= */
 try { $("#nameInput").value = localStorage.getItem("wz-name") || ""; } catch {}
@@ -687,7 +804,7 @@ if (urlCode) $("#codeInput").value = urlCode.toUpperCase();
 (async () => {
   const sess = store.get("wz-session");
   if (!sess) return;
-  try { await getMp().join(sess.code, sess.name); await enterRoom(getMp().code, sess.name); }
+  try { await getMp().join(sess.code, sess.name); await enterRoom(getMp().code, sess.name); await restoreBots(sess.code); }
   catch { store.del("wz-session"); }
 })();
 </script>
