@@ -96,7 +96,31 @@ function initAds() {
   setInterval(cycleAds, 10000);
 }
 
+// Fade elements in as they scroll into view. Pages opt in with data-reveal;
+// the home page tiles get it automatically.
+function initReveal() {
+  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // Only hide what starts below the fold, so nothing visible ever blinks out
+  const els = [...document.querySelectorAll(".tile, [data-reveal]")]
+    .filter(el => el.getBoundingClientRect().top > innerHeight);
+  if (!els.length) return;
+  let fired = false;
+  const show = el => { el.classList.add("in"); io.unobserve(el); };
+  const io = new IntersectionObserver(entries => {
+    fired = true;
+    let batch = 0;
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.style.setProperty("--reveal-delay", (batch++ * 0.07) + "s");
+      show(e.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  els.forEach(el => { el.classList.add("reveal"); io.observe(el); });
+  // Safety net: if the observer never reports (some embedded views), show everything
+  setTimeout(() => { if (!fired) els.forEach(show); }, 1500);
+}
+
 initTheme();
 // Some pages put the ad slots after their scripts, so wait for the full page.
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initAds);
-else initAds();
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => { initAds(); initReveal(); });
+else { initAds(); initReveal(); }
