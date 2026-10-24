@@ -72,7 +72,8 @@
   .plist { list-style:none; display:grid; gap:6px; }
   .plist li { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--rule-soft); font-family:'Fraunces', serif; font-size:18px; }
   .plist li small { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
-  .switch { display:flex; align-items:center; gap:10px; cursor:pointer; font-size:15px; color:var(--ink-soft); padding:6px 0; }
+  .switch { display:flex; flex-wrap:wrap; align-items:center; gap:2px 10px; cursor:pointer; font-size:15px; color:var(--ink-soft); padding:6px 0; }
+  .switch small { flex-basis:100%; padding-left:30px; font-size:13px; }
   .switch input { width:20px; height:20px; accent-color:var(--accent); }
 
   /* Cards */
@@ -89,7 +90,14 @@
   .card.s-R, .card.s-B, .card.s-G, .card.s-Y { background:color-mix(in srgb, var(--c) 10%, var(--paper)); }
   .card.z { background:#1a1a1a; color:#f4d97a; border-color:#f4d97a; font-style:italic; }
   .card.n { background:repeating-linear-gradient(45deg, var(--paper) 0 6px, var(--paper-2) 6px 12px); color:var(--muted); border-color:var(--muted); border-style:dashed; font-style:italic; }
+  .card.x { flex-direction:column; gap:2px; background:linear-gradient(160deg, #2b2440, #18131f); color:#f4d97a; border-color:#b89cf0; }
+  .card.x .ic { font-size:24px; line-height:1; font-family:system-ui, sans-serif; }
+  .card.x .nm { font-family:'JetBrains Mono', monospace; font-size:7.5px; letter-spacing:.04em; font-weight:700; text-transform:uppercase; max-width:100%; overflow:hidden; text-overflow:ellipsis; padding:0 2px; }
+  .card.back { background:repeating-linear-gradient(135deg, var(--accent) 0 5px, color-mix(in srgb, var(--accent) 70%, #000) 5px 10px); color:#fff; border-color:var(--accent); font-style:italic; }
+  .card.dead { opacity:.4; }
   .card.big { width:66px; height:96px; font-size:30px; }
+  .card.big.x .ic { font-size:30px; } .card.big.x .nm { font-size:8.5px; }
+  .card.tiny.x .ic { font-size:16px; } .card.tiny.x .nm { display:none; }
   .card.tiny { width:34px; height:50px; font-size:15px; border-radius:4px; }
   .card.tiny::before, .card.tiny::after { display:none; }
 
@@ -109,6 +117,8 @@
   .seat .score { font-family:'Fraunces', serif; font-weight:800; font-size:17px; }
   .seat .meta { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.04em; color:var(--muted); margin-top:3px; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; }
   .seat .meta b { color:var(--ink); font-weight:700; }
+  .seat .tag.start { color:var(--ok); }
+  .seat .peek { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
   .seat .tag { font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); border:1px solid currentColor; padding:0 4px; }
 
   .table {
@@ -122,6 +132,15 @@
   .trick .play span { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:var(--muted); max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .trick .play.win .card { box-shadow:0 0 0 3px var(--accent); }
   .trick .play.win span { color:var(--accent); font-weight:700; }
+  .trick .play em { font-family:'JetBrains Mono', monospace; font-size:9.5px; font-style:normal; color:var(--ink-soft); }
+  .trick .card.ok { cursor:pointer; } .trick .card.sel { box-shadow:0 0 0 3px var(--accent); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:8px 12px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); cursor:pointer;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.06em; transition:background .15s, color .15s; }
+  .chip.on { background:var(--ink); color:var(--paper); }
+  .chip:disabled { cursor:default; opacity:.7; }
+  .opt-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:14px 0 8px; font-size:15px; color:var(--ink-soft); }
+  .opt-head .btn { min-height:36px; padding:6px 12px; font-size:10.5px; }
   @keyframes deal { from { opacity:0; transform:translateY(14px) scale(.9); } }
 
   .panel { margin-top:12px; }
@@ -237,7 +256,12 @@
         <li>Jeder sagt an, wie viele Stiche er holt. Dann wird gespielt: Farbe bedienen, Zauberer und Narr gehen immer.</li>
         <li>Der erste Zauberer gewinnt den Stich, sonst der höchste Trumpf, sonst die höchste Karte der ausgespielten Farbe.</li>
         <li>Richtig angesagt: 20 Punkte + 10 pro Stich. Daneben: −10 pro Stich Abweichung.</li>
+        <li>Wer ansagt und ausspielt, wechselt jede Runde: Es beginnt immer die Person links vom Geber, und der Geber rückt eins weiter.</li>
+        <li>Blindrunde (einstellbar): In Runde 1 siehst du die Karte der anderen, aber nicht deine eigene.</li>
       </ul>
+      <div style="margin-top:12px; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)">Sonderkarten (einzeln zuschaltbar)</div>
+      <ul id="specialRules"></ul>
+      <p class="note">Sonderkarten dürfen immer gespielt werden. Liegt eine als Trumpfkarte: Drache, Wolke, Jongleur, Gestaltwandler und Vampir — der Geber wählt Trumpf; Fee, Bombe und Hexe — kein Trumpf; Werwolf — die nächste Karte entscheidet.</p>
     </details>
   </section>
 
@@ -258,7 +282,11 @@
     </div>
 
     <div class="section-title">Regeln</div>
+    <label class="switch"><input type="checkbox" id="optBlind"> Blindrunde <small style="color:var(--muted)">(Runde 1: Du siehst die Karten der anderen, aber nicht deine eigene)</small></label>
     <label class="switch"><input type="checkbox" id="optNoEven"> Ansagen dürfen nicht aufgehen <small style="color:var(--muted)">(der Geber darf nicht so ansagen, dass die Summe der Stichzahl entspricht)</small></label>
+
+    <div class="opt-head"><span>Sonderkarten <small style="color:var(--muted)" id="specialCount"></small></span><button class="btn ghost" id="specialAll">Alle an</button></div>
+    <div class="chips" id="specialChips"></div>
 
     <div style="margin-top:18px; display:grid; gap:10px;">
       <button class="btn accent block" id="startBtn" disabled>Spiel starten</button>
@@ -324,67 +352,146 @@
 <script>
 /* =========================================================
    RULES — pure functions on the shared state
-   Cards: "R7" = Rot 7 (suits R, B, G, Y; 1–13), "Z1".."Z4" Zauberer, "N1".."N4" Narr
+   Cards: "R7" = Rot 7 (suits R, B, G, Y; 1–13), "Z1".."Z4" Zauberer, "N1".."N4" Narr.
+   Special cards (anniversary editions, each can be switched on in the lobby):
+   XD Drache, XF Fee, XB Bombe, XW Werwolf, XJ Jongleur, XC Wolke, XS Gestaltwandler, XV Vampir, XH Hexe
 ========================================================= */
 const SUITS = { R:"Rot", B:"Blau", G:"Grün", Y:"Gelb" };
-const isZ = c => c[0] === "Z", isN = c => c[0] === "N";
-const suitOf = c => (isZ(c) || isN(c)) ? null : c[0];
+const SPECIALS = {
+  XD: { name:"Drache",         icon:"🐉", text:"Schlägt alles, auch Zauberer — nur nicht die Fee." },
+  XF: { name:"Fee",            icon:"🧚", text:"Verliert gegen alles, sogar gegen Narren. Liegt der Drache im Stich, gewinnt die Fee." },
+  XB: { name:"Bombe",          icon:"💣", text:"Den Stich bekommt niemand. Wer die höchste Karte gelegt hat, spielt aus." },
+  XW: { name:"Werwolf",        icon:"🐺", text:"Wer ihn bekommt, tauscht ihn gegen die Trumpfkarte und bestimmt Trumpf (oder keinen)." },
+  XJ: { name:"Jongleur",       icon:"🤹", text:"Zählt 7½ in einer Farbe deiner Wahl. Danach gibt jeder eine Karte nach links weiter." },
+  XC: { name:"Wolke",          icon:"☁️", text:"Zählt 9¾ in einer Farbe deiner Wahl. Wer den Stich gewinnt, ändert seine Ansage um +1 oder −1." },
+  XS: { name:"Gestaltwandler", icon:"🎭", text:"Spielst du als Zauberer oder als Narr — deine Wahl." },
+  XV: { name:"Vampir",         icon:"🧛", text:"Kopiert die aufgedeckte Trumpfkarte samt ihren Fähigkeiten." },
+  XH: { name:"Hexe",           icon:"🧙", text:"Niedriger als Narr und Fee. Nach dem Stich darfst du eine Handkarte gegen eine Karte aus dem Stich tauschen." },
+};
+const SPECIAL_IDS = Object.keys(SPECIALS);
+const isZ = c => c[0] === "Z", isN = c => c[0] === "N", isX = c => c[0] === "X";
+const isColor = c => !!c && !isZ(c) && !isN(c) && !isX(c);
+const suitOf = c => isColor(c) ? c[0] : null;
 const valOf = c => +c.slice(1);
 
-function newDeck() {
+function newDeck(settings) {
   const d = [];
   for (const s of "RBGY") for (let v = 1; v <= 13; v++) d.push(s + v);
   for (let i = 1; i <= 4; i++) d.push("Z" + i, "N" + i);
+  for (const x of SPECIAL_IDS) if (settings?.specials?.[x]) d.push(x);
   for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; }
   return d;
 }
 const maxRounds = n => Math.floor(60 / n);
 
-// Lead suit of a trick: first colour card, unless a Zauberer came before it (then anything goes)
-function leadSuit(trick) {
-  for (const { c } of trick) { if (isN(c)) continue; if (isZ(c)) return null; return suitOf(c); }
+// What a played card counts as: k = C (colour, with suit/val), Z, N, D (Drache), F (Fee), B (Bombe), H (Hexe)
+function baseEff(c, play) {
+  if (!c) return { k:"N" };
+  if (isZ(c)) return { k:"Z" };
+  if (isN(c)) return { k:"N" };
+  if (isColor(c)) return { k:"C", suit:c[0], val:valOf(c) };
+  switch (c) {
+    case "XD": return { k:"D" };
+    case "XF": return { k:"F" };
+    case "XB": return { k:"B", fx:"B" };
+    case "XH": return { k:"H", fx:"H" };
+    case "XW": return { k:"N" };                       // only playable if there was nothing to swap with
+    case "XJ": return { k:"C", suit:play.s || "R", val:7.5, fx:"J" };
+    case "XC": return { k:"C", suit:play.s || "R", val:9.75, fx:"C" };
+    case "XS": return play.as === "Z" ? { k:"Z" } : { k:"N" };
+  }
+  return { k:"N" };
+}
+function eff(play, s) {
+  if (play.dead) return { k:"N" };                     // card a Hexe slipped into a finished trick
+  if (play.c === "XV") return baseEff(play.v || s.trump.card, play);
+  return baseEff(play.c, play);
+}
+// Which choice a card needs when it is played
+function choiceFor(card, s) {
+  const c = card === "XV" ? s.trump.card : card;
+  if (c === "XJ" || c === "XC") return "suit";
+  if (c === "XS") return "shape";
   return null;
 }
-function canPlay(hand, card, trick) {
-  if (isZ(card) || isN(card)) return true;
-  const ls = leadSuit(trick);
+
+// Lead suit: first colour card (Jongleur/Wolke count with their chosen suit). Narr-like cards
+// are skipped; a Zauberer or Drache first means anything goes.
+function leadSuit(trick, s) {
+  for (const p of trick) {
+    const e = eff(p, s);
+    if (e.k === "C") return e.suit;
+    if (e.k === "Z" || e.k === "D") return null;
+  }
+  return null;
+}
+function canPlay(hand, card, trick, s) {
+  if (!isColor(card)) return true;                     // Zauberer, Narr and all special cards can always be played
+  const ls = leadSuit(trick, s);
   if (!ls || suitOf(card) === ls) return true;
   return !hand.some(c => suitOf(c) === ls);
 }
-// Index of the winning play in a full trick
-function trickWinner(trick, trump) {
-  const z = trick.findIndex(p => isZ(p.c));
+function pickWinner(E, trump) {
+  const d = E.findIndex(e => e.k === "D"), f = E.findIndex(e => e.k === "F");
+  if (d >= 0) return f >= 0 ? f : d;
+  const z = E.findIndex(e => e.k === "Z");
   if (z >= 0) return z;
-  if (trick.every(p => isN(p.c))) return 0;
-  const ls = leadSuit(trick);
-  let best = -1;
-  trick.forEach((p, i) => {
-    if (isN(p.c)) return;
-    const b = best < 0 ? null : trick[best].c;
-    const score = c => (suitOf(c) === trump ? 200 : suitOf(c) === ls ? 100 : 0) + valOf(c);
-    if (best < 0 || score(p.c) > score(b)) best = i;
+  if (!E.some(e => e.k === "C")) {                     // only Narr-like cards: Narr beats Fee beats Hexe
+    for (const k of ["N", "F", "H", "B"]) { const i = E.findIndex(e => e.k === k); if (i >= 0) return i; }
+    return 0;
+  }
+  const ls = E.find(e => e.k === "C").suit;
+  let best = -1, bestScore = -1;
+  E.forEach((e, i) => {
+    if (e.k !== "C") return;
+    const sc = (e.suit === trump ? 200 : e.suit === ls ? 100 : 0) + e.val;
+    if (sc > bestScore) { best = i; bestScore = sc; }
   });
   return best;
 }
+// { winner: index or null (Bombe), lead: index of who opens the next trick }
+function resolveTrick(trick, s) {
+  const E = trick.map(p => eff(p, s));
+  const w = pickWinner(E, s.trump.suit);
+  return { winner: E.some(e => e.k === "B") ? null : w, lead: w, E };
+}
+
 function sortHand(hand, trump) {
-  const rank = c => isZ(c) ? -1 : isN(c) ? 999 : (suitOf(c) === trump ? 0 : 1 + "RBGY".indexOf(suitOf(c))) * 20 + valOf(c);
+  const rank = c => isZ(c) || c === "XD" ? -1 : isX(c) ? 500 + SPECIAL_IDS.indexOf(c) : isN(c) ? 999 :
+    (suitOf(c) === trump ? 0 : 1 + "RBGY".indexOf(suitOf(c))) * 20 + valOf(c);
   return [...hand].sort((a, b) => rank(a) - rank(b));
 }
 function norm(s) {
   s.order ||= []; s.hands ||= {}; s.bids ||= {}; s.tricksWon ||= {}; s.scores ||= {};
   s.trick ||= []; s.history ||= []; s.ready ||= {}; s.settings ||= {}; s.trump ||= {}; s.names ||= {};
+  s.stock ||= []; s.fx ||= []; s.passes ||= {};
+  s.settings.specials ||= {};
   for (const p of s.order) { s.hands[p] ||= []; s.tricksWon[p] ||= 0; s.scores[p] ||= 0; }
   return s;
 }
 
+// Trump from the turned-up card: colour = that suit; Zauberer-like = dealer chooses; Narr-like = none
+function trumpKind(c) {
+  if (!c) return "none";
+  if (isColor(c)) return "suit";
+  if (isZ(c) || ["XD", "XC", "XJ", "XS", "XV"].includes(c)) return "choose";
+  return "none";                                       // Narr, Fee, Bombe, Hexe
+}
 function deal(s) {
-  const n = s.order.length, r = s.round, deck = newDeck();
+  const n = s.order.length, r = s.round, deck = newDeck(s.settings);
   s.hands = {}; s.bids = {}; s.tricksWon = {}; s.ready = {}; s.trick = []; s.lastTrick = null;
+  s.fx = []; s.passes = {}; s.fxPid = null; s.trickWinner = null; s.nextLead = null;
   s.order.forEach((p, i) => { s.hands[p] = deck.slice(i * r, i * r + r); s.tricksWon[p] = 0; });
-  const tc = deck[n * r] || null;
-  s.trump = { card: tc, suit: tc && !isZ(tc) && !isN(tc) ? suitOf(tc) : null };
+  let stock = deck.slice(n * r);
+  // A Werwolf turned up as trump card is set aside and the next card decides
+  while (stock[0] === "XW") stock = stock.slice(1);
+  const tc = stock[0] || null;
+  s.stock = stock.slice(1);
+  s.trump = { card: tc, suit: trumpKind(tc) === "suit" ? suitOf(tc) : null };
   s.trickNo = 0;
-  if (tc && isZ(tc)) { s.phase = "trumpPick"; s.turn = s.dealer; }
+  const wolf = s.order.findIndex(p => s.hands[p].includes("XW"));
+  if (wolf >= 0) { s.phase = "werwolf"; s.turn = wolf; }
+  else if (trumpKind(tc) === "choose") { s.phase = "trumpPick"; s.turn = s.dealer; }
   else { s.phase = "bidding"; s.turn = (s.dealer + 1) % n; }
 }
 function startGame(s, presentOrder, names) {
@@ -396,15 +503,25 @@ function startGame(s, presentOrder, names) {
 function forbiddenBid(s) {
   if (!s.settings.noEven) return null;
   const n = s.order.length;
-  const placed = Object.keys(s.bids).length;
-  if (placed !== n - 1) return null;   // only the last bidder (the dealer) is restricted
+  if (Object.keys(s.bids).length !== n - 1) return null;   // only the last bidder (the dealer) is restricted
   const sum = Object.values(s.bids).reduce((a, b) => a + b, 0);
   const f = s.round - sum;
   return f >= 0 ? f : null;
 }
+function startBidding(s) { s.phase = "bidding"; s.turn = (s.dealer + 1) % s.order.length; }
 function applyTrump(s, pid, suit) {
   if (s.phase !== "trumpPick" || s.order[s.dealer] !== pid || !SUITS[suit]) return false;
-  s.trump.suit = suit; s.phase = "bidding"; s.turn = (s.dealer + 1) % s.order.length;
+  s.trump.suit = suit; startBidding(s);
+}
+// Werwolf holder swaps it for the trump card and names trump (suit or null = no trump)
+function applyWerwolf(s, pid, suit) {
+  if (s.phase !== "werwolf" || s.order[s.turn] !== pid || (suit !== null && !SUITS[suit])) return false;
+  if (s.trump.card) {
+    s.hands[pid] = s.hands[pid].filter(c => c !== "XW").concat(s.trump.card);
+    s.trump.card = "XW";
+  }
+  s.trump.suit = suit;
+  startBidding(s);
 }
 function applyBid(s, pid, bid) {
   if (s.phase !== "bidding" || s.order[s.turn] !== pid || s.bids[pid] !== undefined) return false;
@@ -414,26 +531,85 @@ function applyBid(s, pid, bid) {
   if (Object.keys(s.bids).length === n) { s.phase = "playing"; s.turn = (s.dealer + 1) % n; }
   else s.turn = (s.turn + 1) % n;
 }
-function applyPlay(s, pid, card) {
+function applyPlay(s, pid, card, opt = {}) {
   if (s.phase !== "playing" || s.order[s.turn] !== pid) return false;
   const hand = s.hands[pid];
-  if (!hand.includes(card) || !canPlay(hand, card, s.trick)) return false;
+  if (!hand.includes(card) || !canPlay(hand, card, s.trick, s)) return false;
+  const play = { p: pid, c: card };
+  if (card === "XV") {
+    // Vampir on a swapped-in Werwolf: turn up the next card, it sets trump from now on and is copied
+    if (s.trump.card === "XW" && s.stock.length) {
+      const nc = s.stock.shift();
+      s.trump.card = nc;
+      const k = trumpKind(nc);
+      if (k === "suit") s.trump.suit = suitOf(nc); else if (k === "none") s.trump.suit = null;
+    }
+    play.v = s.trump.card || "N0";
+  }
+  const need = choiceFor(card, s);
+  if (need === "suit") play.s = SUITS[opt.s] ? opt.s : (s.trump.suit || "R");
+  if (need === "shape") play.as = opt.as === "N" ? "N" : "Z";
   s.hands[pid] = hand.filter(c => c !== card);
-  s.trick.push({ p: pid, c: card });
+  s.trick.push(play);
   const n = s.order.length;
-  if (s.trick.length === n) {
-    const w = s.trick[trickWinner(s.trick, s.trump.suit)].p;
-    s.tricksWon[w] = (s.tricksWon[w] || 0) + 1;
-    s.trickWinner = w; s.phase = "trickEnd";
-  } else s.turn = (s.turn + 1) % n;
+  if (s.trick.length < n) { s.turn = (s.turn + 1) % n; return; }
+  const res = resolveTrick(s.trick, s);
+  const w = res.winner === null ? null : s.trick[res.winner].p;
+  if (w) s.tricksWon[w] = (s.tricksWon[w] || 0) + 1;
+  s.trickWinner = w; s.nextLead = s.trick[res.lead].p;
+  // Effects after the trick, in the official order: Jongleur, then Wolke, then Hexe
+  const fx = res.E.map(e => e.fx), cardsLeft = s.hands[s.order[0]].length > 0;
+  s.fx = [];
+  if (fx.includes("J") && cardsLeft) s.fx.push("pass");
+  if (fx.includes("C") && w) s.fx.push("cloud");
+  const hexIdx = fx.indexOf("H");
+  if (hexIdx >= 0 && cardsLeft) { s.fx.push("witch"); s.fxWitch = s.trick[hexIdx].p; }
+  s.phase = "trickEnd";
 }
 function applyAdvance(s, trickNo) {
   if (s.phase !== "trickEnd" || s.trickNo !== trickNo) return false;
-  const w = s.trickWinner;
-  s.lastTrick = { cards: s.trick, winner: w };
-  s.trick = []; s.trickNo++;
+  if (s.fx.length) { s.phase = s.fx[0]; s.passes = {}; return; }
+  finishTrick(s);
+}
+function nextEffect(s) {
+  s.fx = s.fx.slice(1);
+  if (s.fx.length) { s.phase = s.fx[0]; s.passes = {}; }
+  else finishTrick(s);
+}
+function finishTrick(s) {
+  s.lastTrick = { cards: s.trick, winner: s.trickWinner || null };
+  s.trick = []; s.trickNo++; s.fx = []; s.passes = {}; s.fxWitch = null;
   if (s.order.every(p => !s.hands[p].length)) scoreRound(s);
-  else { s.phase = "playing"; s.turn = s.order.indexOf(w); }
+  else { s.phase = "playing"; s.turn = s.order.indexOf(s.nextLead); }
+}
+// Jongleur: everyone picks a card; when all have, each passes it to the left neighbour
+function applyPass(s, pid, card) {
+  if (s.phase !== "pass" || s.passes[pid] || !s.hands[pid].includes(card)) return false;
+  s.passes[pid] = card;
+  if (!s.order.every(p => s.passes[p])) return;
+  const n = s.order.length, give = { ...s.passes };
+  s.order.forEach(p => { s.hands[p] = s.hands[p].filter(c => c !== give[p]); });
+  s.order.forEach((p, i) => { s.hands[s.order[(i + 1) % n]].push(give[p]); });
+  nextEffect(s);
+}
+// Wolke: the trick winner moves their bid one up or down
+function applyCloud(s, pid, d) {
+  if (s.phase !== "cloud" || s.trickWinner !== pid || (d !== 1 && d !== -1)) return false;
+  const b = (s.bids[pid] || 0) + d;
+  if (b < 0) return false;
+  s.bids[pid] = b;
+  nextEffect(s);
+}
+// Hexe: swap one hand card for one card from the trick (not a Hexe); null = don't swap
+function applyWitch(s, pid, handCard, trickIdx) {
+  if (s.phase !== "witch" || s.fxWitch !== pid) return false;
+  if (handCard !== null) {
+    const t = s.trick[trickIdx];
+    if (!t || t.c === "XH" || !s.hands[pid].includes(handCard)) return false;
+    s.hands[pid] = s.hands[pid].filter(c => c !== handCard).concat(t.c);
+    s.trick[trickIdx] = { p: pid, c: handCard, dead: true };
+  }
+  nextEffect(s);
 }
 function scoreRound(s) {
   const res = {};
@@ -457,6 +633,7 @@ function toLobby(s) {
   for (const k of Object.keys(s)) delete s[k];
   s.phase = "lobby"; s.settings = settings;
 }
+const isBlind = s => !!s.settings.blind && s.round === 1;
 
 /* =========================================================
    CONNECTION
@@ -468,7 +645,7 @@ const store = {
   set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch {} },
   del(k) { try { sessionStorage.removeItem(k); } catch {} }
 };
-let mp = null, room = null, selected = null, advanceTimer = null;
+let mp = null, room = null, selected = null, selectedTrick = null, advanceTimer = null;
 
 function getMp() { return mp ||= Multiplayer.create("wizard", { maxPlayers: 6 }); }
 const me = () => getMp().me;
@@ -499,10 +676,11 @@ async function enterRoom(code, name) {
   getMp().onChange(onRoom);
 }
 
+const DEFAULT_SETTINGS = { noEven: false, blind: true, specials: Object.fromEntries(SPECIAL_IDS.map(x => [x, false])) };
 $("#createBtn").addEventListener("click", async () => {
   const name = myName(); if (!name) return;
   $("#createBtn").disabled = true;
-  try { const code = await getMp().host(name, { phase: "lobby", settings: { noEven: false } }); await enterRoom(code, name); }
+  try { const code = await getMp().host(name, { phase: "lobby", settings: DEFAULT_SETTINGS }); await enterRoom(code, name); }
   catch (e) { $("#startError").textContent = "Raum konnte nicht erstellt werden. Internet da?"; console.error(e); }
   $("#createBtn").disabled = false;
 });
@@ -541,7 +719,23 @@ $("#shareBtn").addEventListener("click", async () => {
   } catch {}
 });
 
-$("#optNoEven").addEventListener("change", e => act(s => { if (s.phase !== "lobby") return false; s.settings.noEven = e.target.checked; }));
+// Lobby settings (host only). Read the new value before act(): act() triggers a re-render
+// that would otherwise reset the control before the transaction reads it.
+function setSetting(fn) { return act(s => { if (s.phase !== "lobby") return false; fn(s.settings); }); }
+$("#optNoEven").addEventListener("change", e => { const v = e.target.checked; setSetting(st => { st.noEven = v; }); });
+$("#optBlind").addEventListener("change", e => { const v = e.target.checked; setSetting(st => { st.blind = v; }); });
+$("#specialAll").addEventListener("click", () => {
+  const on = !SPECIAL_IDS.every(x => room?.state?.settings?.specials?.[x]);
+  setSetting(st => { st.specials = Object.fromEntries(SPECIAL_IDS.map(x => [x, on])); });
+});
+$("#specialChips").innerHTML = SPECIAL_IDS.map(x =>
+  `<button class="chip" data-x="${x}" title="${esc(SPECIALS[x].text)}">${SPECIALS[x].icon} ${SPECIALS[x].name}</button>`).join("");
+$("#specialChips").querySelectorAll("[data-x]").forEach(b => b.addEventListener("click", () => {
+  const x = b.dataset.x, v = !room?.state?.settings?.specials?.[x];
+  setSetting(st => { st.specials = { ...(st.specials || {}), [x]: v }; });
+}));
+$("#specialRules").innerHTML = SPECIAL_IDS.map(x => `<li><b>${SPECIALS[x].icon} ${SPECIALS[x].name}:</b> ${SPECIALS[x].text}</li>`).join("");
+
 $("#startBtn").addEventListener("click", () => act(s => {
   if (s.phase !== "lobby") return false;
   const present = Object.entries(room.players || {}).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)).map(([id]) => id);
@@ -555,11 +749,22 @@ $("#abortBtn").addEventListener("click", () => act(s => { toLobby(s); }));
 ========================================================= */
 const nameOf = id => esc(room?.players?.[id]?.name || room?.state?.names?.[id] || "?");
 
-function cardHTML(c, cls = "") {
+function cardHTML(c, cls = "", extra = "") {
   if (!c) return "";
-  if (isZ(c)) return `<div class="card z ${cls}" data-v="Z" data-c="${c}" title="Zauberer">Z</div>`;
-  if (isN(c)) return `<div class="card n ${cls}" data-v="N" data-c="${c}" title="Narr">N</div>`;
-  return `<div class="card s-${suitOf(c)} ${cls}" data-v="${valOf(c)}" data-c="${c}" title="${SUITS[suitOf(c)]} ${valOf(c)}">${valOf(c)}</div>`;
+  if (c === "?") return `<div class="card back ${cls}" data-c="?" title="Verdeckt">?</div>`;
+  if (isZ(c)) return `<div class="card z ${cls}" data-v="Z" data-c="${c}" title="Zauberer">Z${extra}</div>`;
+  if (isN(c)) return `<div class="card n ${cls}" data-v="N" data-c="${c}" title="Narr">N${extra}</div>`;
+  if (isX(c)) return `<div class="card x x-${c} ${cls}" data-c="${c}" title="${esc(SPECIALS[c].name + ": " + SPECIALS[c].text)}"><span class="ic">${SPECIALS[c].icon}</span><span class="nm">${SPECIALS[c].name}</span>${extra}</div>`;
+  return `<div class="card s-${suitOf(c)} ${cls}" data-v="${valOf(c)}" data-c="${c}" title="${SUITS[suitOf(c)]} ${valOf(c)}">${valOf(c)}${extra}</div>`;
+}
+// Small note under a played special card: chosen suit, shape or copied card
+function playNote(p, s) {
+  if (p.dead) return "getauscht";
+  const parts = [];
+  if (p.c === "XV" && p.v) parts.push("als " + (isX(p.v) ? SPECIALS[p.v].name : isZ(p.v) ? "Zauberer" : isN(p.v) ? "Narr" : SUITS[p.v[0]] + " " + valOf(p.v)));
+  if (p.s) parts.push(SUITS[p.s]);
+  if (p.as) parts.push(p.as === "Z" ? "Zauberer" : "Narr");
+  return parts.join(" · ");
 }
 
 function onRoom(r) {
@@ -585,8 +790,14 @@ function renderLobby(r, s) {
   $("#lobbyPlayers").innerHTML = players.map(([id, p]) =>
     `<li>${esc(p.name)} <small>${id === host ? "Gastgeber" : ""}${id === me() ? (id === host ? " · du" : "du") : ""}</small></li>`).join("");
   const isHost = host === me();
-  $("#optNoEven").checked = !!s.settings.noEven;
-  $("#optNoEven").disabled = !isHost;
+  const st = s.settings;
+  $("#optNoEven").checked = !!st.noEven; $("#optNoEven").disabled = !isHost;
+  $("#optBlind").checked = !!st.blind;   $("#optBlind").disabled = !isHost;
+  const onCount = SPECIAL_IDS.filter(x => st.specials[x]).length;
+  $("#specialAll").textContent = onCount === SPECIAL_IDS.length ? "Alle aus" : "Alle an";
+  $("#specialAll").disabled = !isHost;
+  $("#specialCount").textContent = onCount ? `${onCount} von ${SPECIAL_IDS.length}` : "aus";
+  $("#specialChips").querySelectorAll("[data-x]").forEach(b => { b.classList.toggle("on", !!st.specials[b.dataset.x]); b.disabled = !isHost; });
   $("#startBtn").disabled = !isHost || players.length < 3;
   $("#startBtn").style.display = isHost ? "" : "none";
   $("#lobbyNote").textContent = players.length < 3
@@ -594,65 +805,130 @@ function renderLobby(r, s) {
     : isHost ? `${players.length} Spieler · ${maxRounds(players.length)} Runden` : "Warte, bis der Gastgeber startet …";
 }
 
+function suitButtons(attr, extra = "") {
+  return `<div class="suits">${Object.entries(SUITS).map(([k, v]) => `<button class="btn" ${attr}="${k}" style="background:var(--s-${k})">${v}</button>`).join("")}${extra}</div>`;
+}
+
 function renderGame(r, s) {
   showScreen("screen-game");
-  const n = s.order.length, turnId = s.order[s.turn], mine = me();
+  const n = s.order.length, turnId = s.order[s.turn], mine = me(), blind = isBlind(s);
   $("#roundLbl").innerHTML = `Runde ${s.round}<small>von ${maxRounds(n)}</small>`;
   const t = s.trump || {};
+  const pending = s.phase === "trumpPick" || s.phase === "werwolf";
   $("#trumpBox").innerHTML = (t.card ? cardHTML(t.card, "tiny") : "") +
-    `<span>Trumpf: <b>${t.suit ? SUITS[t.suit] : (s.phase === "trumpPick" ? "wird gewählt" : "keiner")}</b></span>`;
+    `<span>Trumpf: <b>${t.suit ? SUITS[t.suit] : (pending ? "wird gewählt" : "keiner")}</b></span>`;
 
-  // Seats in table order
+  // Seats in table order; in the blind round everyone else's card is shown on their seat
+  const starter = (s.dealer + 1) % n;
   $("#seats").innerHTML = s.order.map((id, i) => {
     const bid = s.bids[id];
     const away = !r.players?.[id];
-    const active = (s.phase === "bidding" || s.phase === "playing" || s.phase === "trumpPick") && id === turnId;
+    const active = ["bidding", "playing", "trumpPick", "werwolf"].includes(s.phase) && id === turnId
+      || (s.phase === "pass" && !s.passes[id]) || (s.phase === "cloud" && id === s.trickWinner) || (s.phase === "witch" && id === s.fxWitch);
+    const peek = blind && id !== mine && s.hands[id]?.length ? `<div class="peek">${s.hands[id].map(c => cardHTML(c, "tiny")).join("")}</div>` : "";
     return `<div class="seat ${active ? "turn" : ""} ${id === mine ? "me" : ""} ${away ? "away" : ""}">
       <div class="top"><div class="name">${nameOf(id)}</div><div class="score">${s.scores[id] || 0}</div></div>
-      <div class="meta"><span>Ansage <b>${bid ?? "–"}</b></span><span>Stiche <b>${s.tricksWon[id] || 0}</b></span>${i === s.dealer ? '<span class="tag">Geber</span>' : ""}</div>
+      <div class="meta"><span>Ansage <b>${bid ?? "–"}</b></span><span>Stiche <b>${s.tricksWon[id] || 0}</b></span>${i === s.dealer ? '<span class="tag">Geber</span>' : ""}${i === starter ? '<span class="tag start">beginnt</span>' : ""}</div>
+      ${peek}
     </div>`;
   }).join("");
 
-  // Table: current trick (or the finished one during the pause)
-  const winnerIdx = s.phase === "trickEnd" ? s.trick.findIndex(p => p.p === s.trickWinner) : -1;
-  $("#trick").innerHTML = s.trick.map((p, i) => `<div class="play ${i === winnerIdx ? "win" : ""}">${cardHTML(p.c, "big")}<span>${nameOf(p.p)}</span></div>`).join("");
+  // Table: current trick (or the finished one while its effects resolve)
+  const done = ["trickEnd", "pass", "cloud", "witch"].includes(s.phase);
+  const winnerIdx = done ? s.trick.findIndex(p => p.p === s.trickWinner && !p.dead) : -1;
+  const pickTrick = s.phase === "witch" && s.fxWitch === mine;
+  if (selectedTrick !== null && (!pickTrick || !s.trick[selectedTrick] || s.trick[selectedTrick].c === "XH")) selectedTrick = null;
+  $("#trick").innerHTML = s.trick.map((p, i) => {
+    const note = playNote(p, s);
+    const cls = (pickTrick && p.c !== "XH" ? "ok" : "") + (i === selectedTrick ? " sel" : "") + (p.dead ? " dead" : "");
+    return `<div class="play ${i === winnerIdx ? "win" : ""}" data-i="${i}">${cardHTML(p.c, "big " + cls)}<span>${nameOf(p.p)}</span>${note ? `<em>${esc(note)}</em>` : ""}</div>`;
+  }).join("");
+  if (pickTrick) $("#trick").querySelectorAll(".play").forEach(el => {
+    if (s.trick[+el.dataset.i].c === "XH") return;
+    el.onclick = () => { selectedTrick = +el.dataset.i; renderGame(room, norm(room.state)); };
+  });
+
+  const who = id => id === mine ? "Du" : nameOf(id);
   let status = "";
-  if (s.phase === "trumpPick") status = turnId === mine ? "Ein Zauberer liegt auf dem Stapel: <b>Du wählst Trumpf.</b>" : `<b>${nameOf(turnId)}</b> wählt Trumpf …`;
-  else if (s.phase === "bidding") status = turnId === mine ? "<b>Deine Ansage:</b> Wie viele Stiche holst du?" : `<b>${nameOf(turnId)}</b> sagt an …`;
+  if (s.phase === "werwolf") status = turnId === mine ? "🐺 <b>Du hast den Werwolf!</b> Tausch ihn gegen die Trumpfkarte und bestimme Trumpf." : `🐺 <b>${nameOf(turnId)}</b> hat den Werwolf und bestimmt Trumpf …`;
+  else if (s.phase === "trumpPick") status = turnId === mine ? "Eine Sonderkarte liegt als Trumpf: <b>Du wählst Trumpf.</b>" : `<b>${nameOf(turnId)}</b> wählt Trumpf …`;
+  else if (s.phase === "bidding") status = (blind ? "Blindrunde: Du siehst nur die Karten der anderen. " : "") +
+    (turnId === mine ? "<b>Deine Ansage:</b> Wie viele Stiche holst du?" : `<b>${nameOf(turnId)}</b> sagt an …`);
   else if (s.phase === "playing") status = s.trick.length ? (turnId === mine ? "<b>Du bist dran.</b>" : `<b>${nameOf(turnId)}</b> ist dran …`)
     : (turnId === mine ? "<b>Du spielst aus.</b>" : `<b>${nameOf(turnId)}</b> spielt aus …`);
-  else if (s.phase === "trickEnd") status = s.trickWinner === mine ? "<b>Dein Stich!</b>" : `Stich an <b>${nameOf(s.trickWinner)}</b>`;
+  else if (s.phase === "trickEnd") status = s.trickWinner ? (s.trickWinner === mine ? "<b>Dein Stich!</b>" : `Stich an <b>${nameOf(s.trickWinner)}</b>`)
+    : `💣 <b>Bombe:</b> Niemand bekommt den Stich. ${who(s.nextLead)} ${s.nextLead === mine ? "spielst" : "spielt"} aus.`;
+  else if (s.phase === "pass") status = "🤹 <b>Jongleur:</b> " + (s.passes[mine] ? "Warte auf die anderen …" : "Wähle eine Karte, die du nach links weitergibst.");
+  else if (s.phase === "cloud") status = "☁️ <b>Wolke:</b> " + (s.trickWinner === mine ? "Ändere deine Ansage um +1 oder −1." : `${nameOf(s.trickWinner)} ändert die Ansage …`);
+  else if (s.phase === "witch") status = "🧙 <b>Hexe:</b> " + (s.fxWitch === mine ? "Tausche eine Handkarte gegen eine Karte aus dem Stich — oder lass es." : `${nameOf(s.fxWitch)} darf tauschen …`);
   $("#status").innerHTML = status;
 
-  // Panel: trump choice or bid buttons
-  const panel = $("#panel");
-  if (s.phase === "trumpPick" && turnId === mine) {
-    panel.innerHTML = `<div class="suits">${Object.entries(SUITS).map(([k, v]) => `<button class="btn" data-suit="${k}" style="background:var(--s-${k})">${v}</button>`).join("")}</div>`;
-    panel.querySelectorAll("[data-suit]").forEach(b => b.onclick = () => act(st => applyTrump(st, mine, b.dataset.suit)));
-  } else if (s.phase === "bidding" && turnId === mine) {
-    const f = forbiddenBid(s);
-    panel.innerHTML = `<div class="bids">${Array.from({ length: s.round + 1 }, (_, i) =>
-      `<button class="btn ${i === f ? "" : "ghost"}" data-bid="${i}" ${i === f ? "disabled title='Ansagen dürfen nicht aufgehen'" : ""}>${i}</button>`).join("")}</div>` +
-      (f !== null ? `<div class="hint" style="margin-top:8px">${f} ist gesperrt — die Ansagen dürfen nicht aufgehen.</div>` : "");
-    panel.querySelectorAll("[data-bid]").forEach(b => b.onclick = () => act(st => applyBid(st, mine, +b.dataset.bid)));
-  } else panel.innerHTML = "";
-
-  // My hand
-  const hand = sortHand(s.hands[mine] || [], t.suit);
-  const myTurnToPlay = s.phase === "playing" && turnId === mine;
-  if (selected && !hand.includes(selected)) selected = null;
+  // Hand
+  const realHand = sortHand(s.hands[mine] || [], t.suit);
+  const myPlay = s.phase === "playing" && turnId === mine;
+  const myPass = s.phase === "pass" && !s.passes[mine];
+  const myWitch = s.phase === "witch" && s.fxWitch === mine;
+  const shown = blind ? realHand.map(() => "?") : realHand;
+  if (selected && !(blind ? selected === "?" : realHand.includes(selected))) selected = null;
+  if (!myPlay && !myPass && !myWitch) selected = null;
   const handEl = $("#hand");
-  handEl.classList.toggle("active", myTurnToPlay);
-  handEl.innerHTML = hand.map(c => cardHTML(c, (myTurnToPlay ? (canPlay(hand, c, s.trick) ? "ok" : "no") : "") + (c === selected ? " sel" : ""))).join("")
-    || `<span class="hint">Keine Karten</span>`;
+  handEl.classList.toggle("active", myPlay || myPass || myWitch);
+  handEl.innerHTML = shown.map((c, i) => {
+    const ok = myPlay ? (blind || canPlay(realHand, c, s.trick, s)) : (myPass || myWitch);
+    return cardHTML(c, (handEl.classList.contains("active") ? (ok ? "ok" : "no") : "") + (c === selected ? " sel" : ""));
+  }).join("") || `<span class="hint">Keine Karten</span>`;
   handEl.querySelectorAll(".card.ok").forEach(el => el.onclick = () => {
     const c = el.dataset.c;
-    if (selected === c) { selected = null; act(st => applyPlay(st, mine, c)); }
-    else { selected = c; renderGame(room, norm(room.state)); }
+    if (myPlay && selected === c && !(choiceFor(blind ? realHand[0] : c, s) && !blind)) return playSelected(s, realHand);
+    selected = c; renderGame(room, norm(room.state));
   });
+
+  // Panel: whatever this phase asks of me
+  const panel = $("#panel");
+  let html = "";
+  if (s.phase === "trumpPick" && turnId === mine) html = suitButtons("data-suit");
+  else if (s.phase === "werwolf" && turnId === mine) html = suitButtons("data-wolf", `<button class="btn ghost" data-wolf="none">Kein Trumpf</button>`);
+  else if (s.phase === "bidding" && turnId === mine) {
+    const f = forbiddenBid(s);
+    html = `<div class="bids">${Array.from({ length: s.round + 1 }, (_, i) =>
+      `<button class="btn ${i === f ? "" : "ghost"}" data-bid="${i}" ${i === f ? "disabled title='Ansagen dürfen nicht aufgehen'" : ""}>${i}</button>`).join("")}</div>` +
+      (f !== null ? `<div class="hint" style="margin-top:8px">${f} ist gesperrt — die Ansagen dürfen nicht aufgehen.</div>` : "");
+  } else if (myPlay && selected) {
+    const card = blind ? realHand[0] : selected;
+    const need = blind ? null : choiceFor(card, s);
+    if (need === "suit") html = `<div class="hint">${SPECIALS[card === "XV" ? t.card : card]?.name || ""} spielen als:</div>` + suitButtons("data-play-suit");
+    else if (need === "shape") html = `<div class="suits"><button class="btn" data-play-as="Z">Als Zauberer</button><button class="btn ghost" data-play-as="N">Als Narr</button></div>`;
+    else html = `<button class="btn accent block" data-play="1">${blind ? "Unbekannte Karte ausspielen" : "Ausspielen"}</button>`;
+  } else if (myPass && selected) html = `<button class="btn accent block" data-pass="1">Karte weitergeben</button>`;
+  else if (s.phase === "cloud" && s.trickWinner === mine) {
+    const b = s.bids[mine] || 0;
+    html = `<div class="suits"><button class="btn" data-cloud="1">+1 (auf ${b + 1})</button><button class="btn" data-cloud="-1" ${b === 0 ? "disabled" : ""}>−1 (auf ${Math.max(0, b - 1)})</button></div>`;
+  } else if (myWitch) html = `<div class="suits"><button class="btn accent" data-witch="swap" ${selected && selectedTrick !== null ? "" : "disabled"}>Tauschen</button><button class="btn ghost" data-witch="skip">Nicht tauschen</button></div>
+      <div class="hint" style="margin-top:6px">Erst eine Karte im Stich, dann eine deiner Karten antippen.</div>`;
+  panel.innerHTML = html;
+  panel.querySelectorAll("[data-suit]").forEach(b => b.onclick = () => act(st => applyTrump(st, mine, b.dataset.suit)));
+  panel.querySelectorAll("[data-wolf]").forEach(b => b.onclick = () => act(st => applyWerwolf(st, mine, b.dataset.wolf === "none" ? null : b.dataset.wolf)));
+  panel.querySelectorAll("[data-bid]").forEach(b => b.onclick = () => act(st => applyBid(st, mine, +b.dataset.bid)));
+  panel.querySelectorAll("[data-play]").forEach(b => b.onclick = () => playSelected(s, realHand));
+  panel.querySelectorAll("[data-play-suit]").forEach(b => b.onclick = () => playSelected(s, realHand, { s: b.dataset.playSuit }));
+  panel.querySelectorAll("[data-play-as]").forEach(b => b.onclick = () => playSelected(s, realHand, { as: b.dataset.playAs }));
+  panel.querySelectorAll("[data-pass]").forEach(b => b.onclick = () => { const c = selected; selected = null; act(st => applyPass(st, mine, c)); });
+  panel.querySelectorAll("[data-cloud]").forEach(b => b.onclick = () => act(st => applyCloud(st, mine, +b.dataset.cloud)));
+  panel.querySelectorAll("[data-witch]").forEach(b => b.onclick = () => {
+    const swap = b.dataset.witch === "swap", c = selected, i = selectedTrick;
+    selected = null; selectedTrick = null;
+    act(st => applyWitch(st, mine, swap ? c : null, swap ? i : null));
+  });
+
   const won = s.tricksWon[mine] || 0;
   $("#myInfo").textContent = s.bids[mine] !== undefined ? `Ansage ${s.bids[mine]} · ${won} ${won === 1 ? "Stich" : "Stiche"}` : "";
-  $("#hint").textContent = myTurnToPlay ? (selected ? "Nochmal tippen zum Ausspielen" : "Karte antippen, dann nochmal zum Ausspielen") : "";
+  $("#hint").textContent = myPlay ? (selected ? "" : (blind ? "Tippe deine verdeckte Karte an" : "Karte antippen, dann nochmal zum Ausspielen"))
+    : myPass && !selected ? "Karte zum Weitergeben antippen" : "";
+}
+function playSelected(s, realHand, opt = {}) {
+  const card = isBlind(s) ? realHand[0] : selected;
+  selected = null;
+  act(st => applyPlay(st, me(), card, opt));
 }
 
 function scheduleAdvance(trickNo) {
@@ -756,40 +1032,59 @@ $("#addBotBtn").addEventListener("click", addBot);
 $("#removeBotsBtn").addEventListener("click", removeBots);
 
 // Simple but sensible play: bid on strong cards, chase tricks only while short of the bid
-function botThink(bot, r) {
-  const s = norm(JSON.parse(JSON.stringify(r.state || {})));
-  const id = bot.id, turnId = s.order?.[s.turn];
-  let move = null;
-  if (s.phase === "trumpPick" && s.order[s.dealer] === id) move = () => {
-    const count = k => s.hands[id].filter(c => suitOf(c) === k).length;
-    const best = "RBGY".split("").sort((a, b) => count(b) - count(a))[0];
-    return st => applyTrump(st, id, best);
-  };
-  else if (s.phase === "bidding" && turnId === id) move = () => {
-    const t = s.trump.suit, hand = s.hands[id];
-    let bid = hand.filter(c => isZ(c) || (t && suitOf(c) === t && valOf(c) >= 9) || (!isN(c) && !isZ(c) && suitOf(c) !== t && valOf(c) === 13)).length;
+function botPower(c, s) {
+  const t = s.trump.suit, ls = leadSuit(s.trick, s);
+  const e = c === "XV" ? baseEff(s.trump.card, { s: t || "R", as: "Z" }) : baseEff(c, { s: t || "R", as: "Z" });
+  if (e.k === "D") return 120;
+  if (e.k === "Z") return 100;
+  if (e.k === "C") return (e.suit === t ? 50 : e.suit === ls ? 25 : 0) + e.val;
+  return { N: -1, B: -2, F: -3, H: -4 }[e.k] ?? -1;
+}
+function botMove(bot, s) {
+  const id = bot.id, turnId = s.order?.[s.turn], hand = s.hands[id] || [];
+  const bestSuit = () => "RBGY".split("").sort((a, b) => hand.filter(c => suitOf(c) === b).length - hand.filter(c => suitOf(c) === a).length)[0];
+  if (s.phase === "trumpPick" && s.order[s.dealer] === id) { const k = bestSuit(); return st => applyTrump(st, id, k); }
+  if (s.phase === "werwolf" && turnId === id) { const k = bestSuit(); return st => applyWerwolf(st, id, k); }
+  if (s.phase === "bidding" && turnId === id) {
+    // Count likely winners: Zauberer, Drache, trumps from 9 up, and other 13s
+    let bid = hand.filter(c => { const p = botPower(c, s); return p >= 59 || (isColor(c) && suitOf(c) !== s.trump.suit && valOf(c) === 13); }).length;
     bid = Math.min(bid, s.round);
     if (bid === forbiddenBid(s)) bid = bid > 0 ? bid - 1 : bid + 1;
     return st => applyBid(st, id, bid);
-  };
-  else if (s.phase === "playing" && turnId === id) move = () => {
-    const hand = s.hands[id], t = s.trump.suit, ls = leadSuit(s.trick);
-    const legal = hand.filter(c => canPlay(hand, c, s.trick));
-    const power = c => isZ(c) ? 100 : isN(c) ? -1 : (suitOf(c) === t ? 50 : suitOf(c) === ls ? 25 : 0) + valOf(c);
-    legal.sort((a, b) => power(a) - power(b));
+  }
+  if (s.phase === "playing" && turnId === id) {
+    const legal = hand.filter(c => canPlay(hand, c, s.trick, s)).sort((a, b) => botPower(a, s) - botPower(b, s));
     const want = (s.bids[id] || 0) > (s.tricksWon[id] || 0);
     const card = want ? legal[legal.length - 1] : legal[0];
-    return st => applyPlay(st, id, card);
-  };
-  else if (s.phase === "roundEnd" && !s.ready[id]) move = () => st => applyReady(st, id);
-  if (!move) return;
+    const opt = { s: s.trump.suit || bestSuit() || "R", as: want ? "Z" : "N" };
+    return st => applyPlay(st, id, card, opt);
+  }
+  if (s.phase === "pass" && !s.passes[id] && hand.length) {
+    const c = [...hand].sort((a, b) => botPower(a, s) - botPower(b, s))[0];
+    return st => applyPass(st, id, c);
+  }
+  if (s.phase === "cloud" && s.trickWinner === id) {
+    const d = (s.tricksWon[id] || 0) > (s.bids[id] || 0) || !s.bids[id] ? 1 : -1;
+    return st => applyCloud(st, id, d);
+  }
+  if (s.phase === "witch" && s.fxWitch === id) return st => applyWitch(st, id, null, null);
+  if (s.phase === "roundEnd" && !s.ready[id]) return st => applyReady(st, id);
+  return null;
+}
+function botThink(bot, r) {
+  const s = norm(JSON.parse(JSON.stringify(r.state || {})));
+  if (!botMove(bot, s)) return;
   // One decision per situation, with a short human-ish pause
-  const key = [s.phase, s.round, s.turn, s.trickNo, s.trick.length].join(":");
+  const key = [s.phase, s.round, s.turn, s.trickNo, s.trick.length, s.fx.length, Object.keys(s.passes).length].join(":");
   if (bot.key === key) return;
   bot.key = key;
   setTimeout(() => {
-    const fn = move();
-    bot.mp.transaction("state", st => { if (!st) return st; norm(st); return fn(st) === false ? undefined : st; });
+    bot.mp.transaction("state", st => {
+      if (!st) return st;
+      norm(st);
+      const fn = botMove(bot, st);                     // decide on the fresh state
+      return fn && fn(st) !== false ? st : undefined;
+    });
   }, 500 + Math.random() * 600);
 }
 

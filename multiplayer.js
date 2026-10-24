@@ -118,9 +118,10 @@ const Multiplayer = {
         off = () => r.off("value", handler);
       },
 
-      setState(patch) { touch(); return ref.child("state").update(patch); },
-      setMine(patch)  { touch(); return ref.child("players/" + me + "/data").update(patch); },
-      transaction(path, fn) { touch(); return ref.child(path).transaction(fn); },
+      // Writes after leave() (e.g. a move that was still scheduled) are ignored
+      setState(patch) { if (!ref) return Promise.resolve(); touch(); return ref.child("state").update(patch); },
+      setMine(patch)  { if (!ref) return Promise.resolve(); touch(); return ref.child("players/" + me + "/data").update(patch); },
+      transaction(path, fn) { if (!ref) return Promise.resolve(); touch(); return ref.child(path).transaction(fn); },
       ref(path = "") { return path ? ref.child(path) : ref; },
 
       async leave() {
