@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Stirnraten — Maiko's Spiele &amp; Tools</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+  .wrap { max-width:900px; }
+
+  /* Hero */
+  .hero { padding:26px 0 18px; border-bottom:1px solid var(--rule); text-align:center; }
+  .hero .eyebrow { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .hero h1 { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(42px, 8vw, 72px); letter-spacing:-.02em; line-height:.95; margin-top:8px; }
+  .hero h1 em { font-style:italic; font-weight:400; color:var(--accent); }
+  .hero .lede { margin-top:10px; font-family:'Fraunces', serif; font-style:italic; font-size:15px; color:var(--muted); }
+
+  .section-title {
+    font-family:'JetBrains Mono', monospace; font-size:10.5px;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    border-top:1px solid var(--rule-soft); padding-top:10px; margin-top:22px; margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-title::before { content:"§"; color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
+  .section-title .count { margin-left:auto; color:var(--ink); }
+
+  /* Chips */
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:9px 12px; border:1px solid var(--rule);
+    background:var(--paper); color:var(--ink); cursor:pointer;
+    font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase;
+    transition:background .15s, color .15s;
+  }
+  .chip small { color:var(--muted); letter-spacing:.04em; }
+  .chip.on { background:var(--ink); color:var(--paper); }
+  .chip.on small { color:var(--rule-soft); }
+
+  /* Buttons */
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:11px 16px; background:var(--ink); color:var(--paper);
+    border:1px solid var(--ink); font-family:'JetBrains Mono', monospace;
+    font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+    font-weight:700; cursor:pointer; text-decoration:none;
+    box-shadow:3px 3px 0 var(--accent);
+    transition:transform .12s ease, box-shadow .18s ease, background .18s;
+  }
+  .btn:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--accent); }
+  .btn.ghost { background:transparent; color:var(--ink); box-shadow:2px 2px 0 var(--rule); }
+  .btn.accent { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:3px 3px 0 var(--ink); }
+  .btn.big { padding:16px 22px; font-size:13px; }
+  .btn.block { display:flex; width:100%; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; transform:none !important; }
+
+  .howto { list-style:none; display:grid; gap:8px; font-size:15px; color:var(--ink-soft); }
+  .howto li { display:flex; gap:10px; }
+  .howto b { font-family:'JetBrains Mono', monospace; color:var(--accent); min-width:22px; }
+  .start-row { margin-top:26px; display:grid; gap:10px; }
+  .note { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.08em; color:var(--muted); text-align:center; }
+
+  /* Results */
+  .screen { display:none; padding:24px 0; }
+  .screen.active { display:block; }
+  .score-big { text-align:center; padding:20px 0 10px; }
+  .score-big .num { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(72px, 16vw, 128px); line-height:1; color:var(--accent); }
+  .score-big .lbl { font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+  .results { list-style:none; columns:2; column-gap:24px; margin-top:6px; }
+  .results li {
+    break-inside:avoid; display:flex; justify-content:space-between; gap:10px;
+    padding:7px 0; border-bottom:1px dashed var(--rule-soft);
+    font-family:'Fraunces', serif; font-size:18px;
+  }
+  .results li span { font-family:'JetBrains Mono', monospace; font-size:12px; }
+  .results li.ok span { color:var(--ok); }
+  .results li.pass { color:var(--muted); text-decoration:line-through; text-decoration-thickness:1px; }
+  .results li.pass span { color:var(--accent); text-decoration:none; }
+  @media (max-width:560px) { .results { columns:1; } }
+
+  /* Play overlay — sits above the paper texture */
+  .play {
+    position:fixed; inset:0; z-index:10000; display:none;
+    flex-direction:column; justify-content:space-between; align-items:stretch;
+    background:var(--paper); color:var(--ink);
+    padding:max(14px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    user-select:none; -webkit-user-select:none; touch-action:manipulation;
+    transition:background .15s ease, color .15s ease;
+  }
+  .play.show { display:flex; }
+  .play.flash-ok   { background:var(--ok); color:#fff; }
+  .play.flash-pass { background:var(--accent); color:#fff; }
+  .play-top, .play-bottom {
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    position:relative; z-index:2; pointer-events:none;
+  }
+  .play-top .timer { font-size:22px; font-weight:700; }
+  .play-top .timer.low { color:var(--accent); }
+  .play.flash-ok .timer.low, .play.flash-pass .timer.low { color:#fff; }
+  .play-bottom { opacity:.7; font-size:11px; }
+  .play-word {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    position:relative; z-index:2; pointer-events:none; padding:0 4vw;
+  }
+  .play-word .cat { font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:.24em; text-transform:uppercase; opacity:.65; margin-bottom:10px; }
+  .play-word .word { font-family:'Fraunces', serif; font-weight:800; letter-spacing:-.02em; line-height:1; font-size:clamp(44px, 11vw, 150px); overflow-wrap:anywhere; hyphens:auto; }
+  .play-word .word.count { font-size:clamp(90px, 26vw, 260px); color:var(--accent); }
+  .play-word .sub { margin-top:14px; font-family:'Fraunces', serif; font-style:italic; font-size:clamp(16px, 3vw, 24px); opacity:.75; }
+  .tap { position:absolute; top:0; bottom:0; width:50%; z-index:1; background:none; border:0; cursor:pointer; }
+  .tap.left { left:0; } .tap.right { right:0; }
+  .play .quit {
+    position:absolute; z-index:3; top:max(10px, env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
+    background:transparent; border:1px solid currentColor; color:inherit; opacity:.55;
+    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+    padding:5px 10px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="edition left">Vol. I · SS 2026 · Nº 10</div>
+    <div class="brand">Stirn<em>raten</em></div>
+    <div class="edition right">
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta">Editorial Edition · Stirnraten</span>
+  </div>
+
+  <!-- ============= SETUP ============= -->
+  <section id="screen-setup" class="screen active">
+    <div class="hero">
+      <div class="eyebrow">Ein Spiel für alle, die gern quatschen</div>
+      <h1>Stirn<em>raten</em></h1>
+      <div class="lede">Handy an die Stirn. Die anderen erklären. Du rätst.</div>
+    </div>
+
+    <div class="section-title">Kategorien <span class="count" id="wordCount"></span></div>
+    <div class="chips" id="catChips"></div>
+
+    <div class="section-title">Rundenzeit</div>
+    <div class="chips" id="timeChips"></div>
+
+    <div class="section-title">So geht's</div>
+    <ul class="howto">
+      <li><b>01</b> Handy quer an die Stirn halten, Bildschirm zu den anderen.</li>
+      <li><b>02</b> Die anderen erklären den Begriff, ohne ihn zu sagen.</li>
+      <li><b>03</b> Erraten? Handy <strong>nach unten</strong> kippen. Passen? <strong>Nach oben</strong> kippen.</li>
+      <li><b>04</b> Ohne Sensor: rechts tippen = richtig, links tippen = weiter.</li>
+    </ul>
+
+    <div class="start-row">
+      <button class="btn accent big block" id="startBtn">Runde starten &rarr;</button>
+      <div class="note" id="sensorNote"></div>
+    </div>
+  </section>
+
+  <!-- ============= RESULTS ============= -->
+  <section id="screen-results" class="screen">
+    <div class="score-big">
+      <div class="num" id="scoreNum">0</div>
+      <div class="lbl" id="scoreLbl">Begriffe erraten</div>
+    </div>
+    <div class="section-title">Die Runde <span class="count" id="roundSummary"></span></div>
+    <ul class="results" id="resultsList"></ul>
+    <div class="start-row">
+      <button class="btn accent big block" id="againBtn">Nächste Runde &rarr;</button>
+      <button class="btn ghost block" id="setupBtn">Kategorien ändern</button>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Strauss · Biebergemünd</span>
+    <span>© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<!-- ============= PLAY ============= -->
+<div class="play" id="play" aria-live="polite">
+  <button class="tap left" id="tapPass" aria-label="Weiter"></button>
+  <button class="tap right" id="tapOk" aria-label="Richtig"></button>
+  <button class="quit" id="quitBtn">Abbrechen</button>
+  <div class="play-top"><span class="timer" id="timer">60</span><span id="liveScore">0 ✓</span></div>
+  <div class="play-word">
+    <div class="cat" id="wordCat"></div>
+    <div class="word" id="word"></div>
+    <div class="sub" id="wordSub"></div>
+  </div>
+  <div class="play-bottom"><span>Weiter · hoch kippen</span><span>runter kippen · Richtig</span></div>
+</div>
+
+<script src="site.js"></script>
+<script>
+/* ================= BEGRIFFE ================= */
+const CATEGORIES = [
+  { id:"tiere", name:"Tiere", words:"Hund|Katze|Elefant|Giraffe|Pinguin|Krokodil|Delfin|Hai|Wal|Löwe|Tiger|Zebra|Känguru|Koala|Panda|Eisbär|Affe|Gorilla|Nashorn|Nilpferd|Kamel|Lama|Esel|Pferd|Kuh|Schwein|Schaf|Ziege|Huhn|Hahn|Ente|Gans|Truthahn|Eule|Adler|Papagei|Flamingo|Storch|Taube|Spatz|Specht|Fledermaus|Maus|Ratte|Hamster|Meerschweinchen|Kaninchen|Igel|Eichhörnchen|Fuchs|Wolf|Bär|Reh|Hirsch|Wildschwein|Biber|Otter|Seehund|Walross|Qualle|Tintenfisch|Seestern|Krabbe|Hummer|Schildkröte|Schlange|Eidechse|Chamäleon|Frosch|Schnecke|Regenwurm|Spinne|Biene|Wespe|Ameise|Schmetterling|Marienkäfer|Mücke|Fliege|Libelle|Heuschrecke|Goldfisch|Faultier|Stinktier|Waschbär|Erdmännchen|Strauß|Pfau|Gepard|Dinosaurier" },
+  { id:"essen", name:"Essen & Trinken", words:"Pizza|Spaghetti|Lasagne|Döner|Currywurst|Bratwurst|Schnitzel|Pommes|Hamburger|Hotdog|Sushi|Brezel|Brötchen|Croissant|Müsli|Pfannkuchen|Waffel|Rührei|Spiegelei|Toast|Käse|Butter|Honig|Marmelade|Nutella|Joghurt|Milch|Kakao|Kaffee|Tee|Orangensaft|Limonade|Cola|Bier|Wein|Sekt|Glühwein|Smoothie|Eistee|Apfel|Banane|Erdbeere|Kirsche|Wassermelone|Ananas|Zitrone|Weintraube|Kiwi|Mango|Kokosnuss|Avocado|Kartoffel|Karotte|Gurke|Tomate|Paprika|Zwiebel|Knoblauch|Brokkoli|Spargel|Kürbis|Pilz|Mais|Salat|Suppe|Popcorn|Chips|Gummibärchen|Schokolade|Eis am Stiel|Torte|Muffin|Donut|Lebkuchen|Zuckerwatte|Kaugummi|Ketchup|Senf|Mayonnaise|Salz|Pfeffer|Reis|Tacos|Burrito|Raclette|Fondue|Gulasch|Kartoffelsalat|Sauerkraut|Fischstäbchen|Leberkäse|Apfelstrudel|Spätzle" },
+  { id:"berufe", name:"Berufe", words:"Arzt|Zahnarzt|Pflegekraft|Lehrer|Polizist|Feuerwehrmann|Pilot|Flugbegleiter|Koch|Bäcker|Metzger|Friseur|Gärtner|Bauer|Tierarzt|Mechaniker|Elektriker|Klempner|Maurer|Dachdecker|Schreiner|Maler|Architekt|Programmierer|Journalist|Fotograf|Schauspieler|Sänger|DJ|Zauberer|Clown|Astronaut|Kapitän|Soldat|Richter|Anwalt|Detektiv|Briefträger|Busfahrer|Taxifahrer|Lokführer|Kellner|Barkeeper|Kassierer|Bibliothekar|Wissenschaftler|Archäologe|Hebamme|Apotheker|Psychologe|Bürgermeister|Pfarrer|Model|Influencer|Fußballtrainer|Schiedsrichter|Bademeister|Rettungssanitäter|Müllmann|Schornsteinfeger|Hausmeister|Babysitter|Erzieher|Tätowierer|Imker|Förster|Fischer|Juwelier|Optiker|Butler|Bodyguard|Stuntman|Dirigent|Fahrlehrer|Hotelier|Tankwart|Pizzabote" },
+  { id:"dinge", name:"Gegenstände", words:"Zahnbürste|Handtuch|Spiegel|Kamm|Föhn|Kühlschrank|Waschmaschine|Staubsauger|Mikrowelle|Toaster|Wasserkocher|Bügeleisen|Bett|Kissen|Bettdecke|Sofa|Teppich|Lampe|Vorhang|Wecker|Armbanduhr|Schlüssel|Regenschirm|Brille|Sonnenbrille|Rucksack|Koffer|Geldbeutel|Handy|Laptop|Fernbedienung|Fernseher|Kopfhörer|Ladekabel|Taschenlampe|Kerze|Feuerzeug|Schere|Kleber|Tesafilm|Bleistift|Radiergummi|Lineal|Kugelschreiber|Notizbuch|Briefmarke|Tasse|Teller|Gabel|Löffel|Messer|Kochtopf|Pfanne|Flaschenöffner|Korkenzieher|Mülleimer|Besen|Eimer|Leiter|Hammer|Nagel|Schraubenzieher|Bohrmaschine|Klopapier|Seife|Shampoo|Zahnpasta|Pflaster|Fieberthermometer|Gießkanne|Blumentopf|Bilderrahmen|Kleiderbügel|Socken|Hausschuhe|Gummistiefel|Mütze|Schal|Handschuhe|Krawatte|Gürtel|Wäscheklammer|Sparschwein|Würfel|Puppe|Teddybär|Luftmatratze" },
+  { id:"orte", name:"Orte & Gebäude", words:"Schule|Universität|Krankenhaus|Bahnhof|Flughafen|Hafen|Kirche|Schloss|Burg|Leuchtturm|Bauernhof|Zoo|Zirkus|Kino|Theater|Museum|Bibliothek|Supermarkt|Bäckerei|Apotheke|Tankstelle|Polizeiwache|Feuerwache|Gefängnis|Rathaus|Bank|Hotel|Jugendherberge|Campingplatz|Freibad|Sauna|Fitnessstudio|Stadion|Spielplatz|Friedhof|Kindergarten|Restaurant|Kneipe|Disco|Waschanlage|Parkhaus|Autobahn|Tunnel|Brücke|Wolkenkratzer|Pyramide|Iglu|Zelt|Baumhaus|Keller|Dachboden|Garage|Badezimmer|Küche|Balkon|Weihnachtsmarkt|Jahrmarkt|Achterbahn|Freizeitpark|Strand|Wüste|Dschungel|Vulkan|Insel|Höhle|Raumstation|U-Bahn|Fußgängerzone|Bushaltestelle|Kiosk|Waschsalon|Baumarkt|Tierheim|Wasserpark|Kloster" },
+  { id:"sport", name:"Sport & Freizeit", words:"Fußball|Basketball|Tennis|Volleyball|Handball|Eishockey|Golf|Boxen|Schwimmen|Tauchen|Surfen|Skifahren|Snowboarden|Schlittschuhlaufen|Klettern|Wandern|Joggen|Radfahren|Reiten|Yoga|Ballett|Turnen|Bowling|Billard|Darts|Minigolf|Tischtennis|Badminton|Bogenschießen|Fechten|Judo|Karate|Rudern|Segeln|Angeln|Paragliding|Fallschirmspringen|Bungee-Jumping|Skateboard|Inlineskates|Trampolin|Marathon|Olympische Spiele|Formel 1|Schach|Puzzle|Karaoke|Grillen|Picknick|Lagerfeuer|Videospiele|Brettspiel|Monopoly|Uno|Lotto|Sudoku|Kreuzworträtsel|Stricken|Backen|Escape Room|Paintball|Bierpong|Flunkyball|Tauziehen|Verstecken|Fangen|Seilspringen|Schneeballschlacht|Schneemann|Sandburg|Kegeln|Wasserski|Rodeln|Breakdance|Zumba|Sackhüpfen|Twister|Jenga" },
+  { id:"film", name:"Filme & Figuren", words:"Harry Potter|Star Wars|Der König der Löwen|Titanic|Die Eiskönigin|Findet Nemo|Shrek|Toy Story|Die Simpsons|SpongeBob|Micky Maus|Batman|Superman|Spider-Man|Iron Man|Hulk|James Bond|Indiana Jones|Herr der Ringe|Gollum|Darth Vader|Yoda|Pikachu|Super Mario|Sonic|Pac-Man|Minions|Garfield|Asterix|Pippi Langstrumpf|Biene Maja|Heidi|Die Schlümpfe|Benjamin Blümchen|Bibi Blocksberg|Sandmännchen|Tatort|Game of Thrones|Squid Game|Stranger Things|Haus des Geldes|Breaking Bad|Friends|Barbie|Dracula|Frankenstein|Rotkäppchen|Schneewittchen|Aschenputtel|Hänsel und Gretel|Dornröschen|Rapunzel|Pinocchio|Peter Pan|Tarzan|Aladdin|Arielle|Bambi|Dumbo|Winnie Puuh|Sherlock Holmes|Zorro|Robin Hood|Jurassic Park|Fluch der Karibik|Ghostbusters|E.T.|King Kong|Godzilla|Terminator|Rocky|Matrix|Avatar|Ratatouille|Cars|Die Maus|Grinch|Kung Fu Panda|Madagascar|Ice Age" },
+  { id:"personen", name:"Berühmte Personen", words:"Albert Einstein|Angela Merkel|Donald Trump|Barack Obama|Elon Musk|Taylor Swift|Michael Jackson|Elvis Presley|Madonna|Beyoncé|Rihanna|Ed Sheeran|Justin Bieber|Helene Fischer|Dieter Bohlen|Heidi Klum|Thomas Gottschalk|Stefan Raab|Günther Jauch|Michael Schumacher|Lionel Messi|Cristiano Ronaldo|Manuel Neuer|Thomas Müller|Boris Becker|Usain Bolt|Muhammad Ali|Roger Federer|Mozart|Beethoven|Picasso|Leonardo da Vinci|Napoleon|Kleopatra|Julius Caesar|Martin Luther|Goethe|Shakespeare|Isaac Newton|Charles Darwin|Marie Curie|Christoph Kolumbus|Neil Armstrong|Mark Zuckerberg|Steve Jobs|Bill Gates|Queen Elizabeth|Der Papst|Weihnachtsmann|Osterhase|Arnold Schwarzenegger|Leonardo DiCaprio|Brad Pitt|Johnny Depp|Tom Cruise|Charlie Chaplin|Marilyn Monroe|Mr. Bean|Kim Kardashian|Lady Gaga|The Beatles|Rammstein|ABBA|Freddie Mercury|Bob Marley|Eminem|Gandhi|Bruce Lee|Jackie Chan|Til Schweiger|Karl Lagerfeld|Sigmund Freud|Zahnfee|Nikolaus|Robbie Williams|Shakira|Tim Mälzer" },
+  { id:"welt", name:"Länder & Städte", words:"Deutschland|Frankreich|Italien|Spanien|Portugal|Griechenland|Türkei|England|Irland|Schottland|Schweiz|Österreich|Niederlande|Dänemark|Schweden|Norwegen|Finnland|Island|Polen|Russland|Ägypten|Marokko|Südafrika|USA|Kanada|Mexiko|Brasilien|Argentinien|Kuba|Jamaika|Australien|Neuseeland|Japan|China|Indien|Thailand|Dubai|Hawaii|Berlin|Hamburg|München|Köln|Frankfurt|Paris|London|Rom|Venedig|Madrid|Barcelona|Amsterdam|Wien|Prag|Moskau|New York|Las Vegas|Hollywood|Tokio|Sydney|Rio de Janeiro|Mallorca|Ibiza|Malediven|Mount Everest|Nordpol|Antarktis|Sahara|Amazonas|Niagarafälle|Eiffelturm|Freiheitsstatue|Big Ben|Brandenburger Tor|Kölner Dom|Neuschwanstein|Chinesische Mauer|Kolosseum|Schiefer Turm von Pisa|Bodensee|Nordsee|Ostsee|Alpen|Rhein|Sylt|Disneyland|Grand Canyon|Titanic-Wrack" },
+  { id:"technik", name:"Fahrzeuge & Technik", words:"Auto|Fahrrad|Motorrad|Motorroller|E-Scooter|Bus|Straßenbahn|Zug|ICE|Flugzeug|Hubschrauber|Heißluftballon|Rakete|Ufo|Schiff|U-Boot|Segelboot|Ruderboot|Kreuzfahrtschiff|Fähre|Traktor|Bagger|Kran|Lkw|Feuerwehrauto|Krankenwagen|Polizeiauto|Müllauto|Wohnmobil|Taxi|Limousine|Cabrio|Monstertruck|Gabelstapler|Seilbahn|Skilift|Rolltreppe|Aufzug|Kinderwagen|Rollstuhl|Roboter|Drohne|Computer|Tastatur|Computermaus|Drucker|Smartwatch|Spielkonsole|Kamera|Mikrofon|Lautsprecher|Navi|Ampel|Windrad|Atomkraftwerk|Satellit|Teleskop|Mikroskop|Lupe|Kompass|Batterie|Glühbirne|Steckdose|WLAN|Passwort|Emoji|Selfie|Powerbank|Taschenrechner|Bobbycar|Tretboot|Dampflok|Formel-1-Auto|Panzer" },
+  { id:"natur", name:"Natur & Wetter", words:"Sonne|Mond|Stern|Regenbogen|Gewitter|Blitz|Donner|Regen|Schnee|Hagel|Nebel|Wind|Sturm|Tornado|Hitze|Frost|Wolke|Sonnenuntergang|Sonnenfinsternis|Komet|Sternschnuppe|Erdbeben|Tsunami|Lawine|Überschwemmung|Waldbrand|Wasserfall|Fluss|See|Meer|Welle|Gletscher|Eisberg|Berg|Wald|Wiese|Sumpf|Baum|Blume|Rose|Sonnenblume|Kaktus|Tulpe|Gänseblümchen|Löwenzahn|Moos|Palme|Tannenbaum|Eiche|Kastanie|Blatt|Wurzel|Stein|Sand|Muschel|Feder|Frühling|Sommer|Herbst|Winter|Nordlicht|Planet|Erde|Mars|Schwarzes Loch|Nacht|Pfütze|Eiszapfen|Schneeflocke|Kleeblatt|Brennnessel|Spinnennetz|Vogelnest|Lagune|Ebbe und Flut" },
+  { id:"alltag", name:"Alltag & Aktionen", words:"Zähneputzen|Duschen|Kochen|Abwaschen|Staubsaugen|Bügeln|Einkaufen|Aufräumen|Schlafen|Schnarchen|Gähnen|Niesen|Husten|Schluckauf|Lachen|Weinen|Flüstern|Schreien|Singen|Pfeifen|Klatschen|Winken|Umarmen|Küssen|Händeschütteln|Zwinkern|Schminken|Rasieren|Haare föhnen|Autofahren|Einparken|Trampen|Telefonieren|Fernsehen|Lesen|Zeichnen|Kaugummi kauen|Wäsche aufhängen|Rasen mähen|Gassi gehen|Liegestütze|Kopfstand|Purzelbaum|Schwitzen|Frieren|Verlaufen|Verschlafen|Zu spät kommen|Daumen drücken|Würfeln|Arschbombe|Ausrutschen|Stolpern|Kerzen auspusten|Geschenk auspacken|Anstoßen|Kater haben|Diät machen|Umziehen|Bewerbungsgespräch|Prüfung schreiben|Spicken|Schwänzen|Hausaufgaben|Mittagsschlaf|Frühstück im Bett|Stau|Warteschlange|Sonnenbrand|Muskelkater|Heimweh|Lampenfieber|Ohrwurm|Gänsehaut|Blind Date|Schwarzfahren|Selfie machen" },
+  { id:"feste", name:"Feste & Anlässe", words:"Weihnachten|Ostern|Silvester|Karneval|Halloween|Geburtstag|Hochzeit|Taufe|Muttertag|Valentinstag|Adventskalender|Weihnachtsbaum|Osterei|Feuerwerk|Kostüm|Luftballon|Konfetti|Polterabend|Junggesellenabschied|Abiball|Einschulung|Schultüte|Flitterwochen|Verlobung|Ruhestand|Ramadan|Thanksgiving|Erntedank|Sankt Martin|Laterne|Kirmes|Schützenfest|Oktoberfest|Dirndl|Lederhose|Maibaum|Sommerferien|Urlaub|Festival|Konzert|Grillparty|Hausparty|Brautstrauß|Ehering|Hochzeitstorte|Geburtstagskuchen|Wunderkerze|Bleigießen|Glückskeks|Hufeisen|Wichteln|Schrottwichteln|Ostereiersuche|Kürbisschnitzen|Süßes oder Saures|Weihnachtsfeier|Familientreffen|Klassenfahrt|Abschlussfeier|Babyparty|Sternsinger|Neujahrsvorsatz|Lebkuchenherz|Rosenmontag" }
+];
+const TIMES = [30, 60, 90, 120];
+
+// Dedupe across categories (first category wins) and split into arrays
+const seen = new Set();
+CATEGORIES.forEach(c => {
+  c.list = c.words.split("|").map(w => w.trim()).filter(w => w && !seen.has(w.toLowerCase()) && seen.add(w.toLowerCase()));
+});
+
+/* ================= STATE ================= */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+let selected = new Set(store.get("sr-cats", CATEGORIES.map(c => c.id)));
+let roundTime = store.get("sr-time", 60);
+let used = new Set(store.get("sr-used", []));   // words already shown, so rounds don't repeat
+
+const $ = sel => document.querySelector(sel);
+const play = $("#play");
+
+/* ================= SETUP UI ================= */
+function renderSetup() {
+  const cats = $("#catChips");
+  cats.innerHTML = "";
+  const all = document.createElement("button");
+  all.className = "chip" + (selected.size === CATEGORIES.length ? " on" : "");
+  all.textContent = "Alle";
+  all.onclick = () => { selected = selected.size === CATEGORIES.length ? new Set() : new Set(CATEGORIES.map(c => c.id)); renderSetup(); };
+  cats.appendChild(all);
+  CATEGORIES.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip" + (selected.has(c.id) ? " on" : "");
+    b.innerHTML = `${c.name} <small>${c.list.length}</small>`;
+    b.onclick = () => { selected.has(c.id) ? selected.delete(c.id) : selected.add(c.id); renderSetup(); };
+    cats.appendChild(b);
+  });
+  const times = $("#timeChips");
+  times.innerHTML = "";
+  TIMES.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "chip" + (t === roundTime ? " on" : "");
+    b.textContent = t + " s";
+    b.onclick = () => { roundTime = t; renderSetup(); };
+    times.appendChild(b);
+  });
+  const n = CATEGORIES.filter(c => selected.has(c.id)).reduce((s, c) => s + c.list.length, 0);
+  $("#wordCount").textContent = n + " Begriffe";
+  $("#startBtn").disabled = n === 0;
+  store.set("sr-cats", [...selected]);
+  store.set("sr-time", roundTime);
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+  window.scrollTo(0, 0);
+}
+
+/* ================= DECK ================= */
+function buildDeck() {
+  const pool = CATEGORIES.filter(c => selected.has(c.id)).flatMap(c => c.list.map(w => ({ w, cat: c.name })));
+  let fresh = pool.filter(p => !used.has(p.w));
+  if (fresh.length < 20) {                       // nearly exhausted: start over
+    pool.forEach(p => used.delete(p.w));
+    fresh = pool;
+  }
+  for (let i = fresh.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [fresh[i], fresh[j]] = [fresh[j], fresh[i]]; }
+  return fresh;
+}
+
+/* ================= TILT ================= */
+// Gravity along the screen normal: +1 face up, 0 upright at the forehead, −1 face down.
+// cos(beta)·cos(gamma) stays continuous when the phone is held upright in landscape.
+let tiltZ = null, tiltArmed = false, sensorSeen = false;
+window.addEventListener("deviceorientation", e => {
+  if (e.beta === null || e.gamma === null) return;
+  sensorSeen = true;
+  const rad = Math.PI / 180;
+  tiltZ = Math.cos(e.beta * rad) * Math.cos(e.gamma * rad);
+  if (!game.running || game.lock) return;
+  if (Math.abs(tiltZ) < 0.3) { tiltArmed = true; return; }   // back to neutral
+  if (!tiltArmed || game.counting) return;
+  if (tiltZ < -0.6) { tiltArmed = false; answer(true); }      // screen to the floor
+  else if (tiltZ > 0.6) { tiltArmed = false; answer(false); } // screen to the ceiling
+});
+async function askSensor() {
+  // iOS needs a permission prompt from a user gesture
+  if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+    try { await DeviceOrientationEvent.requestPermission(); } catch {}
+  }
+}
+
+/* ================= GAME ================= */
+const game = { running:false, counting:false, lock:false, deck:[], idx:0, results:[], left:0, timer:null };
+let wakeLock = null;
+
+async function startRound() {
+  await askSensor();
+  try { await document.documentElement.requestFullscreen?.(); await screen.orientation?.lock?.("landscape"); } catch {}
+  try { wakeLock = await navigator.wakeLock?.request("screen"); } catch {}
+
+  game.deck = buildDeck(); game.idx = 0; game.results = [];
+  game.left = roundTime; game.running = true; game.counting = true; game.lock = false;
+  tiltArmed = false;
+  $("#timer").textContent = roundTime; $("#timer").classList.remove("low");
+  $("#liveScore").textContent = "0 ✓";
+  play.className = "play show";
+
+  // 3-2-1 while the phone goes to the forehead
+  $("#wordCat").textContent = "";
+  $("#wordSub").textContent = "Handy an die Stirn!";
+  for (const n of [3, 2, 1]) {
+    if (!game.running) return;
+    setWord(String(n), true);
+    await wait(900);
+  }
+  if (!game.running) return;
+  game.counting = false;
+  $("#wordSub").textContent = "";
+  nextWord();
+  game.timer = setInterval(tick, 1000);
+}
+
+function tick() {
+  game.left--;
+  $("#timer").textContent = game.left;
+  $("#timer").classList.toggle("low", game.left <= 10);
+  if (game.left <= 5 && game.left > 0) navigator.vibrate?.(40);
+  if (game.left <= 0) endRound();
+}
+
+function setWord(text, isCount) {
+  const w = $("#word");
+  w.textContent = text;
+  w.classList.toggle("count", !!isCount);
+}
+function nextWord() {
+  if (game.idx >= game.deck.length) { endRound(); return; }
+  const item = game.deck[game.idx];
+  $("#wordCat").textContent = item.cat;
+  setWord(item.w);
+}
+
+async function answer(ok) {
+  if (!game.running || game.counting || game.lock) return;
+  const item = game.deck[game.idx];
+  if (!item) return;
+  game.lock = true;
+  game.results.push({ w: item.w, ok });
+  used.add(item.w);
+  game.idx++;
+  $("#liveScore").textContent = game.results.filter(r => r.ok).length + " ✓";
+  navigator.vibrate?.(ok ? 60 : [30, 40, 30]);
+  play.classList.add(ok ? "flash-ok" : "flash-pass");
+  setWord(ok ? "Richtig!" : "Weiter");
+  $("#wordCat").textContent = "";
+  await wait(650);
+  play.classList.remove("flash-ok", "flash-pass");
+  if (!game.running) return;
+  game.lock = false;
+  nextWord();
+}
+
+async function endRound() {
+  if (!game.running) return;
+  clearInterval(game.timer);
+  game.running = false;
+  store.set("sr-used", [...used]);
+  play.classList.add("flash-pass");
+  $("#wordCat").textContent = "";
+  setWord("Zeit!");
+  navigator.vibrate?.(300);
+  await wait(1200);
+  closePlay();
+  showResults();
+}
+
+function quitRound() {
+  clearInterval(game.timer);
+  game.running = false;
+  closePlay();
+  showScreen("screen-setup");
+}
+
+function closePlay() {
+  play.className = "play";
+  try { wakeLock?.release(); } catch {}
+  wakeLock = null;
+  try { screen.orientation?.unlock?.(); } catch {}
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+}
+
+function showResults() {
+  const ok = game.results.filter(r => r.ok).length;
+  $("#scoreNum").textContent = ok;
+  $("#scoreLbl").textContent = ok === 1 ? "Begriff erraten" : "Begriffe erraten";
+  $("#roundSummary").textContent = `${ok} ✓ · ${game.results.length - ok} weiter`;
+  const list = $("#resultsList");
+  list.innerHTML = "";
+  if (!game.results.length) list.innerHTML = '<li class="pass">Kein Begriff gespielt <span>—</span></li>';
+  game.results.forEach(r => {
+    const li = document.createElement("li");
+    li.className = r.ok ? "ok" : "pass";
+    li.innerHTML = `${r.w} <span>${r.ok ? "✓" : "✕"}</span>`;
+    list.appendChild(li);
+  });
+  showScreen("screen-results");
+}
+
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ================= EVENTS ================= */
+$("#startBtn").addEventListener("click", startRound);
+$("#againBtn").addEventListener("click", startRound);
+$("#setupBtn").addEventListener("click", () => showScreen("screen-setup"));
+$("#quitBtn").addEventListener("click", quitRound);
+$("#tapOk").addEventListener("click", () => answer(true));
+$("#tapPass").addEventListener("click", () => answer(false));
+document.addEventListener("keydown", e => {
+  if (!game.running) return;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") { e.preventDefault(); answer(true); }
+  else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); answer(false); }
+  else if (e.key === "Escape") quitRound();
+});
+
+renderSetup();
+setTimeout(() => {
+  const needsPermission = typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
+  $("#sensorNote").textContent = sensorSeen
+    ? "Neigungssensor erkannt · kippen oder tippen"
+    : needsPermission
+      ? "Beim Start nach Bewegungssensor-Zugriff fragen lassen · erlauben zum Kippen"
+      : "Kein Neigungssensor erkannt · tippen oder Pfeiltasten";
+}, 800);
+</script>
+</body>
+</html>
