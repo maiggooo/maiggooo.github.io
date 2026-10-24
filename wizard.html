@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Wizard — Maiko's Spiele &amp; Tools</title>
+<meta name="description" content="Wizard online: Stiche ansagen, Trumpf beachten, Punkte sammeln — jeder auf seinem eigenen Handy.">
+<meta name="theme-color" content="#f4efe6">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Maiko&#39;s Spiele &amp; Tools">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Wizard — Maiko&#x27;s Spiele &amp; Tools">
+<meta property="og:description" content="Wizard online: Stiche ansagen, Trumpf beachten, Punkte sammeln — jeder auf seinem eigenen Handy.">
+<meta property="og:url" content="https://maiggooo.github.io/wizard.html">
+<meta property="og:image" content="https://maiggooo.github.io/og/wizard.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Wizard">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+  .wrap { max-width:900px; }
+  :root { --s-R:#c0392b; --s-B:#2c5aa0; --s-G:#2f7d46; --s-Y:#d4a017; }
+
+  /* Hero / sections (same vocabulary as the other games) */
+  .hero { padding:26px 0 18px; border-bottom:1px solid var(--rule); text-align:center; }
+  .hero .eyebrow { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .hero h1 { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(42px, 8vw, 72px); letter-spacing:-.02em; line-height:.95; margin-top:8px; }
+  .hero h1 em { font-style:italic; font-weight:400; color:var(--accent); }
+  .hero .lede { margin-top:10px; font-family:'Fraunces', serif; font-style:italic; font-size:15px; color:var(--muted); }
+  .screen { display:none; padding:22px 0; }
+  .screen.active { display:block; }
+  .section-title {
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    border-top:1px solid var(--rule-soft); padding-top:10px; margin:20px 0 10px; display:flex; align-items:center; gap:8px;
+  }
+  .section-title::before { content:"§"; color:var(--accent); font-family:'Fraunces', serif; font-style:italic; }
+  .section-title .count { margin-left:auto; color:var(--ink); }
+
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  input[type="text"] {
+    flex:1; min-width:0; padding:11px 12px; background:var(--paper); color:var(--ink);
+    border:1px solid var(--rule); border-radius:0; font-family:'Inter', sans-serif; font-size:16px; outline:none;
+  }
+  input[type="text"]:focus { border-color:var(--accent); }
+  input.code { text-transform:uppercase; letter-spacing:.3em; font-family:'JetBrains Mono', monospace; max-width:170px; }
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px;
+    padding:11px 16px; background:var(--ink); color:var(--paper); border:1px solid var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+    font-weight:700; cursor:pointer; box-shadow:3px 3px 0 var(--accent);
+    transition:transform .12s ease, box-shadow .18s ease, background .18s;
+  }
+  .btn:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--accent); }
+  .btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--accent); }
+  .btn.ghost { background:transparent; color:var(--ink); box-shadow:2px 2px 0 var(--rule); }
+  .btn.accent { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:3px 3px 0 var(--ink); }
+  .btn.block { display:flex; width:100%; }
+  .btn:disabled { opacity:.4; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
+  .or { text-align:center; font-family:'Fraunces', serif; font-style:italic; color:var(--muted); margin:14px 0; }
+  .note { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.08em; color:var(--muted); margin-top:8px; }
+  .error { color:var(--accent); }
+
+  /* Waiting room */
+  .room-code { text-align:center; padding:18px 0 6px; }
+  .room-code .lbl { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .room-code .code { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(44px, 12vw, 72px); letter-spacing:.12em; color:var(--accent); line-height:1.1; }
+  .plist { list-style:none; display:grid; gap:6px; }
+  .plist li { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--rule-soft); font-family:'Fraunces', serif; font-size:18px; }
+  .plist li small { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .switch { display:flex; align-items:center; gap:10px; cursor:pointer; font-size:15px; color:var(--ink-soft); padding:6px 0; }
+  .switch input { width:20px; height:20px; accent-color:var(--accent); }
+
+  /* Cards */
+  .card {
+    --c:var(--ink); position:relative; flex:none;
+    width:52px; height:76px; border-radius:6px; border:1.5px solid var(--c);
+    background:var(--paper); color:var(--c); display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:800; font-size:24px; line-height:1; user-select:none;
+    box-shadow:2px 2px 0 rgba(0,0,0,.18);
+  }
+  .card::before, .card::after { content:attr(data-v); position:absolute; font-size:10px; font-family:'JetBrains Mono', monospace; font-weight:700; }
+  .card::before { top:4px; left:5px; } .card::after { bottom:4px; right:5px; transform:rotate(180deg); }
+  .card.s-R { --c:var(--s-R); } .card.s-B { --c:var(--s-B); } .card.s-G { --c:var(--s-G); } .card.s-Y { --c:var(--s-Y); }
+  .card.s-R, .card.s-B, .card.s-G, .card.s-Y { background:color-mix(in srgb, var(--c) 10%, var(--paper)); }
+  .card.z { background:#1a1a1a; color:#f4d97a; border-color:#f4d97a; font-style:italic; }
+  .card.n { background:repeating-linear-gradient(45deg, var(--paper) 0 6px, var(--paper-2) 6px 12px); color:var(--muted); border-color:var(--muted); border-style:dashed; font-style:italic; }
+  .card.big { width:66px; height:96px; font-size:30px; }
+  .card.tiny { width:34px; height:50px; font-size:15px; border-radius:4px; }
+  .card.tiny::before, .card.tiny::after { display:none; }
+
+  /* Game layout */
+  .bar { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--rule); flex-wrap:wrap; }
+  .bar .round { font-family:'Fraunces', serif; font-weight:800; font-size:22px; }
+  .bar .round small { font-family:'JetBrains Mono', monospace; font-weight:400; font-size:11px; letter-spacing:.14em; color:var(--muted); margin-left:6px; }
+  .trump { display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .trump b { color:var(--ink); }
+  .seats { display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:6px; margin:12px 0; }
+  .seat { border:1px solid var(--rule-soft); padding:8px 10px; position:relative; transition:border-color .2s, background .2s; }
+  .seat.turn { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, transparent); }
+  .seat.me .name::after { content:" (du)"; color:var(--muted); font-weight:400; font-style:italic; }
+  .seat.away { opacity:.45; }
+  .seat .top { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .seat .name { font-family:'Fraunces', serif; font-weight:600; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .seat .score { font-family:'Fraunces', serif; font-weight:800; font-size:17px; }
+  .seat .meta { font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.04em; color:var(--muted); margin-top:3px; display:flex; flex-wrap:wrap; gap:2px 8px; align-items:center; }
+  .seat .meta b { color:var(--ink); font-weight:700; }
+  .seat .tag { font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); border:1px solid currentColor; padding:0 4px; }
+
+  .table {
+    min-height:150px; border:1px solid var(--rule); background:var(--paper-2);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:14px 10px;
+  }
+  .table .status { font-family:'Fraunces', serif; font-style:italic; font-size:17px; text-align:center; color:var(--ink-soft); }
+  .table .status b { font-style:normal; color:var(--accent); }
+  .trick { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .trick .play { display:flex; flex-direction:column; align-items:center; gap:4px; animation:deal .3s cubic-bezier(.2,.7,.2,1) backwards; }
+  .trick .play span { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:var(--muted); max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .trick .play.win .card { box-shadow:0 0 0 3px var(--accent); }
+  .trick .play.win span { color:var(--accent); font-weight:700; }
+  @keyframes deal { from { opacity:0; transform:translateY(14px) scale(.9); } }
+
+  .panel { margin-top:12px; }
+  .bids { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .bids .btn { min-width:52px; padding:10px 12px; font-size:15px; }
+  .suits { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .suits .btn { color:#fff; box-shadow:2px 2px 0 var(--ink); border:0; }
+
+  .hand-wrap { margin-top:16px; border-top:2px solid var(--rule); padding-top:10px; }
+  .hand-head { display:flex; justify-content:space-between; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .hand { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; padding-bottom:8px; }
+  .hand .card { cursor:default; transition:transform .15s ease, opacity .15s, box-shadow .15s; }
+  .hand.active .card.ok { cursor:pointer; }
+  .hand.active .card.ok:hover { transform:translateY(-4px); }
+  .hand.active .card.no { opacity:.35; }
+  .hand .card.sel { transform:translateY(-12px); box-shadow:0 0 0 3px var(--accent), 2px 6px 0 rgba(0,0,0,.2); }
+  .hint { text-align:center; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:.1em; color:var(--muted); min-height:16px; }
+
+  /* Result tables */
+  .score-table { width:100%; border-collapse:collapse; font-size:14px; }
+  .score-table th, .score-table td { padding:8px 6px; border-bottom:1px dashed var(--rule-soft); text-align:right; white-space:nowrap; }
+  .score-table th:first-child, .score-table td:first-child { text-align:left; }
+  .score-table th { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+  .score-table td { font-family:'Fraunces', serif; }
+  .score-table .pos { color:var(--ok); } .score-table .neg { color:var(--accent); }
+  .score-table tr.lead td:first-child { font-weight:800; }
+  .table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .podium { text-align:center; padding:16px 0; }
+  .podium .crown { font-size:40px; }
+  .podium .who { font-family:'Fraunces', serif; font-weight:800; font-size:clamp(34px, 8vw, 56px); line-height:1; }
+  .podium .pts { font-family:'JetBrains Mono', monospace; letter-spacing:.14em; color:var(--muted); margin-top:6px; }
+
+  /* Overlay for missing players */
+  .overlay { position:fixed; inset:0; z-index:10000; background:rgba(20,20,16,.72); display:none; align-items:center; justify-content:center; padding:20px; }
+  .overlay.show { display:flex; }
+  .overlay .box { background:var(--paper); border:1px solid var(--rule); padding:22px; max-width:380px; width:100%; text-align:center; box-shadow:6px 6px 0 var(--accent); }
+  .overlay h3 { font-family:'Fraunces', serif; font-size:24px; margin-bottom:8px; }
+  .overlay p { color:var(--ink-soft); margin-bottom:16px; }
+
+  details.rules { margin-top:22px; border-top:1px solid var(--rule-soft); padding-top:10px; }
+  details.rules summary { cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+  details.rules ul { margin:10px 0 0 18px; display:grid; gap:6px; color:var(--ink-soft); font-size:15px; }
+
+  @media (max-width:560px) {
+    .card { width:44px; height:66px; font-size:21px; }
+    .card.big { width:56px; height:82px; font-size:26px; }
+    .seats { grid-template-columns:repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="edition left">Vol. I · SS 2026 · Nº 09</div>
+    <div class="brand">Wiz<em>ard</em></div>
+    <div class="edition right">
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta" id="roomMeta">Online · 3–6 Spieler</span>
+  </div>
+
+  <!-- ============= START ============= -->
+  <section id="screen-start" class="screen active">
+    <div class="hero">
+      <div class="eyebrow">Das Kartenspiel · Online · jeder am eigenen Handy</div>
+      <h1>Wiz<em>ard</em></h1>
+      <div class="lede">Sag an, wie viele Stiche du holst — und dann hol genau so viele.</div>
+    </div>
+
+    <div class="section-title">Dein Name</div>
+    <input type="text" id="nameInput" maxlength="16" placeholder="Name eingeben …" autocomplete="off">
+
+    <div class="section-title">Neues Spiel</div>
+    <button class="btn accent block" id="createBtn">Raum erstellen &rarr;</button>
+
+    <div class="or">— oder —</div>
+
+    <div class="section-title">Raum beitreten</div>
+    <div class="row">
+      <input type="text" class="code" id="codeInput" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters">
+      <button class="btn" id="joinBtn">Beitreten</button>
+    </div>
+    <div class="note error" id="startError"></div>
+
+    <details class="rules">
+      <summary>Spielregeln in Kürze</summary>
+      <ul>
+        <li>60 Karten: vier Farben von 1 bis 13, dazu 4 Zauberer (Z) und 4 Narren (N).</li>
+        <li>Runde 1 hat 1 Karte pro Person, Runde 2 hat 2 und so weiter — bis alle Karten verteilt sind.</li>
+        <li>Die nächste Karte vom Stapel bestimmt Trumpf. Zauberer: Der Geber wählt. Narr: kein Trumpf.</li>
+        <li>Jeder sagt an, wie viele Stiche er holt. Dann wird gespielt: Farbe bedienen, Zauberer und Narr gehen immer.</li>
+        <li>Der erste Zauberer gewinnt den Stich, sonst der höchste Trumpf, sonst die höchste Karte der ausgespielten Farbe.</li>
+        <li>Richtig angesagt: 20 Punkte + 10 pro Stich. Daneben: −10 pro Stich Abweichung.</li>
+      </ul>
+    </details>
+  </section>
+
+  <!-- ============= LOBBY ============= -->
+  <section id="screen-lobby" class="screen">
+    <div class="room-code">
+      <div class="lbl">Raumcode</div>
+      <div class="code" id="lobbyCode">—</div>
+    </div>
+    <button class="btn ghost block" id="shareBtn">Einladung teilen</button>
+
+    <div class="section-title">Am Tisch <span class="count" id="lobbyCount"></span></div>
+    <ul class="plist" id="lobbyPlayers"></ul>
+
+    <div class="section-title">Regeln</div>
+    <label class="switch"><input type="checkbox" id="optNoEven"> Ansagen dürfen nicht aufgehen <small style="color:var(--muted)">(der Geber darf nicht so ansagen, dass die Summe der Stichzahl entspricht)</small></label>
+
+    <div style="margin-top:18px; display:grid; gap:10px;">
+      <button class="btn accent block" id="startBtn" disabled>Spiel starten</button>
+      <div class="note" id="lobbyNote" style="text-align:center"></div>
+      <button class="btn ghost block" id="leaveLobbyBtn">Raum verlassen</button>
+    </div>
+  </section>
+
+  <!-- ============= GAME ============= -->
+  <section id="screen-game" class="screen">
+    <div class="bar">
+      <div class="round" id="roundLbl">Runde 1</div>
+      <div class="trump" id="trumpBox"></div>
+    </div>
+    <div class="seats" id="seats"></div>
+
+    <div class="table">
+      <div class="status" id="status"></div>
+      <div class="trick" id="trick"></div>
+    </div>
+
+    <div class="panel" id="panel"></div>
+
+    <div class="hand-wrap">
+      <div class="hand-head"><span>Deine Karten</span><span id="myInfo"></span></div>
+      <div class="hand" id="hand"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </section>
+
+  <!-- ============= ROUND / GAME END ============= -->
+  <section id="screen-score" class="screen">
+    <div class="podium" id="podium"></div>
+    <div class="section-title" id="scoreTitle">Runde</div>
+    <div class="table-scroll"><table class="score-table" id="scoreTable"></table></div>
+    <div style="margin-top:18px; display:grid; gap:10px;" id="scoreActions"></div>
+  </section>
+
+  <footer class="foot">
+    <span>Strauss · Biebergemünd</span>
+    <span>© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<div class="overlay" id="awayOverlay">
+  <div class="box">
+    <h3>Warte auf Mitspieler</h3>
+    <p id="awayText"></p>
+    <button class="btn ghost block" id="abortBtn">Zurück in die Lobby</button>
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="multiplayer.js"></script>
+<script>
+/* =========================================================
+   RULES — pure functions on the shared state
+   Cards: "R7" = Rot 7 (suits R, B, G, Y; 1–13), "Z1".."Z4" Zauberer, "N1".."N4" Narr
+========================================================= */
+const SUITS = { R:"Rot", B:"Blau", G:"Grün", Y:"Gelb" };
+const isZ = c => c[0] === "Z", isN = c => c[0] === "N";
+const suitOf = c => (isZ(c) || isN(c)) ? null : c[0];
+const valOf = c => +c.slice(1);
+
+function newDeck() {
+  const d = [];
+  for (const s of "RBGY") for (let v = 1; v <= 13; v++) d.push(s + v);
+  for (let i = 1; i <= 4; i++) d.push("Z" + i, "N" + i);
+  for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; }
+  return d;
+}
+const maxRounds = n => Math.floor(60 / n);
+
+// Lead suit of a trick: first colour card, unless a Zauberer came before it (then anything goes)
+function leadSuit(trick) {
+  for (const { c } of trick) { if (isN(c)) continue; if (isZ(c)) return null; return suitOf(c); }
+  return null;
+}
+function canPlay(hand, card, trick) {
+  if (isZ(card) || isN(card)) return true;
+  const ls = leadSuit(trick);
+  if (!ls || suitOf(card) === ls) return true;
+  return !hand.some(c => suitOf(c) === ls);
+}
+// Index of the winning play in a full trick
+function trickWinner(trick, trump) {
+  const z = trick.findIndex(p => isZ(p.c));
+  if (z >= 0) return z;
+  if (trick.every(p => isN(p.c))) return 0;
+  const ls = leadSuit(trick);
+  let best = -1;
+  trick.forEach((p, i) => {
+    if (isN(p.c)) return;
+    const b = best < 0 ? null : trick[best].c;
+    const score = c => (suitOf(c) === trump ? 200 : suitOf(c) === ls ? 100 : 0) + valOf(c);
+    if (best < 0 || score(p.c) > score(b)) best = i;
+  });
+  return best;
+}
+function sortHand(hand, trump) {
+  const rank = c => isZ(c) ? -1 : isN(c) ? 999 : (suitOf(c) === trump ? 0 : 1 + "RBGY".indexOf(suitOf(c))) * 20 + valOf(c);
+  return [...hand].sort((a, b) => rank(a) - rank(b));
+}
+function norm(s) {
+  s.order ||= []; s.hands ||= {}; s.bids ||= {}; s.tricksWon ||= {}; s.scores ||= {};
+  s.trick ||= []; s.history ||= []; s.ready ||= {}; s.settings ||= {}; s.trump ||= {}; s.names ||= {};
+  for (const p of s.order) { s.hands[p] ||= []; s.tricksWon[p] ||= 0; s.scores[p] ||= 0; }
+  return s;
+}
+
+function deal(s) {
+  const n = s.order.length, r = s.round, deck = newDeck();
+  s.hands = {}; s.bids = {}; s.tricksWon = {}; s.ready = {}; s.trick = []; s.lastTrick = null;
+  s.order.forEach((p, i) => { s.hands[p] = deck.slice(i * r, i * r + r); s.tricksWon[p] = 0; });
+  const tc = deck[n * r] || null;
+  s.trump = { card: tc, suit: tc && !isZ(tc) && !isN(tc) ? suitOf(tc) : null };
+  s.trickNo = 0;
+  if (tc && isZ(tc)) { s.phase = "trumpPick"; s.turn = s.dealer; }
+  else { s.phase = "bidding"; s.turn = (s.dealer + 1) % n; }
+}
+function startGame(s, presentOrder, names) {
+  s.order = presentOrder; s.names = names; s.round = 1; s.scores = {}; s.history = [];
+  presentOrder.forEach(p => s.scores[p] = 0);
+  s.dealer = Math.floor(Math.random() * presentOrder.length);
+  deal(s);
+}
+function forbiddenBid(s) {
+  if (!s.settings.noEven) return null;
+  const n = s.order.length;
+  const placed = Object.keys(s.bids).length;
+  if (placed !== n - 1) return null;   // only the last bidder (the dealer) is restricted
+  const sum = Object.values(s.bids).reduce((a, b) => a + b, 0);
+  const f = s.round - sum;
+  return f >= 0 ? f : null;
+}
+function applyTrump(s, pid, suit) {
+  if (s.phase !== "trumpPick" || s.order[s.dealer] !== pid || !SUITS[suit]) return false;
+  s.trump.suit = suit; s.phase = "bidding"; s.turn = (s.dealer + 1) % s.order.length;
+}
+function applyBid(s, pid, bid) {
+  if (s.phase !== "bidding" || s.order[s.turn] !== pid || s.bids[pid] !== undefined) return false;
+  if (!(bid >= 0 && bid <= s.round) || bid === forbiddenBid(s)) return false;
+  s.bids[pid] = bid;
+  const n = s.order.length;
+  if (Object.keys(s.bids).length === n) { s.phase = "playing"; s.turn = (s.dealer + 1) % n; }
+  else s.turn = (s.turn + 1) % n;
+}
+function applyPlay(s, pid, card) {
+  if (s.phase !== "playing" || s.order[s.turn] !== pid) return false;
+  const hand = s.hands[pid];
+  if (!hand.includes(card) || !canPlay(hand, card, s.trick)) return false;
+  s.hands[pid] = hand.filter(c => c !== card);
+  s.trick.push({ p: pid, c: card });
+  const n = s.order.length;
+  if (s.trick.length === n) {
+    const w = s.trick[trickWinner(s.trick, s.trump.suit)].p;
+    s.tricksWon[w] = (s.tricksWon[w] || 0) + 1;
+    s.trickWinner = w; s.phase = "trickEnd";
+  } else s.turn = (s.turn + 1) % n;
+}
+function applyAdvance(s, trickNo) {
+  if (s.phase !== "trickEnd" || s.trickNo !== trickNo) return false;
+  const w = s.trickWinner;
+  s.lastTrick = { cards: s.trick, winner: w };
+  s.trick = []; s.trickNo++;
+  if (s.order.every(p => !s.hands[p].length)) scoreRound(s);
+  else { s.phase = "playing"; s.turn = s.order.indexOf(w); }
+}
+function scoreRound(s) {
+  const res = {};
+  for (const p of s.order) {
+    const b = s.bids[p], w = s.tricksWon[p] || 0;
+    const pts = b === w ? 20 + 10 * w : -10 * Math.abs(b - w);
+    s.scores[p] = (s.scores[p] || 0) + pts;
+    res[p] = { b, w, pts };
+  }
+  s.history.push({ round: s.round, res });
+  s.ready = {};
+  s.phase = s.round >= maxRounds(s.order.length) ? "gameEnd" : "roundEnd";
+}
+function applyReady(s, pid) {
+  if (s.phase !== "roundEnd") return false;
+  s.ready[pid] = true;
+  if (s.order.every(p => s.ready[p])) { s.round++; s.dealer = (s.dealer + 1) % s.order.length; deal(s); }
+}
+function toLobby(s) {
+  const settings = s.settings || {};
+  for (const k of Object.keys(s)) delete s[k];
+  s.phase = "lobby"; s.settings = settings;
+}
+
+/* =========================================================
+   CONNECTION
+========================================================= */
+const $ = sel => document.querySelector(sel);
+const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const store = {
+  get(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { sessionStorage.removeItem(k); } catch {} }
+};
+let mp = null, room = null, selected = null, advanceTimer = null;
+
+function getMp() { return mp ||= Multiplayer.create("wizard", { maxPlayers: 6 }); }
+const me = () => getMp().me;
+
+// Run a rule function inside a Firebase transaction so two phones can't act at once
+function act(fn) {
+  return getMp().transaction("state", s => {
+    if (!s) return s;
+    norm(s);
+    return fn(s) === false ? undefined : s;
+  });
+}
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+}
+
+function myName() {
+  const n = $("#nameInput").value.trim();
+  if (!n) { $("#startError").textContent = "Bitte zuerst einen Namen eingeben."; $("#nameInput").focus(); return null; }
+  try { localStorage.setItem("wz-name", n); } catch {}
+  return n;
+}
+
+async function enterRoom(code, name) {
+  store.set("wz-session", { code, name });
+  history.replaceState(null, "", "?r=" + code);
+  getMp().onChange(onRoom);
+}
+
+$("#createBtn").addEventListener("click", async () => {
+  const name = myName(); if (!name) return;
+  $("#createBtn").disabled = true;
+  try { const code = await getMp().host(name, { phase: "lobby", settings: { noEven: false } }); await enterRoom(code, name); }
+  catch (e) { $("#startError").textContent = "Raum konnte nicht erstellt werden. Internet da?"; console.error(e); }
+  $("#createBtn").disabled = false;
+});
+$("#joinBtn").addEventListener("click", () => join($("#codeInput").value));
+$("#codeInput").addEventListener("input", e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); });
+$("#codeInput").addEventListener("keydown", e => { if (e.key === "Enter") join(e.target.value); });
+
+async function join(code) {
+  const name = myName(); if (!name) return;
+  if (String(code).trim().length < 4) { $("#startError").textContent = "Code prüfen."; return; }
+  $("#joinBtn").disabled = true;
+  try { await getMp().join(code, name); await enterRoom(getMp().code, name); }
+  catch (e) { $("#startError").textContent = e.message || "Beitritt fehlgeschlagen."; }
+  $("#joinBtn").disabled = false;
+}
+
+async function leaveRoom() {
+  store.del("wz-session");
+  history.replaceState(null, "", location.pathname);
+  room = null;
+  await getMp().leave();
+  $("#awayOverlay").classList.remove("show");
+  $("#roomMeta").textContent = "Online · 3–6 Spieler";
+  showScreen("screen-start");
+}
+$("#leaveLobbyBtn").addEventListener("click", leaveRoom);
+
+$("#shareBtn").addEventListener("click", async () => {
+  const url = location.origin + location.pathname + "?r=" + getMp().code;
+  const text = `Spiel Wizard mit mir! Raumcode: ${getMp().code}`;
+  try {
+    if (navigator.share) await navigator.share({ title: "Wizard", text, url });
+    else { await navigator.clipboard.writeText(url); $("#shareBtn").textContent = "Link kopiert ✓"; setTimeout(() => $("#shareBtn").textContent = "Einladung teilen", 1800); }
+  } catch {}
+});
+
+$("#optNoEven").addEventListener("change", e => act(s => { if (s.phase !== "lobby") return false; s.settings.noEven = e.target.checked; }));
+$("#startBtn").addEventListener("click", () => act(s => {
+  if (s.phase !== "lobby") return false;
+  const present = Object.entries(room.players || {}).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0)).map(([id]) => id);
+  if (present.length < 3 || present.length > 6) return false;
+  startGame(s, present, Object.fromEntries(present.map(id => [id, room.players[id].name])));
+}));
+$("#abortBtn").addEventListener("click", () => act(s => { toLobby(s); }));
+
+/* =========================================================
+   RENDER
+========================================================= */
+const nameOf = id => esc(room?.players?.[id]?.name || room?.state?.names?.[id] || "?");
+
+function cardHTML(c, cls = "") {
+  if (!c) return "";
+  if (isZ(c)) return `<div class="card z ${cls}" data-v="Z" data-c="${c}" title="Zauberer">Z</div>`;
+  if (isN(c)) return `<div class="card n ${cls}" data-v="N" data-c="${c}" title="Narr">N</div>`;
+  return `<div class="card s-${suitOf(c)} ${cls}" data-v="${valOf(c)}" data-c="${c}" title="${SUITS[suitOf(c)]} ${valOf(c)}">${valOf(c)}</div>`;
+}
+
+function onRoom(r) {
+  if (!r) { leaveRoom(); $("#startError").textContent = "Der Raum wurde geschlossen."; return; }
+  room = r;
+  const s = norm(r.state || { phase: "lobby" });
+  $("#roomMeta").textContent = "Raum " + r.code;
+  if (s.phase === "lobby") return renderLobby(r, s);
+  if (s.phase === "roundEnd" || s.phase === "gameEnd") renderScore(r, s);
+  else renderGame(r, s);
+  renderAway(r, s);
+  if (s.phase === "trickEnd") scheduleAdvance(s.trickNo);
+}
+
+function renderLobby(r, s) {
+  showScreen("screen-lobby");
+  $("#awayOverlay").classList.remove("show");
+  $("#lobbyCode").textContent = r.code;
+  const players = Object.entries(r.players || {}).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0));
+  const host = Multiplayer.hostOf(r);
+  $("#lobbyCount").textContent = `${players.length} / 6`;
+  $("#lobbyPlayers").innerHTML = players.map(([id, p]) =>
+    `<li>${esc(p.name)} <small>${id === host ? "Gastgeber" : ""}${id === me() ? (id === host ? " · du" : "du") : ""}</small></li>`).join("");
+  const isHost = host === me();
+  $("#optNoEven").checked = !!s.settings.noEven;
+  $("#optNoEven").disabled = !isHost;
+  $("#startBtn").disabled = !isHost || players.length < 3;
+  $("#startBtn").style.display = isHost ? "" : "none";
+  $("#lobbyNote").textContent = players.length < 3
+    ? `Noch ${3 - players.length} Mitspieler nötig — teile den Code.`
+    : isHost ? `${players.length} Spieler · ${maxRounds(players.length)} Runden` : "Warte, bis der Gastgeber startet …";
+}
+
+function renderGame(r, s) {
+  showScreen("screen-game");
+  const n = s.order.length, turnId = s.order[s.turn], mine = me();
+  $("#roundLbl").innerHTML = `Runde ${s.round}<small>von ${maxRounds(n)}</small>`;
+  const t = s.trump || {};
+  $("#trumpBox").innerHTML = (t.card ? cardHTML(t.card, "tiny") : "") +
+    `<span>Trumpf: <b>${t.suit ? SUITS[t.suit] : (s.phase === "trumpPick" ? "wird gewählt" : "keiner")}</b></span>`;
+
+  // Seats in table order
+  $("#seats").innerHTML = s.order.map((id, i) => {
+    const bid = s.bids[id];
+    const away = !r.players?.[id];
+    const active = (s.phase === "bidding" || s.phase === "playing" || s.phase === "trumpPick") && id === turnId;
+    return `<div class="seat ${active ? "turn" : ""} ${id === mine ? "me" : ""} ${away ? "away" : ""}">
+      <div class="top"><div class="name">${nameOf(id)}</div><div class="score">${s.scores[id] || 0}</div></div>
+      <div class="meta"><span>Ansage <b>${bid ?? "–"}</b></span><span>Stiche <b>${s.tricksWon[id] || 0}</b></span>${i === s.dealer ? '<span class="tag">Geber</span>' : ""}</div>
+    </div>`;
+  }).join("");
+
+  // Table: current trick (or the finished one during the pause)
+  const winnerIdx = s.phase === "trickEnd" ? s.trick.findIndex(p => p.p === s.trickWinner) : -1;
+  $("#trick").innerHTML = s.trick.map((p, i) => `<div class="play ${i === winnerIdx ? "win" : ""}">${cardHTML(p.c, "big")}<span>${nameOf(p.p)}</span></div>`).join("");
+  let status = "";
+  if (s.phase === "trumpPick") status = turnId === mine ? "Ein Zauberer liegt auf dem Stapel: <b>Du wählst Trumpf.</b>" : `<b>${nameOf(turnId)}</b> wählt Trumpf …`;
+  else if (s.phase === "bidding") status = turnId === mine ? "<b>Deine Ansage:</b> Wie viele Stiche holst du?" : `<b>${nameOf(turnId)}</b> sagt an …`;
+  else if (s.phase === "playing") status = s.trick.length ? (turnId === mine ? "<b>Du bist dran.</b>" : `<b>${nameOf(turnId)}</b> ist dran …`)
+    : (turnId === mine ? "<b>Du spielst aus.</b>" : `<b>${nameOf(turnId)}</b> spielt aus …`);
+  else if (s.phase === "trickEnd") status = s.trickWinner === mine ? "<b>Dein Stich!</b>" : `Stich an <b>${nameOf(s.trickWinner)}</b>`;
+  $("#status").innerHTML = status;
+
+  // Panel: trump choice or bid buttons
+  const panel = $("#panel");
+  if (s.phase === "trumpPick" && turnId === mine) {
+    panel.innerHTML = `<div class="suits">${Object.entries(SUITS).map(([k, v]) => `<button class="btn" data-suit="${k}" style="background:var(--s-${k})">${v}</button>`).join("")}</div>`;
+    panel.querySelectorAll("[data-suit]").forEach(b => b.onclick = () => act(st => applyTrump(st, mine, b.dataset.suit)));
+  } else if (s.phase === "bidding" && turnId === mine) {
+    const f = forbiddenBid(s);
+    panel.innerHTML = `<div class="bids">${Array.from({ length: s.round + 1 }, (_, i) =>
+      `<button class="btn ${i === f ? "" : "ghost"}" data-bid="${i}" ${i === f ? "disabled title='Ansagen dürfen nicht aufgehen'" : ""}>${i}</button>`).join("")}</div>` +
+      (f !== null ? `<div class="hint" style="margin-top:8px">${f} ist gesperrt — die Ansagen dürfen nicht aufgehen.</div>` : "");
+    panel.querySelectorAll("[data-bid]").forEach(b => b.onclick = () => act(st => applyBid(st, mine, +b.dataset.bid)));
+  } else panel.innerHTML = "";
+
+  // My hand
+  const hand = sortHand(s.hands[mine] || [], t.suit);
+  const myTurnToPlay = s.phase === "playing" && turnId === mine;
+  if (selected && !hand.includes(selected)) selected = null;
+  const handEl = $("#hand");
+  handEl.classList.toggle("active", myTurnToPlay);
+  handEl.innerHTML = hand.map(c => cardHTML(c, (myTurnToPlay ? (canPlay(hand, c, s.trick) ? "ok" : "no") : "") + (c === selected ? " sel" : ""))).join("")
+    || `<span class="hint">Keine Karten</span>`;
+  handEl.querySelectorAll(".card.ok").forEach(el => el.onclick = () => {
+    const c = el.dataset.c;
+    if (selected === c) { selected = null; act(st => applyPlay(st, mine, c)); }
+    else { selected = c; renderGame(room, norm(room.state)); }
+  });
+  const won = s.tricksWon[mine] || 0;
+  $("#myInfo").textContent = s.bids[mine] !== undefined ? `Ansage ${s.bids[mine]} · ${won} ${won === 1 ? "Stich" : "Stiche"}` : "";
+  $("#hint").textContent = myTurnToPlay ? (selected ? "Nochmal tippen zum Ausspielen" : "Karte antippen, dann nochmal zum Ausspielen") : "";
+}
+
+function scheduleAdvance(trickNo) {
+  clearTimeout(advanceTimer);
+  advanceTimer = setTimeout(() => act(st => applyAdvance(st, trickNo)), 1700);
+}
+
+function renderScore(r, s) {
+  showScreen("screen-score");
+  const ended = s.phase === "gameEnd";
+  const ranking = [...s.order].sort((a, b) => (s.scores[b] || 0) - (s.scores[a] || 0));
+  const last = s.history[s.history.length - 1];
+  $("#podium").innerHTML = ended
+    ? `<div class="crown">♛</div><div class="who">${nameOf(ranking[0])}</div><div class="pts">${s.scores[ranking[0]]} Punkte · Sieg</div>`
+    : `<div class="who" style="font-size:clamp(28px,7vw,44px)">Runde ${s.round} vorbei</div><div class="pts">${maxRounds(s.order.length) - s.round} Runden übrig</div>`;
+
+  if (ended) {
+    $("#scoreTitle").textContent = "Endstand";
+    const rounds = s.history.map(h => h.round);
+    $("#scoreTable").innerHTML = `<tr><th>Spieler</th><th>Punkte</th>${rounds.map(n => `<th>R${n}</th>`).join("")}</tr>` +
+      ranking.map((p, i) => `<tr class="${i === 0 ? "lead" : ""}"><td>${i + 1}. ${nameOf(p)}</td><td><b>${s.scores[p]}</b></td>${
+        s.history.map(h => { const x = h.res[p]; return `<td class="${x.pts > 0 ? "pos" : "neg"}">${x.pts > 0 ? "+" : ""}${x.pts}</td>`; }).join("")}</tr>`).join("");
+    const isHost = Multiplayer.hostOf(r) === me();
+    $("#scoreActions").innerHTML = (isHost ? `<button class="btn accent block" id="againBtn">Nochmal spielen</button>` : `<div class="note" style="text-align:center">Der Gastgeber kann eine neue Partie starten.</div>`) +
+      `<button class="btn ghost block" id="leaveBtn">Raum verlassen</button>`;
+    if (isHost) $("#againBtn").onclick = () => act(st => { toLobby(st); });
+  } else {
+    $("#scoreTitle").textContent = "Diese Runde";
+    $("#scoreTable").innerHTML = `<tr><th>Spieler</th><th>Ansage</th><th>Stiche</th><th>Runde</th><th>Gesamt</th></tr>` +
+      ranking.map((p, i) => { const x = last.res[p]; return `<tr class="${i === 0 ? "lead" : ""}"><td>${nameOf(p)}</td><td>${x.b}</td><td>${x.w}</td>
+        <td class="${x.pts > 0 ? "pos" : "neg"}">${x.pts > 0 ? "+" : ""}${x.pts}</td><td><b>${s.scores[p]}</b></td></tr>`; }).join("");
+    const waiting = s.order.filter(p => !s.ready[p]);
+    const iAmReady = !!s.ready[me()];
+    $("#scoreActions").innerHTML = `<button class="btn accent block" id="readyBtn" ${iAmReady ? "disabled" : ""}>${iAmReady ? "Bereit ✓" : "Weiter zur nächsten Runde"}</button>
+      <div class="note" style="text-align:center">${waiting.length ? "Warte auf: " + waiting.map(nameOf).join(", ") : ""}</div>
+      <button class="btn ghost block" id="leaveBtn">Raum verlassen</button>`;
+    $("#readyBtn").onclick = () => act(st => applyReady(st, me()));
+  }
+  $("#leaveBtn").onclick = () => { if (ended || confirm("Wirklich verlassen? Die Partie kann dann nicht weitergehen.")) leaveRoom(); };
+}
+
+function renderAway(r, s) {
+  const away = s.order.filter(p => !r.players?.[p]);
+  const show = away.length && s.phase !== "gameEnd";
+  $("#awayOverlay").classList.toggle("show", !!show);
+  if (show) $("#awayText").innerHTML = `${away.map(nameOf).join(", ")} ${away.length > 1 ? "sind" : "ist"} nicht mehr verbunden. Sobald die Seite dort wieder offen ist, geht es weiter.`;
+}
+
+/* =========================================================
+   START-UP
+========================================================= */
+try { $("#nameInput").value = localStorage.getItem("wz-name") || ""; } catch {}
+const urlCode = new URLSearchParams(location.search).get("r");
+if (urlCode) $("#codeInput").value = urlCode.toUpperCase();
+
+// Back after a reload or a lost connection: rejoin the same room automatically
+(async () => {
+  const sess = store.get("wz-session");
+  if (!sess) return;
+  try { await getMp().join(sess.code, sess.name); await enterRoom(getMp().code, sess.name); }
+  catch { store.del("wz-session"); }
+})();
+</script>
+</body>
+</html>

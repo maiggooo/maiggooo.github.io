@@ -7,16 +7,21 @@
 //   <script src="multiplayer.js"></script>
 //
 // Usage:
-//   const mp = Multiplayer.create("werwolf", { maxPlayers: 12 });
+//   const mp = Multiplayer.create("wizard", { maxPlayers: 6 });
 //   const code = await mp.host("Maiko", { phase: "lobby" });  // open a room, you are the host
 //   await mp.join("K7QXM", "Lina");                           // or join one by its code
-//   mp.onChange(room => render(room));  // { code, hostId, status, state, players: { id: { name, joinedAt, data } } }
-//   mp.setState({ phase: "night" });    // shared game state (usually only the host writes it)
+//   mp.onChange(room => render(room));  // { code, hostId, state, players: { id: { name, joinedAt, data } } }
+//   mp.setState({ phase: "night" });    // shared game state
+//   mp.transaction("state", s => { ...; return s; });  // race-free update
 //   mp.setMine({ vote: "p2" });         // this player's own data
+//   Multiplayer.hostOf(room);           // host, or the longest-present player if the host is gone
 //   mp.leave();
 //
 // Rooms live under games/<game>/rooms/<code>. A player who closes the tab is removed
-// automatically; when the host leaves, the room is marked "closed".
+// automatically and comes back by themselves when the connection returns (e.g. after the
+// phone screen was locked). When the last player leaves, the room is deleted; rooms that
+// have been empty and idle for 15 minutes, or are older than a day, are swept away
+// whenever someone opens or joins a room.
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyC5rIZe_XZsUI7XElqYPuyzVf3-PCNALtI",
@@ -28,6 +33,9 @@ const FIREBASE_CONFIG = {
   appId:             "1:390526000253:web:dcc10cb716978769cf2514"
 };
 
+const ROOM_MAX_AGE = 24 * 60 * 60 * 1000;
+const ROOM_IDLE    = 15 * 60 * 1000;
+
 const Multiplayer = {
   NOW: () => firebase.database.ServerValue.TIMESTAMP,
 
@@ -35,6 +43,13 @@ const Multiplayer = {
   makeCode(len = 5) {
     const abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     return Array.from({ length: len }, () => abc[Math.floor(Math.random() * abc.length)]).join("");
+  },
+
+  // The host, or whoever has been in the room longest if the host left
+  hostOf(room) {
+    const players = room?.players || {};
+    if (players[room?.hostId]) return room.hostId;
+    return Object.entries(players).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0))[0]?.[0] || null;
   },
 
   create(game, { maxPlayers = 20, playerId } = {}) {
@@ -46,36 +61,52 @@ const Multiplayer = {
       try { me = sessionStorage.getItem("mp-id"); } catch {}
       if (!me) { me = "p" + Math.random().toString(36).slice(2, 10); try { sessionStorage.setItem("mp-id", me); } catch {} }
     }
-    const roomRef = code => db.ref(`games/${game}/rooms/${code}`);
-    let ref = null, off = null;
+    const roomsRef = db.ref(`games/${game}/rooms`);
+    const roomRef = code => roomsRef.child(code);
+    let ref = null, off = null, myName = "", connOff = null;
+    const touch = () => ref && ref.child("lastActive").set(Multiplayer.NOW());
+
+    // Delete rooms that are empty or stale. Best effort, never blocks the caller.
+    async function sweep() {
+      try {
+        const snap = await roomsRef.get();
+        const now = Date.now();
+        snap.forEach(r => {
+          const v = r.val() || {};
+          const idle = now - (v.lastActive || v.createdAt || 0);
+          if ((!v.players && idle > ROOM_IDLE) || now - (v.createdAt || 0) > ROOM_MAX_AGE) r.ref.remove();
+        });
+      } catch {}
+    }
 
     const api = {
       me, code: null, isHost: false,
 
       async host(name, state = {}) {
+        sweep();
         let code;
         do { code = Multiplayer.makeCode(); } while ((await roomRef(code).get()).exists());
         await roomRef(code).set({
-          hostId: me, status: "open", createdAt: Multiplayer.NOW(), state,
+          hostId: me, createdAt: Multiplayer.NOW(), lastActive: Multiplayer.NOW(), state,
           players: { [me]: { name, joinedAt: Multiplayer.NOW() } }
         });
         api.isHost = true;
-        enter(code);
-        ref.child("status").onDisconnect().set("closed");
+        enter(code, name);
         return code;
       },
 
       async join(code, name) {
+        sweep();
         code = String(code).trim().toUpperCase();
         const snap = await roomRef(code).get();
-        if (!snap.exists()) throw new Error("Raum nicht gefunden");
+        if (!snap.exists()) throw new Error("Raum nicht gefunden");   // empty rooms stay joinable until the sweep removes them
         const room = snap.val();
-        if (room.status === "closed") throw new Error("Raum wurde beendet");
         const players = room.players || {};
         if (!players[me] && Object.keys(players).length >= maxPlayers) throw new Error("Raum ist voll");
-        await roomRef(code).child("players/" + me).update({ name, joinedAt: Multiplayer.NOW() });
+        await roomRef(code).child("players/" + me).update({ name, joinedAt: players[me]?.joinedAt || Multiplayer.NOW() });
         api.isHost = room.hostId === me;
-        enter(code);
+        enter(code, name);
+        touch();
         return room;
       },
 
@@ -87,26 +118,42 @@ const Multiplayer = {
         off = () => r.off("value", handler);
       },
 
-      setState(patch) { return ref.child("state").update(patch); },
-      setMine(patch)  { return ref.child("players/" + me + "/data").update(patch); },
-      transaction(path, fn) { return ref.child(path).transaction(fn); },
+      setState(patch) { touch(); return ref.child("state").update(patch); },
+      setMine(patch)  { touch(); return ref.child("players/" + me + "/data").update(patch); },
+      transaction(path, fn) { touch(); return ref.child(path).transaction(fn); },
       ref(path = "") { return path ? ref.child(path) : ref; },
 
       async leave() {
         if (!ref) return;
+        const r = ref;
         if (off) { off(); off = null; }
-        try {
-          if (api.isHost) await ref.child("status").set("closed");
-          await ref.child("players/" + me).remove();
-        } catch {}
+        if (connOff) { connOff(); connOff = null; }
         ref = null; api.code = null; api.isHost = false;
+        try {
+          // Cancel the tab-close handler first, or it would re-create the room after it is deleted
+          await r.child("players/" + me).onDisconnect().cancel();
+          await r.child("players/" + me).remove();
+          const left = await r.child("players").get();
+          if (!left.exists()) await r.remove();   // last one out deletes the room
+        } catch {}
       }
     };
 
-    function enter(code) {
-      api.code = code;
+    function enter(code, name) {
+      api.code = code; myName = name;
       ref = roomRef(code);
-      ref.child("players/" + me).onDisconnect().remove();
+      if (connOff) connOff();
+      // (Re)announce this player whenever the connection is (re)established
+      const info = db.ref(".info/connected");
+      const h = info.on("value", async snap => {
+        if (!snap.val() || !ref) return;
+        const r = ref;
+        await r.child("players/" + me).onDisconnect().remove();
+        if (!(await r.child("createdAt").get()).exists()) return;   // room is gone, don't recreate it
+        await r.child("players/" + me).update({ name: myName });
+        if (!(await r.child("players/" + me + "/joinedAt").get()).exists()) r.child("players/" + me + "/joinedAt").set(Multiplayer.NOW());
+      });
+      connOff = () => info.off("value", h);
     }
     return api;
   }
