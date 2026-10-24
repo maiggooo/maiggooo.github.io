@@ -121,6 +121,20 @@
     font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
     padding:5px 10px; cursor:pointer;
   }
+  /* Phone still upright (e.g. rotation lock on): turn the play screen 90° so it
+     reads correctly once the phone is turned to the left. */
+  @media (orientation: portrait) {
+    .play {
+      inset:auto; top:0; left:0;
+      width:100vh; width:100dvh; height:100vw;
+      transform-origin:top left; transform:rotate(90deg) translateY(-100%);
+      padding:14px 22px;
+    }
+    .play .quit { top:10px; }
+    .play-word .word { font-size:clamp(44px, 11dvh, 150px); }
+    .play-word .word.count { font-size:clamp(90px, 26dvh, 260px); }
+    .play-word .sub { font-size:clamp(16px, 3dvh, 24px); }
+  }
 </style>
 </head>
 <body>
@@ -161,7 +175,7 @@
 
     <div class="section-title">So geht's</div>
     <ul class="howto">
-      <li><b>01</b> Handy quer an die Stirn halten, Bildschirm zu den anderen.</li>
+      <li><b>01</b> Handy nach links quer drehen und an die Stirn halten, Bildschirm zu den anderen. Das Bild dreht sich automatisch mit.</li>
       <li><b>02</b> Die anderen erklären den Begriff, ohne ihn zu sagen.</li>
       <li><b>03</b> Erraten? Handy <strong>nach unten</strong> kippen. Passen? <strong>Nach oben</strong> kippen.</li>
       <li><b>04</b> Ohne Sensor: rechts tippen = richtig, links tippen = weiter.</li>
