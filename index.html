@@ -262,11 +262,13 @@
     .tile { aspect-ratio:auto; min-height:240px; }
     /* Stack masthead: brand centered above, controls in a row below */
     .mast {
+      display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
       padding: 12px 0 10px;
     }
     .mast .brand { order: -1; text-align: center; }
+    .mast .edition.right { margin-left: 0; }
     .mast .edition.left,
     .mast .edition.right {
       display: flex;
@@ -462,6 +464,12 @@
   }
 
 
+  /* Touch screens: bigger tap targets */
+  @media (pointer:coarse) {
+    .cat-filter button { min-height:40px; padding:8px 14px; }
+    .section-label .reload, .section-label .pause { min-height:36px; padding:6px 12px; }
+    .weather { min-height:38px; }
+  }
 </style>
 </head>
 <body>
@@ -511,6 +519,18 @@
 
   <div class="section-label">
     <span class="num">02</span>
+    <span>—</span>
+    <span>Kabinett</span>
+    <span class="rule"></span>
+    <span class="meta" id="tileCount">— Einträge</span>
+  </div>
+
+  <nav class="cat-filter" id="catFilter" aria-label="Kategorie-Filter" hidden></nav>
+
+  <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie"></section>
+
+  <div class="section-label">
+    <span class="num">03</span>
     <span>—</span>
     <span>Depeschen</span>
     <span class="rule"></span>
@@ -578,18 +598,6 @@
       <div class="dep-progress"></div>
     </article>
   </section>
-
-  <div class="section-label">
-    <span class="num">03</span>
-    <span>—</span>
-    <span>Kabinett</span>
-    <span class="rule"></span>
-    <span class="meta" id="tileCount">— Einträge</span>
-  </div>
-
-  <nav class="cat-filter" id="catFilter" aria-label="Kategorie-Filter" hidden></nav>
-
-  <section class="gallery" id="gallery" aria-label="Werkzeug-Galerie"></section>
 
   <footer class="foot">
     <div>Strauss · Biebergemünd</div>

@@ -304,3 +304,24 @@ body.ads-off .ads-side { display:none !important; }
   .toggle:hover .dot { transform:scale(1.25); }
   .foot { animation:site-fade .8s ease .5s backwards; }
 }
+
+/* ————————————— MOBILE ————————————— */
+/* Snappier taps: no grey flash, no double-tap zoom delay */
+button, a, input, select, label, [role="button"] { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+
+@media (max-width:560px) {
+  /* Masthead wraps instead of pushing the page sideways when the title is long */
+  .mast { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px 14px; }
+  .mast .brand { min-width:0; font-size:clamp(19px, 6vw, 22px); }
+  .mast .edition.right { margin-left:auto; }
+}
+
+/* Touch screens: comfortable tap targets (~40px) */
+@media (pointer:coarse) {
+  .toggle { min-height:38px; padding:8px 12px; font-size:11px; }
+  .subhead a.back { padding:12px 0; margin:-12px 0; }
+  .chip { min-height:40px; }
+  input[type="range"] { min-height:32px; }
+  /* iOS zooms into inputs below 16px */
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]), select, textarea { font-size:16px; }
+}
