@@ -191,6 +191,19 @@
   .bot-row { gap:8px; margin-top:10px; }
   body.admin .bot-row { display:flex !important; }
   .bot-row .btn { flex:1; }
+  /* Long-press card info */
+  .card, .chip[data-x] { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .card-info { position:fixed; z-index:10001; width:min(320px, calc(100vw - 24px)); background:var(--paper); color:var(--ink);
+    border:1px solid var(--rule); box-shadow:5px 5px 0 var(--accent); padding:14px 16px; display:none; animation:info-in .16s ease-out; }
+  .card-info.show { display:block; }
+  @keyframes info-in { from { opacity:0; transform:translateY(6px) scale(.98); } }
+  .card-info h4 { font-family:'Fraunces', serif; font-size:22px; font-weight:800; display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .card-info h4 .ic { font-size:26px; font-family:system-ui, sans-serif; font-weight:400; }
+  .card-info .sec { font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; margin:10px 0 4px; }
+  .card-info .sec.good { color:var(--ok); } .card-info .sec.bad { color:var(--accent); } .card-info .sec.perk { color:var(--muted); }
+  .card-info ul { margin:0 0 0 16px; display:grid; gap:3px; font-size:14px; line-height:1.35; color:var(--ink-soft); }
+  .card-info .now { margin-top:10px; padding-top:8px; border-top:1px dashed var(--rule-soft); font-size:13px; font-style:italic; color:var(--ink-soft); }
+  .card-info .close { position:absolute; top:6px; right:10px; background:none; border:0; color:var(--muted); font-size:20px; cursor:pointer; }
   details.rules { margin-top:22px; border-top:1px solid var(--rule-soft); padding-top:10px; }
   details.rules summary { cursor:pointer; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
   details.rules ul { margin:10px 0 0 18px; display:grid; gap:6px; color:var(--ink-soft); font-size:15px; }
@@ -259,6 +272,7 @@
         <li>Wer ansagt und ausspielt, wechselt jede Runde: Es beginnt immer die Person links vom Geber, und der Geber rückt eins weiter.</li>
         <li>Blindrunde (einstellbar): In Runde 1 siehst du die Karte der anderen, aber nicht deine eigene.</li>
       </ul>
+      <p class="note">Tipp: Halte eine Sonderkarte, einen Zauberer oder Narren lange gedrückt (am PC: Rechtsklick), um zu sehen, was sie schlägt und was sie kann.</p>
       <div style="margin-top:12px; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)">Sonderkarten (einzeln zuschaltbar)</div>
       <ul id="specialRules"></ul>
       <p class="note">Sonderkarten dürfen immer gespielt werden. Liegt eine als Trumpfkarte: Drache, Wolke, Jongleur, Gestaltwandler und Vampir — der Geber wählt Trumpf; Fee, Bombe und Hexe — kein Trumpf; Werwolf — die nächste Karte entscheidet.</p>
@@ -336,6 +350,8 @@
   <span>Admin</span>
   <label><input type="checkbox" id="autoMe"> Autoplay</label>
 </div>
+
+<div class="card-info" id="cardInfo" role="dialog" aria-live="polite"></div>
 
 <div class="overlay" id="awayOverlay">
   <div class="box">
@@ -605,7 +621,7 @@ function applyWitch(s, pid, handCard, trickIdx) {
   if (s.phase !== "witch" || s.fxWitch !== pid) return false;
   if (handCard !== null) {
     const t = s.trick[trickIdx];
-    if (!t || t.c === "XH" || !s.hands[pid].includes(handCard)) return false;
+    if (!t || isHexe(t, s) || !s.hands[pid].includes(handCard)) return false;
     s.hands[pid] = s.hands[pid].filter(c => c !== handCard).concat(t.c);
     s.trick[trickIdx] = { p: pid, c: handCard, dead: true };
   }
@@ -634,6 +650,57 @@ function toLobby(s) {
   s.phase = "lobby"; s.settings = settings;
 }
 const isBlind = s => !!s.settings.blind && s.round === 1;
+// A Hexe can't take a Hexe out of the trick — that includes a Vampir copying one
+const isHexe = (p, s) => !p.dead && eff(p, s).k === "H";
+
+/* Long-press info for Zauberer, Narr and the special cards: what it beats, what beats it, extras */
+const CARD_INFO = {
+  Z:  { name:"Zauberer", icon:"Z",
+        beats:["alle Farbkarten, auch Trumpf", "Narren, Fee und Hexe", "jeden später gespielten Zauberer"],
+        loses:["den Drachen", "einen Zauberer, der vorher im Stich lag"],
+        perks:["Darf immer gespielt werden, auch wenn du bedienen könntest", "Spielst du ihn aus, darf jeder beliebige Karten legen", "Als Trumpfkarte: Der Geber wählt Trumpf"] },
+  N:  { name:"Narr", icon:"N",
+        beats:["die Fee und die Hexe", "spätere Narren, wenn nur Narren im Stich liegen"],
+        loses:["alle Farbkarten", "Zauberer und Drache"],
+        perks:["Darf immer gespielt werden — der sichere Weg, einen Stich nicht zu bekommen", "Spielst du ihn aus, bestimmt die nächste Farbkarte die Farbe", "Als Trumpfkarte: kein Trumpf"] },
+  XD: { name:"Drache", icon:"🐉",
+        beats:["alles — auch jeden Zauberer"],
+        loses:["die Fee, wenn sie im selben Stich liegt"],
+        perks:["Darf immer gespielt werden", "Spielst du ihn aus, darf jeder beliebige Karten legen", "Mit einer Bombe im Stich bekommt trotzdem niemand den Stich", "Als Trumpfkarte: Der Geber wählt Trumpf"] },
+  XF: { name:"Fee", icon:"🧚",
+        beats:["den Drachen — liegt er im Stich, gewinnt die Fee", "sonst nur die Hexe"],
+        loses:["alles andere, sogar Narren"],
+        perks:["Darf immer gespielt werden — perfekt, um keinen Stich zu machen", "Die Antwort auf den Drachen", "Als Trumpfkarte: kein Trumpf"] },
+  XB: { name:"Bombe", icon:"💣",
+        beats:["— niemand gewinnt einen Stich mit Bombe"],
+        loses:["—"],
+        perks:["Der Stich zählt für niemanden", "Wer die höchste Karte gelegt hat, spielt trotzdem aus", "Hebt die Wolke auf: keine Änderung der Ansage", "Als Trumpfkarte: kein Trumpf"] },
+  XW: { name:"Werwolf", icon:"🐺",
+        beats:["— wirkt beim Austeilen, nicht im Stich"],
+        loses:["— liegt er doch im Stich, zählt er wie ein Narr"],
+        perks:["Wer ihn bekommt, tauscht ihn sofort gegen die Trumpfkarte", "Du bestimmst Trumpf — oder dass es keinen gibt", "Wird er als Trumpfkarte aufgedeckt, entscheidet die nächste Karte"] },
+  XJ: { name:"Jongleur", icon:"🤹",
+        beats:["Karten 1–7 der gewählten Farbe", "andere Farben, wenn deine Farbe Trumpf ist oder ausgespielt wurde", "Narren, Fee und Hexe"],
+        loses:["Karten 8–13 der gewählten Farbe", "Trumpf (wenn deine Farbe kein Trumpf ist)", "Zauberer und Drache"],
+        perks:["Zählt 7½ in einer Farbe deiner Wahl", "Danach gibt jeder eine Handkarte an den linken Nachbarn", "Spielst du ihn aus, muss die gewählte Farbe bedient werden"] },
+  XC: { name:"Wolke", icon:"☁️",
+        beats:["Karten 1–9 der gewählten Farbe", "andere Farben, wenn deine Farbe Trumpf ist oder ausgespielt wurde", "Narren, Fee und Hexe"],
+        loses:["Karten 10–13 der gewählten Farbe", "Trumpf (wenn deine Farbe kein Trumpf ist)", "Zauberer und Drache"],
+        perks:["Zählt 9¾ in einer Farbe deiner Wahl", "Wer den Stich gewinnt, muss seine Ansage um +1 oder −1 ändern", "Mit einer Bombe im Stich entfällt das", "Als Trumpfkarte: Der Geber wählt Trumpf"] },
+  XS: { name:"Gestaltwandler", icon:"🎭",
+        beats:["als Zauberer: wie ein Zauberer", "als Narr: Fee und Hexe"],
+        loses:["als Zauberer: Drache und frühere Zauberer", "als Narr: fast alles"],
+        perks:["Du entscheidest beim Ausspielen: Zauberer oder Narr", "Darf immer gespielt werden", "Als Trumpfkarte: Der Geber wählt Trumpf"] },
+  XV: { name:"Vampir", icon:"🧛",
+        beats:["genau das, was die kopierte Karte schlägt"],
+        loses:["genau das, wogegen die kopierte Karte verliert"],
+        perks:["Kopiert die aufgedeckte Trumpfkarte samt Fähigkeiten", "Darf immer gespielt werden — auch wenn Trumpf ausgespielt wurde", "Liegt der Werwolf als Trumpfkarte, wird die nächste Karte aufgedeckt: Sie gilt ab sofort als Trumpf und wird kopiert", "Als Trumpfkarte: Der Geber wählt Trumpf"] },
+  XH: { name:"Hexe", icon:"🧙",
+        beats:["nichts — sie ist die niedrigste Karte"],
+        loses:["alles, auch Narr und Fee"],
+        perks:["Nach dem Stich darfst du eine Handkarte gegen eine Karte aus dem Stich tauschen (keine Hexe)", "Die getauschte Karte im Stich hat keine Wirkung mehr", "Wirkt nach allen anderen Sonderkarten", "Spielst du sie aus, bestimmt die nächste Farbkarte die Farbe", "Als Trumpfkarte: kein Trumpf"] },
+};
+const infoKey = c => !c || c === "?" ? null : isZ(c) ? "Z" : isN(c) ? "N" : CARD_INFO[c] ? c : null;
 
 /* =========================================================
    CONNECTION
@@ -837,14 +904,14 @@ function renderGame(r, s) {
   const done = ["trickEnd", "pass", "cloud", "witch"].includes(s.phase);
   const winnerIdx = done ? s.trick.findIndex(p => p.p === s.trickWinner && !p.dead) : -1;
   const pickTrick = s.phase === "witch" && s.fxWitch === mine;
-  if (selectedTrick !== null && (!pickTrick || !s.trick[selectedTrick] || s.trick[selectedTrick].c === "XH")) selectedTrick = null;
+  if (selectedTrick !== null && (!pickTrick || !s.trick[selectedTrick] || isHexe(s.trick[selectedTrick], s))) selectedTrick = null;
   $("#trick").innerHTML = s.trick.map((p, i) => {
     const note = playNote(p, s);
-    const cls = (pickTrick && p.c !== "XH" ? "ok" : "") + (i === selectedTrick ? " sel" : "") + (p.dead ? " dead" : "");
+    const cls = (pickTrick && !isHexe(p, s) ? "ok" : "") + (i === selectedTrick ? " sel" : "") + (p.dead ? " dead" : "");
     return `<div class="play ${i === winnerIdx ? "win" : ""}" data-i="${i}">${cardHTML(p.c, "big " + cls)}<span>${nameOf(p.p)}</span>${note ? `<em>${esc(note)}</em>` : ""}</div>`;
   }).join("");
   if (pickTrick) $("#trick").querySelectorAll(".play").forEach(el => {
-    if (s.trick[+el.dataset.i].c === "XH") return;
+    if (isHexe(s.trick[+el.dataset.i], s)) return;
     el.onclick = () => { selectedTrick = +el.dataset.i; renderGame(room, norm(room.state)); };
   });
 
@@ -923,7 +990,8 @@ function renderGame(r, s) {
   const won = s.tricksWon[mine] || 0;
   $("#myInfo").textContent = s.bids[mine] !== undefined ? `Ansage ${s.bids[mine]} · ${won} ${won === 1 ? "Stich" : "Stiche"}` : "";
   $("#hint").textContent = myPlay ? (selected ? "" : (blind ? "Tippe deine verdeckte Karte an" : "Karte antippen, dann nochmal zum Ausspielen"))
-    : myPass && !selected ? "Karte zum Weitergeben antippen" : "";
+    : myPass && !selected ? "Karte zum Weitergeben antippen"
+    : realHand.some(infoKey) && !blind ? "Sonderkarte lange drücken für Infos" : "";
 }
 function playSelected(s, realHand, opt = {}) {
   const card = isBlind(s) ? realHand[0] : selected;
@@ -976,6 +1044,76 @@ function renderAway(r, s) {
   $("#awayOverlay").classList.toggle("show", !!show);
   if (show) $("#awayText").innerHTML = `${away.map(nameOf).join(", ")} ${away.length > 1 ? "sind" : "ist"} nicht mehr verbunden. Sobald die Seite dort wieder offen ist, geht es weiter.`;
 }
+
+/* =========================================================
+   CARD INFO — long-press (touch) or right-click (mouse) on Zauberer, Narr or a special card
+========================================================= */
+function cardInfoHTML(c) {
+  const k = infoKey(c), info = CARD_INFO[k];
+  const li = a => a.map(x => `<li>${esc(x)}</li>`).join("");
+  let now = "";
+  const st = room?.state;
+  if (k === "XV" && st?.trump?.card) {
+    const t = st.trump.card, ik = infoKey(t);
+    now = `<div class="now">Gerade kopiert der Vampir: <b>${ik ? CARD_INFO[ik].name : SUITS[t[0]] + " " + valOf(t)}</b></div>`;
+  }
+  if (st?.trump?.suit && (k === "XJ" || k === "XC")) now = `<div class="now">Trumpf ist gerade <b>${SUITS[st.trump.suit]}</b> — wählst du diese Farbe, ist die Karte ein Trumpf.</div>`;
+  return `<button class="close" aria-label="Schließen">×</button>
+    <h4><span class="ic">${info.icon}</span>${info.name}</h4>
+    <div class="sec good">Schlägt</div><ul>${li(info.beats)}</ul>
+    <div class="sec bad">Verliert gegen</div><ul>${li(info.loses)}</ul>
+    <div class="sec perk">Besonderheiten</div><ul>${li(info.perks)}</ul>${now}`;
+}
+const infoBox = $("#cardInfo");
+function showCardInfo(c, el) {
+  if (!infoKey(c)) return;
+  infoBox.innerHTML = cardInfoHTML(c);
+  infoBox.classList.add("show");
+  // Place it above the card if there is room, otherwise below; keep it on screen
+  const r = el.getBoundingClientRect(), w = infoBox.offsetWidth, h = infoBox.offsetHeight;
+  const left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), innerWidth - w - 12);
+  const top = r.top - h - 12 > 12 ? r.top - h - 12 : Math.min(r.bottom + 12, innerHeight - h - 12);
+  infoBox.style.left = left + "px"; infoBox.style.top = Math.max(12, top) + "px";
+  navigator.vibrate?.(15);
+}
+function hideCardInfo() { infoBox.classList.remove("show"); }
+
+const infoTarget = e => {
+  const el = e.target.closest?.(".card[data-c], .chip[data-x]");
+  if (!el) return null;
+  const c = el.dataset.c || el.dataset.x;
+  return infoKey(c) ? { el, c } : null;
+};
+let pressTimer = null, pressStart = null, suppressClick = false;
+document.addEventListener("pointerdown", e => {
+  if (infoBox.classList.contains("show") && !infoBox.contains(e.target)) { hideCardInfo(); suppressClick = true; return; }
+  const t = infoTarget(e);
+  if (!t || e.button > 0) return;
+  pressStart = { x: e.clientX, y: e.clientY };
+  clearTimeout(pressTimer);
+  pressTimer = setTimeout(() => { suppressClick = true; showCardInfo(t.c, t.el); }, 450);
+});
+const cancelPress = () => { clearTimeout(pressTimer); pressTimer = null; };
+document.addEventListener("pointerup", cancelPress);
+document.addEventListener("pointercancel", cancelPress);
+document.addEventListener("pointermove", e => {
+  if (pressStart && Math.hypot(e.clientX - pressStart.x, e.clientY - pressStart.y) > 10) cancelPress();
+});
+// The tap that ends a long press must not also select or play the card
+document.addEventListener("click", e => {
+  if (e.target.closest?.(".card-info .close")) { hideCardInfo(); return; }
+  if (suppressClick) { suppressClick = false; e.preventDefault(); e.stopPropagation(); }
+}, true);
+// Mouse: right-click opens the info; also stops the phone's own long-press menu
+document.addEventListener("contextmenu", e => {
+  const t = infoTarget(e);
+  if (!t) return;
+  e.preventDefault();
+  cancelPress();
+  showCardInfo(t.c, t.el);
+});
+window.addEventListener("scroll", hideCardInfo, { passive: true });
+document.addEventListener("keydown", e => { if (e.key === "Escape") hideCardInfo(); });
 
 /* =========================================================
    ADMIN MODE — secret: tap the "Wizard" title 5× (or open ?admin)
@@ -1067,7 +1205,7 @@ function botMove(bot, s) {
     const d = (s.tricksWon[id] || 0) > (s.bids[id] || 0) || !s.bids[id] ? 1 : -1;
     return st => applyCloud(st, id, d);
   }
-  if (s.phase === "witch" && s.fxWitch === id) return st => applyWitch(st, id, null, null);
+  if (s.phase === "witch" && s.fxWitch === id) return st => applyWitch(st, id, null, null);   // bots never swap
   if (s.phase === "roundEnd" && !s.ready[id]) return st => applyReady(st, id);
   return null;
 }
