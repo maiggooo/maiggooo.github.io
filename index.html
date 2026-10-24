@@ -533,7 +533,7 @@
         <div class="dep-body">lädt …</div>
         <div class="dep-attr">
           <span id="depQuoteAuthor">—</span>
-          <span class="src">Quotable</span>
+          <span class="src">Zitatsammlung</span>
         </div>
       </div>
       <div class="dep-progress"></div>
@@ -595,11 +595,9 @@
 
   /* ———— PIKTOGRAMME (monochrom, currentColor) ———— */
   const ICONS = {
-    quiz:      '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 9.2c0-1.7 1.3-3 3-3s3 1.3 3 3c0 1.5-2 2.1-2 3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="currentColor"/></svg>',
     scissors:  '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="17" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="8.6" x2="20" y2="16.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="15.4" x2="20" y2="7.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     hourglass: '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12M6 21h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7 3v3.5l5 5.5-5 5.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M17 3v3.5l-5 5.5 5 5.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     arrows:    '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v16M8 4l-2.5 2.8M8 4l2.5 2.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20V4M16 20l-2.5-2.8M16 20l2.5-2.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    swords:    '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l10 10-1.5 3.5L9 15 4 20 3 19 8 14 4.5 10.5 3 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M20 3L10 13l1.5 3.5L15 15l5 5 1-1-5-5 3.5-3.5L21 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     plane:     '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2L2 10l7 3 3 7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M22 2L9 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     spy:       '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c1.5-2.5 5-3.5 10-3.5S20.5 9.5 22 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 12h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7.5" cy="15" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16.5" cy="15" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.7 15.4c.5-.4 1.6-.4 2.6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 8.5c1.5-2 4-3 8-3s6.5 1 8 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     wolf:      '<svg class="ticon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L15.5 7.5 L20 5.5 L18 11 C20.5 13 20.5 17.5 17 19.5 C15 20.7 13 21 12 21 C11 21 9 20.7 7 19.5 C3.5 17.5 3.5 13 6 11 L4 5.5 L8.5 7.5 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.3" cy="12.5" r="0.9" fill="currentColor"/><circle cx="14.7" cy="12.5" r="0.9" fill="currentColor"/><path d="M12 14.5 L10.5 16.5 L13.5 16.5 Z" fill="currentColor"/></svg>',
@@ -616,9 +614,7 @@
     { no: "V",    category: "Spiel",    icon: "spy",       title: "Spyfall <em>Nº 05</em>",             desc: "Entlarve den Spion — oder bleib selbst unerkannt.", path: "spyfall.html" },
     { no: "VI",   category: "Spiel",    icon: "wolf",      title: "Werwölfe <em>Nº 06</em>",            desc: "Dorfbewohner gegen Werwölfe — wer überlebt die Nacht?", path: "werwolf.html" },
     { no: "VII",  category: "Werkzeug", icon: "finger",    title: "Chooser <em>Nº 07</em>",             desc: "Finger auflegen — der Zufall wählt einen aus.",     path: "Chooser.html" },
-    { no: "VIII", category: "Wissen",   icon: "quiz",      title: "MarketingQuiz <em>Nº 08</em>",       desc: "Ein Quiz zum Fit werden in Marketing.",             path: "MarketingTeacher.html" },
-    { no: "IX",   category: "Wissen",   icon: "swords",    title: "MarketingDuell <em>Nº 09</em>",      desc: "Beweise dich gegen deine Freunde.",                 path: "quizduell.html" },
-    { no: "X",    category: "Spiel",    icon: "head",      title: "Stirnraten <em>Nº 10</em>",          desc: "Handy an die Stirn — die anderen erklären, du rätst.", path: "stirnraten.html" }
+    { no: "VIII", category: "Spiel",    icon: "head",      title: "Stirnraten <em>Nº 08</em>",          desc: "Handy an die Stirn — die anderen erklären, du rätst.", path: "stirnraten.html" }
   ];
 
   const gallery = document.getElementById('gallery');
@@ -812,17 +808,122 @@
     const pick = pool[Math.floor(Math.random()*pool.length)];
     return { year: pick.year, text: pick.text, link: pick.pages?.[0]?.content_urls?.desktop?.page || null };
   }
+  // Built in: the quote APIs used before went offline or blocked this site.
+  const QUOTES = [
+    ["Phantasie ist wichtiger als Wissen, denn Wissen ist begrenzt.", "Albert Einstein"],
+    ["Das Leben ist wie Fahrradfahren. Um die Balance zu halten, musst du in Bewegung bleiben.", "Albert Einstein"],
+    ["Ich habe keine besondere Begabung, sondern bin nur leidenschaftlich neugierig.", "Albert Einstein"],
+    ["Probleme kann man niemals mit derselben Denkweise lösen, durch die sie entstanden sind.", "Albert Einstein"],
+    ["Spiel ist die höchste Form der Forschung.", "Albert Einstein"],
+    ["Es ist nicht genug zu wissen, man muss auch anwenden; es ist nicht genug zu wollen, man muss auch tun.", "Johann Wolfgang von Goethe"],
+    ["Alles Gescheite ist schon gedacht worden, man muss nur versuchen, es noch einmal zu denken.", "Johann Wolfgang von Goethe"],
+    ["Edel sei der Mensch, hilfreich und gut.", "Johann Wolfgang von Goethe"],
+    ["Der Mensch ist nur da ganz Mensch, wo er spielt.", "Friedrich Schiller"],
+    ["Drum prüfe, wer sich ewig bindet.", "Friedrich Schiller"],
+    ["Die Axt im Haus erspart den Zimmermann.", "Friedrich Schiller"],
+    ["Gegen Dummheit kämpfen Götter selbst vergebens.", "Friedrich Schiller"],
+    ["Ohne Musik wäre das Leben ein Irrtum.", "Friedrich Nietzsche"],
+    ["Was mich nicht umbringt, macht mich stärker.", "Friedrich Nietzsche"],
+    ["Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt.", "Ludwig Wittgenstein"],
+    ["Wovon man nicht sprechen kann, darüber muss man schweigen.", "Ludwig Wittgenstein"],
+    ["Habe Mut, dich deines eigenen Verstandes zu bedienen!", "Immanuel Kant"],
+    ["Der Mensch ist, was er isst.", "Ludwig Feuerbach"],
+    ["Ich denke, also bin ich.", "René Descartes"],
+    ["Ich weiß, dass ich nichts weiß.", "Sokrates"],
+    ["Freundschaft, das ist eine Seele in zwei Körpern.", "Aristoteles"],
+    ["Das Ganze ist mehr als die Summe seiner Teile.", "Aristoteles"],
+    ["Nichts ist so beständig wie der Wandel.", "Heraklit"],
+    ["Man kann nicht zweimal in denselben Fluss steigen.", "Heraklit"],
+    ["Mut steht am Anfang des Handelns, Glück am Ende.", "Demokrit"],
+    ["Carpe diem – nutze den Tag.", "Horaz"],
+    ["Ich kam, sah und siegte.", "Julius Caesar"],
+    ["Die Würfel sind gefallen.", "Julius Caesar"],
+    ["Wissen ist Macht.", "Francis Bacon"],
+    ["Sein oder Nichtsein, das ist hier die Frage.", "William Shakespeare"],
+    ["Der Rest ist Schweigen.", "William Shakespeare"],
+    ["Einer für alle, alle für einen.", "Alexandre Dumas"],
+    ["Kleider machen Leute.", "Gottfried Keller"],
+    ["Man sieht nur mit dem Herzen gut. Das Wesentliche ist für die Augen unsichtbar.", "Antoine de Saint-Exupéry"],
+    ["Und jedem Anfang wohnt ein Zauber inne.", "Hermann Hesse"],
+    ["Man muss das Unmögliche versuchen, um das Mögliche zu erreichen.", "Hermann Hesse"],
+    ["Es gibt nichts Gutes, außer: Man tut es.", "Erich Kästner"],
+    ["Wer kämpft, kann verlieren. Wer nicht kämpft, hat schon verloren.", "Bertolt Brecht"],
+    ["Wer A sagt, der muss nicht B sagen. Er kann auch erkennen, dass A falsch war.", "Bertolt Brecht"],
+    ["Wer will, dass die Welt so bleibt, wie sie ist, der will nicht, dass sie bleibt.", "Erich Fried"],
+    ["Die Wahrheit ist dem Menschen zumutbar.", "Ingeborg Bachmann"],
+    ["Wer nichts weiß, muss alles glauben.", "Marie von Ebner-Eschenbach"],
+    ["Je planmäßiger die Menschen vorgehen, desto wirksamer vermag sie der Zufall zu treffen.", "Friedrich Dürrenmatt"],
+    ["Wer sich nicht bewegt, spürt seine Fesseln nicht.", "Rosa Luxemburg"],
+    ["Freiheit ist immer die Freiheit der Andersdenkenden.", "Rosa Luxemburg"],
+    ["Humor ist, wenn man trotzdem lacht.", "Otto Julius Bierbaum"],
+    ["Das Glück ist das Einzige, was sich verdoppelt, wenn man es teilt.", "Albert Schweitzer"],
+    ["Wer aufhört, besser zu werden, hat aufgehört, gut zu sein.", "Philip Rosenthal"],
+    ["Einfachheit ist die höchste Stufe der Vollendung.", "Leonardo da Vinci"],
+    ["Ein Tag ohne Lächeln ist ein verlorener Tag.", "Charlie Chaplin"],
+    ["Leben ist das, was passiert, während du eifrig dabei bist, andere Pläne zu machen.", "John Lennon"],
+    ["Man lebt nur einmal – aber wenn man es richtig macht, reicht einmal.", "Mae West"],
+    ["Wer nicht an Wunder glaubt, ist kein Realist.", "David Ben-Gurion"],
+    ["Hoffnung ist nicht die Überzeugung, dass etwas gut ausgeht, sondern die Gewissheit, dass etwas Sinn hat.", "Václav Havel"],
+    ["Nichts in der Welt ist so mächtig wie eine Idee, deren Zeit gekommen ist.", "Victor Hugo"],
+    ["Man entdeckt keine neuen Weltteile, ohne den Mut zu haben, alle Küsten aus den Augen zu verlieren.", "André Gide"],
+    ["Sei du selbst die Veränderung, die du dir wünschst für diese Welt.", "Mahatma Gandhi"],
+    ["Lerne, als ob du ewig leben würdest; lebe, als ob du morgen sterben würdest.", "Mahatma Gandhi"],
+    ["Auch eine Reise von tausend Meilen beginnt mit einem Schritt.", "Laozi"],
+    ["Wer fragt, ist ein Narr für eine Minute. Wer nicht fragt, ist ein Narr sein Leben lang.", "Konfuzius"],
+    ["Kunst ist schön, macht aber viel Arbeit.", "Karl Valentin"],
+    ["Heute ist die gute alte Zeit von morgen.", "Karl Valentin"],
+    ["Mögen hätt' ich schon wollen, aber dürfen hab ich mich nicht getraut.", "Karl Valentin"],
+    ["Es ist schon alles gesagt, nur noch nicht von allen.", "Karl Valentin"],
+    ["Ein Optimist ist ein Mensch, der die Dinge nicht so tragisch nimmt, wie sie sind.", "Karl Valentin"],
+    ["Ein Leben ohne Mops ist möglich, aber sinnlos.", "Loriot"],
+    ["Früher war mehr Lametta.", "Loriot"],
+    ["Die Ente bleibt draußen!", "Loriot"],
+    ["Wer nicht genießt, ist ungenießbar.", "Konstantin Wecker"],
+    ["Der Ball ist rund. Das Spiel dauert 90 Minuten.", "Sepp Herberger"],
+    ["Nach dem Spiel ist vor dem Spiel.", "Sepp Herberger"],
+    ["Das nächste Spiel ist immer das schwerste.", "Sepp Herberger"],
+    ["Ich habe fertig.", "Giovanni Trapattoni"],
+    ["Lebbe geht weider.", "Dragoslav Stepanović"],
+    ["Erst hatten wir kein Glück, und dann kam auch noch Pech dazu.", "Jürgen Wegmann"],
+    ["Mailand oder Madrid – Hauptsache Italien!", "Andreas Möller"],
+    ["Ich bin ein Berliner.", "John F. Kennedy"],
+    ["Wir schaffen das.", "Angela Merkel"],
+    ["Möge die Macht mit dir sein.", "Star Wars"],
+    ["Tu es oder tu es nicht. Es gibt kein Versuchen.", "Yoda"],
+    ["Ich schau dir in die Augen, Kleines.", "Casablanca"],
+    ["Das Leben ist wie eine Schachtel Pralinen. Man weiß nie, was man kriegt.", "Forrest Gump"],
+    ["Houston, wir haben ein Problem.", "Apollo 13"],
+    ["Hasta la vista, Baby.", "Terminator 2"],
+    ["Wenn du schnell gehen willst, geh allein. Wenn du weit gehen willst, geh mit anderen.", "Afrikanisches Sprichwort"],
+    ["Die beste Zeit, einen Baum zu pflanzen, war vor zwanzig Jahren. Die nächstbeste Zeit ist jetzt.", "Chinesisches Sprichwort"],
+    ["In der Ruhe liegt die Kraft.", "Sprichwort"],
+    ["Übung macht den Meister.", "Sprichwort"],
+    ["Wer zuletzt lacht, lacht am besten.", "Sprichwort"],
+    ["Morgenstund hat Gold im Mund.", "Sprichwort"],
+    ["Lügen haben kurze Beine.", "Sprichwort"],
+    ["Ende gut, alles gut.", "Sprichwort"],
+    ["Aller Anfang ist schwer.", "Sprichwort"],
+    ["Wer nicht wagt, der nicht gewinnt.", "Sprichwort"],
+    ["Gut Ding will Weile haben.", "Sprichwort"],
+    ["Reden ist Silber, Schweigen ist Gold.", "Sprichwort"],
+    ["Der frühe Vogel fängt den Wurm.", "Sprichwort"],
+    ["Not macht erfinderisch.", "Sprichwort"],
+    ["Was du heute kannst besorgen, das verschiebe nicht auf morgen.", "Sprichwort"],
+    ["Wer anderen eine Grube gräbt, fällt selbst hinein.", "Sprichwort"],
+    ["Ordnung ist das halbe Leben.", "Sprichwort"],
+    ["Ohne Fleiß kein Preis.", "Sprichwort"],
+    ["Dabei sein ist alles.", "Sprichwort"],
+    ["Der Klügere gibt nach.", "Sprichwort"],
+    ["Viele Köche verderben den Brei.", "Sprichwort"],
+    ["Die Hoffnung stirbt zuletzt.", "Sprichwort"],
+    ["Lachen ist die beste Medizin.", "Sprichwort"],
+    ["Geteiltes Leid ist halbes Leid.", "Sprichwort"],
+    ["Wo ein Wille ist, ist auch ein Weg.", "Sprichwort"],
+    ["Rom wurde auch nicht an einem Tag erbaut.", "Sprichwort"]
+  ];
   async function fetchQuote() {
-    try {
-      const res = await fetch('https://api.quotable.io/random?maxLength=180');
-      if (!res.ok) throw new Error('quote');
-      const d = await res.json();
-      return { text: d.content, author: d.author };
-    } catch {
-      const res = await fetch('https://corsproxy.io/?https://zenquotes.io/api/random');
-      const d = await res.json();
-      return { text: d[0].q, author: d[0].a };
-    }
+    const [text, author] = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    return { text, author };
   }
   async function fetchFact() {
     const res = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random?language=de');
@@ -964,7 +1065,7 @@
       const sameDay = cached && new Date(cached.t).toDateString() === depNow.toDateString();
       if (cached && sameDay && (Date.now() - cached.t) < maxAge) {
         if (cached.otd) renderOtd(cached.otd); else renderError('depOtd');
-        if (cached.quote) renderQuote(cached.quote); else renderError('depQuote');
+        fetchQuote().then(q => renderQuote(cached.quote || q));
         if (cached.fact) renderFact(cached.fact); else renderError('depFact');
         if (cached.ticker) { tickerIdx=0; renderTicker(cached.ticker,0); } else renderError('depTicker');
         return;
