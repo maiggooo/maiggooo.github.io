@@ -1,0 +1,548 @@
+{
+ "rates": {
+  "EUR": 1,
+  "JPY": 0.0061,
+  "USD": 0.92,
+  "GBP": 1.17,
+  "CHF": 1.05
+ },
+ "trips": [
+  {
+   "id": "lisbon-2026",
+   "title": "Lissabon & die Küste",
+   "start": "2026-05-01",
+   "end": "2026-05-07",
+   "cover": "images/lisbon-2026/cover.svg",
+   "summary": "Eine Woche Miradouros, Pastéis de Nata und Atlantikwind — mit Tram, Zug, Mietwagen und Fähre.",
+   "tags": [
+    "Stadt",
+    "Meer",
+    "Zug"
+   ],
+   "countries": [
+    "PT"
+   ],
+   "stops": [
+    {
+     "name": "Miradouro da Senhora do Monte",
+     "lngLat": [
+      -9.1327,
+      38.7192
+     ],
+     "time": "2026-05-01T19:30",
+     "md": "Erster Abend, erster **Sonnenuntergang**. Von hier sieht man die ganze Stadt bis zum Tejo.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/01-1.svg",
+       "alt": "Sonnenuntergang über Lissabon",
+       "lngLat": [
+        -9.1321,
+        38.7196
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Alfama & Sé",
+     "lngLat": [
+      -9.1305,
+      38.711
+     ],
+     "time": "2026-05-02T10:00",
+     "md": "Treppen, Wäscheleinen, Azulejos. Abends **Fado** in einer winzigen Tasca — Gänsehaut.\n\nTipp: früh losgehen, bevor die Kreuzfahrtgruppen kommen.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/02-1.svg",
+       "alt": "Gasse in der Alfama",
+       "lngLat": [
+        -9.131,
+        38.7116
+       ],
+       "time": null
+      },
+      {
+       "src": "images/lisbon-2026/02-2.svg",
+       "alt": "Azulejo-Fassade",
+       "lngLat": null,
+       "time": null
+      },
+      {
+       "src": "images/lisbon-2026/02-3.svg",
+       "alt": "Kathedrale Sé",
+       "lngLat": [
+        -9.1298,
+        38.7107
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Belém",
+     "lngLat": [
+      -9.206,
+      38.6916
+     ],
+     "time": "2026-05-03T09:30",
+     "md": "Mit der **Tram 15** raus nach Belém. Torre de Belém, Hieronymus-Kloster und natürlich die *Pastéis de Belém*.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/03-1.svg",
+       "alt": "Torre de Belém",
+       "lngLat": [
+        -9.2158,
+        38.6916
+       ],
+       "time": null
+      },
+      {
+       "src": "images/lisbon-2026/03-2.svg",
+       "alt": "Pastéis de Belém",
+       "lngLat": [
+        -9.2055,
+        38.692
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Sintra",
+     "lngLat": [
+      -9.39,
+      38.798
+     ],
+     "time": "2026-05-04T11:00",
+     "md": "Nebel, Paläste, Märchenwald. Der **Palácio da Pena** sieht aus wie gemalt.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/04-1.svg",
+       "alt": "Palácio da Pena im Nebel",
+       "lngLat": [
+        -9.386,
+        38.788
+       ],
+       "time": null
+      },
+      {
+       "src": "images/lisbon-2026/04-2.svg",
+       "alt": "Quinta da Regaleira",
+       "lngLat": [
+        -9.396,
+        38.796
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Cascais",
+     "lngLat": [
+      -9.4215,
+      38.6979
+     ],
+     "time": "2026-05-05T15:00",
+     "md": "Strandtag. Kaltes Wasser, warmer Sand, gegrillte Sardinen.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/05-1.svg",
+       "alt": "Strand von Cascais",
+       "lngLat": [
+        -9.4207,
+        38.6969
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Cais do Sodré",
+     "lngLat": [
+      -9.145,
+      38.706
+     ],
+     "time": "2026-05-06T18:00",
+     "md": "Zurück in die Stadt mit dem Küstenzug. Time Out Market und die *Pink Street*.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/06-1.svg",
+       "alt": "Pink Street",
+       "lngLat": [
+        -9.1446,
+        38.7062
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Cacilhas",
+     "lngLat": [
+      -9.148,
+      38.687
+     ],
+     "time": "2026-05-07T12:00",
+     "md": "Mit der **Fähre** über den Tejo — beste Aussicht auf Lissabon für 1,60 €.",
+     "photos": [
+      {
+       "src": "images/lisbon-2026/07-1.svg",
+       "alt": "Blick von der Fähre",
+       "lngLat": [
+        -9.147,
+        38.691
+       ],
+       "time": null
+      },
+      {
+       "src": "images/lisbon-2026/07-2.svg",
+       "alt": "Ponte 25 de Abril",
+       "lngLat": null,
+       "time": null
+      }
+     ]
+    }
+   ],
+   "legs": [
+    {
+     "mode": "walk",
+     "track": "data/tracks/lisbon-alfama-walk.geojson"
+    },
+    {
+     "mode": "train"
+    },
+    {
+     "mode": "car",
+     "track": "data/tracks/lisbon-sintra.gpx"
+    },
+    {
+     "mode": "car"
+    },
+    {
+     "mode": "train"
+    },
+    {
+     "mode": "boat"
+    }
+   ],
+   "costs": [
+    {
+     "cat": "transport",
+     "amount": 186,
+     "cur": "EUR",
+     "note": "Flug FRA–LIS"
+    },
+    {
+     "cat": "transport",
+     "amount": 32,
+     "cur": "EUR",
+     "note": "Viva Viagem"
+    },
+    {
+     "cat": "transport",
+     "amount": 95,
+     "cur": "EUR",
+     "note": "Mietwagen",
+     "stop": 3
+    },
+    {
+     "cat": "transport",
+     "amount": 1.6,
+     "cur": "EUR",
+     "note": "Fähre",
+     "stop": 6
+    },
+    {
+     "cat": "lodging",
+     "amount": 540,
+     "cur": "EUR",
+     "note": "6 Nächte"
+    },
+    {
+     "cat": "food",
+     "amount": 210,
+     "cur": "EUR"
+    },
+    {
+     "cat": "food",
+     "amount": 9.5,
+     "cur": "EUR",
+     "note": "Pastéis",
+     "stop": 2
+    },
+    {
+     "cat": "activities",
+     "amount": 45,
+     "cur": "EUR",
+     "note": "Fado",
+     "stop": 1
+    },
+    {
+     "cat": "activities",
+     "amount": 20,
+     "cur": "EUR",
+     "note": "Palácio da Pena",
+     "stop": 3
+    },
+    {
+     "cat": "other",
+     "amount": 25,
+     "cur": "EUR"
+    }
+   ]
+  },
+  {
+   "id": "japan-2025",
+   "title": "Japan im Herbst",
+   "start": "2025-10-10",
+   "end": "2025-10-24",
+   "cover": "images/japan-2025/cover.svg",
+   "summary": "Zwei Wochen von Tokio bis Osaka: Neonlichter, Tempel, Onsen und sehr viel Shinkansen.",
+   "tags": [
+    "Stadt",
+    "Kultur",
+    "Zug",
+    "Fernreise"
+   ],
+   "countries": [
+    "JP"
+   ],
+   "stops": [
+    {
+     "name": "Frankfurt (FRA)",
+     "lngLat": [
+      8.5622,
+      50.0379
+     ],
+     "time": "2025-10-10T13:30",
+     "md": "Los geht's. 13 Stunden Flug, drei Filme, kein Schlaf.",
+     "photos": []
+    },
+    {
+     "name": "Tokio – Shinjuku",
+     "lngLat": [
+      139.7003,
+      35.6938
+     ],
+     "time": "2025-10-11T09:00",
+     "md": "Jetlag trifft **Neon**. Omoide Yokocho zum Abendessen, Aussicht vom Rathaus gratis.",
+     "photos": [
+      {
+       "src": "images/japan-2025/02-1.svg",
+       "alt": "Shinjuku bei Nacht",
+       "lngLat": [
+        139.7013,
+        35.6944
+       ],
+       "time": null
+      },
+      {
+       "src": "images/japan-2025/02-2.svg",
+       "alt": "Omoide Yokocho",
+       "lngLat": [
+        139.6997,
+        35.6942
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Tokio – Asakusa",
+     "lngLat": [
+      139.7967,
+      35.7148
+     ],
+     "time": "2025-10-13T08:00",
+     "md": "Senso-ji im Morgenlicht, danach Sumida-Spaziergang zum Skytree.",
+     "photos": [
+      {
+       "src": "images/japan-2025/03-1.svg",
+       "alt": "Senso-ji",
+       "lngLat": [
+        139.7968,
+        35.7155
+       ],
+       "time": null
+      },
+      {
+       "src": "images/japan-2025/03-2.svg",
+       "alt": "Tokyo Skytree",
+       "lngLat": [
+        139.8107,
+        35.7108
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Hakone",
+     "lngLat": [
+      139.1069,
+      35.2324
+     ],
+     "time": "2025-10-15T12:00",
+     "md": "Onsen, Ropeway über dampfende Schwefelfelder und — kurz — **Fuji** ohne Wolken.",
+     "photos": [
+      {
+       "src": "images/japan-2025/04-1.svg",
+       "alt": "Fuji über dem Ashi-See",
+       "lngLat": [
+        139.0969,
+        35.2124
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Kyoto",
+     "lngLat": [
+      135.7681,
+      34.9858
+     ],
+     "time": "2025-10-17T07:30",
+     "md": "Fushimi Inari vor Sonnenaufgang, Bambuswald, Gion am Abend. *Drei Tage sind zu wenig.*",
+     "photos": [
+      {
+       "src": "images/japan-2025/05-1.svg",
+       "alt": "Torii in Fushimi Inari",
+       "lngLat": [
+        135.7721,
+        34.9678
+       ],
+       "time": null
+      },
+      {
+       "src": "images/japan-2025/05-2.svg",
+       "alt": "Bambuswald Arashiyama",
+       "lngLat": null,
+       "time": null
+      },
+      {
+       "src": "images/japan-2025/05-3.svg",
+       "alt": "Gion",
+       "lngLat": [
+        135.7741,
+        35.0038
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Nara",
+     "lngLat": [
+      135.8048,
+      34.6851
+     ],
+     "time": "2025-10-20T10:00",
+     "md": "Rehe, die sich verbeugen (für Kekse). Der große Buddha im Todai-ji.",
+     "photos": [
+      {
+       "src": "images/japan-2025/06-1.svg",
+       "alt": "Rehe im Nara-Park",
+       "lngLat": [
+        135.8068,
+        34.6861
+       ],
+       "time": null
+      }
+     ]
+    },
+    {
+     "name": "Osaka – Dōtonbori",
+     "lngLat": [
+      135.5023,
+      34.6687
+     ],
+     "time": "2025-10-22T19:00",
+     "md": "Takoyaki, Okonomiyaki, Glico-Mann. Osaka isst, Osaka lacht.",
+     "photos": [
+      {
+       "src": "images/japan-2025/07-1.svg",
+       "alt": "Dōtonbori-Kanal",
+       "lngLat": [
+        135.5026,
+        34.6689
+       ],
+       "time": null
+      },
+      {
+       "src": "images/japan-2025/07-2.svg",
+       "alt": "Takoyaki",
+       "lngLat": null,
+       "time": null
+      }
+     ]
+    }
+   ],
+   "legs": [
+    {
+     "mode": "plane"
+    },
+    {
+     "mode": "train"
+    },
+    {
+     "mode": "train"
+    },
+    {
+     "mode": "train"
+    },
+    {
+     "mode": "train"
+    },
+    {
+     "mode": "train"
+    }
+   ],
+   "costs": [
+    {
+     "cat": "transport",
+     "amount": 920,
+     "cur": "EUR",
+     "note": "Flug FRA–HND / KIX–FRA"
+    },
+    {
+     "cat": "transport",
+     "amount": 50000,
+     "cur": "JPY",
+     "note": "JR Pass 7 Tage"
+    },
+    {
+     "cat": "lodging",
+     "amount": 180000,
+     "cur": "JPY",
+     "note": "14 Nächte"
+    },
+    {
+     "cat": "lodging",
+     "amount": 32000,
+     "cur": "JPY",
+     "note": "Ryokan",
+     "stop": 3
+    },
+    {
+     "cat": "food",
+     "amount": 85000,
+     "cur": "JPY"
+    },
+    {
+     "cat": "activities",
+     "amount": 22000,
+     "cur": "JPY",
+     "note": "Tempel & Museen",
+     "stop": 4
+    },
+    {
+     "cat": "other",
+     "amount": 40,
+     "cur": "USD",
+     "note": "eSIM"
+    }
+   ]
+  }
+ ]
+}

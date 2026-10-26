@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1067" width="1600" height="1067">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(225,70%,78%)"/><stop offset="1" stop-color="hsl(255,65%,58%)"/></linearGradient></defs>
+<rect width="1600" height="1067" fill="url(#g)"/>
+<circle cx="680" cy="300" r="110" fill="#fff5d6" opacity=".85"/>
+<path d="M0 760 Q 390 530 700 700 T 1600 640 V1067 H0Z" fill="hsl(15,35%,42%)"/>
+<path d="M0 880 Q 500 760 900 860 T 1600 820 V1067 H0Z" fill="hsl(35,40%,28%)"/>
+<text x="80" y="990" font-family="Georgia, serif" font-style="italic" font-size="64" fill="#fff" opacity=".92">Azulejo-Fassade</text>
+<text x="80" y="1035" font-family="monospace" font-size="22" letter-spacing="6" fill="#fff" opacity=".6">PLATZHALTER</text>
+</svg>

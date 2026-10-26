@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Reisekarte · Maiko's Spiele &amp; Tools</title>
+<meta name="description" content="Meine Reisen auf der Karte — Routen, Stopps, Fotos und Kosten.">
+<meta name="theme-color" content="#f4efe6">
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="trips.css">
+</head>
+<body class="trips">
+<div id="map" role="region" aria-label="Karte"></div>
+
+<header class="topbar">
+  <a class="brand-pill" href="../" aria-label="Zurück zu Maiko's Spiele &amp; Tools">
+    <span class="arrow" aria-hidden="true">←</span><span class="brand">Reise<em>karte</em></span>
+  </a>
+  <label class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="sr-only">Reisen durchsuchen</span>
+    <input id="q" type="search" placeholder="Reisen, Orte, Tags …" autocomplete="off">
+  </label>
+  <button class="round-btn" id="themeToggle" aria-label="Theme wechseln" title="Theme wechseln">
+    <span class="dot" aria-hidden="true"></span><span id="themeLabel" class="sr-only">Dark</span>
+  </button>
+</header>
+
+<aside id="panel" class="panel" aria-label="Reisen">
+  <button class="sheet-handle" id="sheetHandle" aria-label="Liste ein-/ausklappen" aria-expanded="false"><span></span></button>
+  <div class="panel-scroll" id="panelScroll"><div id="panelBody"></div></div>
+  <nav class="story-nav" id="storyNav" hidden aria-label="Story-Navigation">
+    <button class="round-btn" id="prevStop" aria-label="Vorheriger Stopp (←)">‹</button>
+    <span id="storyLabel" aria-live="polite"></span>
+    <button class="round-btn" id="nextStop" aria-label="Nächster Stopp (→)">›</button>
+  </nav>
+</aside>
+
+<dialog id="lightbox" class="lightbox" aria-label="Foto">
+  <figure>
+    <img id="lbImg" alt="">
+    <figcaption><span id="lbCap"></span><span id="lbCount" class="mono"></span></figcaption>
+  </figure>
+  <button class="round-btn lb-close" id="lbClose" aria-label="Schließen (Esc)">×</button>
+  <button class="round-btn lb-prev" id="lbPrev" aria-label="Vorheriges Foto">‹</button>
+  <button class="round-btn lb-next" id="lbNext" aria-label="Nächstes Foto">›</button>
+</dialog>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<!-- ponytail: Markdown comes only from my own trips.json, so no sanitizer. Add DOMPurify if others can ever submit text. -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="../site.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
