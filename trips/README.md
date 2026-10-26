@@ -1,106 +1,94 @@
 # Reisekarte (Trip Map)
 
-An interactive travel log at `/trips/`. It is 100% static: no build step and no server code. Open `index.html` through any static host and it works.
+An interactive, social travel log at `/trips/`. The site itself is static (GitHub Pages, no build step); trips, profiles, follows and photos live in Supabase.
 
 | File | Purpose |
 |---|---|
-| `index.html`, `app.js` | Public viewer: world map, trip list, story mode, costs, lightbox |
-| `editor.html`, `editor.js` | Local editor (not linked from the site) |
-| `lib.js` | Shared helpers: transport modes, cost categories, distances, GPX parsing |
+| `index.html`, `app.js` | Viewer: world map, trip list, feed, profiles, story mode, costs, lightbox |
+| `editor.html`, `editor.js` | Editor: sign in, add stops, photos, vlogs, costs; saves live |
+| `db.js` | Supabase connection and the mapping between database rows and trips |
+| `lib.js` | Shared helpers: transport modes, cost categories, exchange rates, distances, GPX parsing |
 | `trips.css` | All styling. Design tokens are at the top. |
-| `data/trips.json` | All trips |
-| `data/tracks/` | Optional GPX or GeoJSON tracks for single legs |
-| `images/<trip-id>/` | Photos |
+| `supabase/schema.sql` | Database tables, access rules and photo storage. Already run in the project. |
+| `data/trips.json`, `images/`, `data/tracks/` | The original demo trips and their files (now imported into Supabase) |
 
 Libraries are loaded from CDNs with pinned versions:
 - MapLibre GL 4.7.1, with free Carto basemaps (no API key)
+- supabase-js 2.117.3
 - marked 12.0.2, for stop descriptions
-- exifr 7.1.3 and JSZip 3.10.1, used in the editor only
+- exifr 7.1.3, used in the editor only
+
+## Backend (Supabase)
+
+- **Project:** `reisekarte` (`https://aabwbmfszderdsrphtqg.supabase.co`). `db.js` holds the URL and the *publishable* key. That key is meant to be public; the access rules in `schema.sql` decide what it can do. Never put the secret / `service_role` key in this folder.
+- **Who can post:** sign-ups are turned off. Invite people in the dashboard under Authentication → Users → Add user → Send invitation. Supabase's built-in email only reaches members of your Supabase team; for friends, connect an email service first (Authentication → Emails → SMTP, e.g. Resend's free tier).
+- **What visitors see:** published trips and everyone's profiles. Private trips are visible only to their owner.
+- **Free plan:** 500 MB database, 1 GB photo storage. The project pauses after a week without any traffic.
 
 ## Run locally
-
-The pages load `trips.json` with `fetch`, so they need a local server. Opening them as `file://` does not work.
 
 ```bash
 python3 -m http.server 8123
 ```
 
-Then open http://localhost:8123/trips/ for the viewer, or http://localhost:8123/trips/editor.html for the editor.
+Then open http://localhost:8123/trips/ for the viewer, or http://localhost:8123/trips/editor.html for the editor. Use `localhost`, not `127.0.0.1`: only `localhost:8123` is allowed as a sign-in return address.
 
 ## Adding a trip (editor workflow)
 
-1. Open the editor: click **✎** in the map's top bar (it opens the trip you are viewing), or go to `editor.html`. Pick **+ Neue Reise** from the dropdown for a new trip.
-2. Fill in the title, dates, tags and countries. Countries are ISO codes such as `PT` or `JP`. **Set the ID first.** It becomes the image folder `images/<id>/`.
-3. **Click the map** to add stops in order.
-   - Drag a card by its `⋮⋮` grip to reorder stops.
-   - Drag a marker on the map to move a stop.
-4. Each stop has a time, an optional zoom level and a Markdown text.
-5. Set the transport mode for each leg ("weiter mit …").
-   - **GPX…** imports a recorded track for that leg.
-   - The import thins the track to at most 500 points and snaps both stops to the track's ends.
-6. **Drop photos** onto a stop, or onto the drop zone at the top.
-   - Photos are resized in the browser to at most 1600 px and saved as WebP (JPEG in Safari, which cannot encode WebP).
-   - When a photo has EXIF GPS, it gets a map position and goes to the nearest stop within 3 km. If no stop is that close, a new stop is created there.
-   - Photos without GPS go to the stop with the closest timestamp, or else to the selected stop.
-   - Convert iPhone HEIC photos to JPEG first unless you use Safari.
-7. **Vlogs:** click **▶ Vlog-Link** on a stop and paste a YouTube or Vimeo link (unlisted works; for unlisted Vimeo keep the hash part of the link). A link the editor doesn't recognize is marked red.
-8. Add costs. Each cost has a category, an amount and a currency, and can be linked to a stop. Exchange rates are under `rates` in `trips.json` (1 unit = x EUR). Edit them there.
-9. Drafts save automatically to this browser:
-   - The JSON goes to localStorage.
-   - New photos go to the Cache API.
-   - You can close the tab and come back later.
+1. Open the editor: click **✎** in the map's top bar (it opens the trip you are viewing), or go to `editor.html`. The first time, enter your email and click the link you receive. **+ Neue Reise** starts a new trip; give it a title. Its link name is generated from the title, and the countries and dates fill themselves in from the stops.
+   - **🔒 Privat / 🌍 Öffentlich** at the top decides who sees the trip. New trips start private.
+   - Under **Profil** (bottom) set your name and a username; the username gives you a profile link `#u=username`.
+2. **Add a stop** in one of four ways:
+   - **Search** a place ("Kolosseum Rom") and pick a result.
+   - **📍 Ich bin hier** uses your phone's location and the current time.
+   - **Tap the map.** The stop is named after the place automatically.
+   - **📷 Fotos (mit Ort)**: photos with GPS land at the nearest stop within 3 km, or become a new stop.
 
-### Publishing
+   Place names come from OpenStreetMap's Nominatim service.
+3. **Fill in a stop.** Tap its card to open it. Everything except the place is optional:
+   - time
+   - **★ rating** (tap the same star again to clear it)
+   - text (Markdown)
+   - photos
+   - **💶 Ausgabe** (expense): amount, currency (defaults to the one you used last on this trip), what it was for, and a note
+   - **▶ Vlog**: a YouTube or Vimeo link (unlisted works; for unlisted Vimeo keep the hash part). A link the editor doesn't recognize is marked red.
+4. **Reorder and move.** Drag a card by its `⋮⋮` grip to reorder stops. Drag a marker on the map to move a stop.
+5. **How you travelled.** Each card ends with "Weiter zu … mit" to pick the transport mode to the next stop. **GPX** imports a recorded track for that leg; it is thinned to at most 500 points and both stops snap to its ends.
+6. **Photos** are resized in the browser to at most 1600 px and saved as WebP (JPEG in Safari, which cannot encode WebP). Convert iPhone HEIC photos to JPEG first unless you use Safari.
+7. **Everything saves by itself** about a second after each change. The status next to "+ Neue Reise" shows "✓ Gespeichert"; if it shows "⚠ Nicht gespeichert", tap it to retry. Public trips update for visitors live, without reloading.
 
-1. In the editor, click **Exportieren (.zip)**. You get `trips-export.zip` with `data/trips.json` and the new photos under `images/…`.
-2. Unzip it **into the `trips/` folder** and overwrite `data/trips.json`.
-3. Check the result at http://localhost:8123/trips/, then commit and push:
-
-   ```bash
-   git add trips && git commit -m "Trip: Lissabon" && git push
-   ```
-
-4. Optional: click **Bilder-Cache leeren** and **Entwurf verwerfen**. The editor then starts again from the committed `trips.json`.
-
-You can also edit `data/trips.json` by hand. The editor and the viewer read the same format.
+Exchange rates for the cost totals are `RATES` in `lib.js` (1 unit = x EUR); currencies listed there appear in the editor.
 
 ## Data format
 
+Tables are defined in `supabase/schema.sql`: `profiles`, `trips` (one row per trip; `legs` as JSON), `stops` (one row per stop, ordered by `position`; `photos`, `videos`, `costs` as JSON), `follows`. `db.js` turns rows into the trip objects the viewer and editor use:
+
 ```jsonc
 {
-  "rates": { "EUR": 1, "JPY": 0.0061 },          // static conversion to EUR
-  "trips": [{
-    "id": "lisbon-2026",                          // URL + image folder
-    "title": "…", "start": "2026-05-01", "end": "2026-05-07",
-    "cover": "images/lisbon-2026/cover.webp",
-    "summary": "…", "tags": ["Stadt"], "countries": ["PT"],
-    "stops": [{
-      "name": "Alfama", "lngLat": [-9.13, 38.71], // [longitude, latitude]
-      "time": "2026-05-02T10:00", "zoom": 14,     // zoom optional (default 13.5)
-      "md": "Markdown **text**",
-      "photos": [{ "src": "images/…/x.webp", "alt": "Describe the photo", "lngLat": [-9.13, 38.71] | null, "time": null }],
-      "videos": [{ "url": "https://youtu.be/…", "title": "Vlog title" }]   // optional, YouTube or Vimeo
-    }],
-    "legs": [                                     // legs[i] = stop i → stop i+1
-      { "mode": "walk", "track": "data/tracks/walk.geojson" },  // or .gpx
-      { "mode": "plane" },                        // drawn as a great-circle arc
-      { "mode": "car", "coords": [[…], […]] }      // inline track (editor GPX import)
-    ],
-    "costs": [{ "cat": "food", "amount": 12.5, "cur": "EUR", "stop": 1, "note": "…" }]
-  }]
+  "id": "lisbon-2026",          // link name (#trip=…), unique
+  "title": "…", "start": "2026-05-01", "end": "2026-05-07", "published": true,
+  "cover": "https://…/photo.webp", "summary": "…", "tags": ["Stadt"], "countries": ["PT"],
+  "stops": [{
+    "name": "Alfama", "lngLat": [-9.13, 38.71], "cc": "PT", "time": "2026-05-02T10:00",
+    "md": "Markdown **text**", "rating": 5,
+    "photos": [{ "src": "https://…", "alt": "…", "lngLat": [-9.13, 38.71] }],
+    "videos": [{ "url": "https://youtu.be/…", "title": "…" }],
+    "costs": [{ "cat": "food", "amount": 12.5, "cur": "EUR", "note": "…" }]
+  }],
+  "legs": [{ "mode": "walk", "coords": [[…], […]] }, { "mode": "plane" }]  // legs[i] = stop i → stop i+1
 }
 ```
 
-- **Modes:** `walk`, `car`, `train`, `plane`, `boat`. Their colors, dashes and icons are in `MODES` in `lib.js`.
-- **Cost categories:** `transport`, `lodging`, `food`, `activities`, `other`. They are defined in `CATS` in `lib.js`.
-- **Photo markers:** only photos with `lngLat` get a round thumbnail on the map. They show from zoom 11 upward.
-- **Vlogs:** a stop with a vlog gets a small ▶ badge on its map pin, and the stop card shows the video's thumbnail. The player (youtube-nocookie / Vimeo with `dnt=1`) loads only when someone presses play. The demo vlog on the Lisbon trip is someone else's public video used as a placeholder; replace it with your own.
-- **Overview pin:** the trip's pin on the world map sits on its middle stop.
+- **Modes:** `walk`, `car`, `train`, `plane`, `boat` (`MODES` in `lib.js`). Flights are drawn as great-circle arcs; a leg with `coords` (GPX import) follows the real track.
+- **Cost categories:** `food`, `lodging`, `transport`, `activities`, `other` (`CATS` in `lib.js`).
+- **Photos:** uploaded to the `photos` storage bucket under `<user id>/<trip id>/`. Only photos with a position get a thumbnail on the map (from zoom 11).
+- **Vlogs:** a ▶ badge on the stop's pin; the player loads only on play (youtube-nocookie / Vimeo `dnt=1`). The demo vlog is someone else's public video used as a placeholder.
 
 ## Deep links
 
 - `#trip=lisbon-2026` opens a trip.
 - `#trip=lisbon-2026&stop=3` opens the trip at stop 3 (counting from 1).
+- `#u=username` opens a profile: their trips, their posts in the feed, and a follow button.
 
 In story mode the URL updates as you move between stops, so you can copy and share it at any point.
 
@@ -116,7 +104,7 @@ In story mode the URL updates as you move between stops, so you can copy and sha
 
 Nothing extra to do. The folder is part of the `maiggooo.github.io` repo, so it is served at `https://maiggooo.github.io/trips/` on the next push. All paths are relative, so the folder also works under any other subpath.
 
-`editor.html` is published too, but it only changes the visitor's own browser storage. Nobody can change your trips through it. To keep it off the live site anyway, move it out of the repo and serve it from a local copy.
+Every push to `main` updates the site; trips and photos don't need a push, they live in Supabase.
 
 ## Changing the styling
 
@@ -134,7 +122,5 @@ Nothing extra to do. The folder is part of the `maiggooo.github.io` repo, so it 
 
 ## Later (not built yet)
 
-The structure leaves room for these:
-
-- **Phone uploads via Firebase/Supabase:** replace the `fetch("data/trips.json")` call at the top of `app.js` with a call to the backend. The editor's `save()` and `addPhotos()` are the two places to send data there instead of localStorage and the Cache API.
-- **Private trips:** add `"private": true` to a trip and filter it out in `app.js`. That needs the backend first, because everything in a static repo is public.
+- **Avatars:** `profiles.avatar_url` exists; the editor needs an upload field.
+- **Old photos stay in storage** when you remove them from a stop (so undo works). Clean up in the dashboard under Storage if space gets tight.

@@ -41,6 +41,36 @@
        ],
        "time": null
       }
+     ],
+     "costs": [
+      {
+       "cat": "transport",
+       "amount": 186,
+       "cur": "EUR",
+       "note": "Flug FRA–LIS"
+      },
+      {
+       "cat": "transport",
+       "amount": 32,
+       "cur": "EUR",
+       "note": "Viva Viagem"
+      },
+      {
+       "cat": "lodging",
+       "amount": 540,
+       "cur": "EUR",
+       "note": "6 Nächte"
+      },
+      {
+       "cat": "food",
+       "amount": 210,
+       "cur": "EUR"
+      },
+      {
+       "cat": "other",
+       "amount": 25,
+       "cur": "EUR"
+      }
      ]
     },
     {
@@ -82,7 +112,16 @@
        "url": "https://www.youtube.com/watch?v=3ByN5ryEUHo",
        "title": "Demo-Vlog: Tram 28 (fremdes Video als Platzhalter)"
       }
-     ]
+     ],
+     "costs": [
+      {
+       "cat": "activities",
+       "amount": 45,
+       "cur": "EUR",
+       "note": "Fado"
+      }
+     ],
+     "rating": 5
     },
     {
      "name": "Belém",
@@ -110,6 +149,14 @@
         38.692
        ],
        "time": null
+      }
+     ],
+     "costs": [
+      {
+       "cat": "food",
+       "amount": 9.5,
+       "cur": "EUR",
+       "note": "Pastéis"
       }
      ]
     },
@@ -140,7 +187,22 @@
        ],
        "time": null
       }
-     ]
+     ],
+     "costs": [
+      {
+       "cat": "transport",
+       "amount": 95,
+       "cur": "EUR",
+       "note": "Mietwagen"
+      },
+      {
+       "cat": "activities",
+       "amount": 20,
+       "cur": "EUR",
+       "note": "Palácio da Pena"
+      }
+     ],
+     "rating": 4
     },
     {
      "name": "Cascais",
@@ -206,6 +268,14 @@
        "lngLat": null,
        "time": null
       }
+     ],
+     "costs": [
+      {
+       "cat": "transport",
+       "amount": 1.6,
+       "cur": "EUR",
+       "note": "Fähre"
+      }
      ]
     }
    ],
@@ -229,71 +299,6 @@
     },
     {
      "mode": "boat"
-    }
-   ],
-   "costs": [
-    {
-     "cat": "transport",
-     "amount": 186,
-     "cur": "EUR",
-     "note": "Flug FRA–LIS"
-    },
-    {
-     "cat": "transport",
-     "amount": 32,
-     "cur": "EUR",
-     "note": "Viva Viagem"
-    },
-    {
-     "cat": "transport",
-     "amount": 95,
-     "cur": "EUR",
-     "note": "Mietwagen",
-     "stop": 3
-    },
-    {
-     "cat": "transport",
-     "amount": 1.6,
-     "cur": "EUR",
-     "note": "Fähre",
-     "stop": 6
-    },
-    {
-     "cat": "lodging",
-     "amount": 540,
-     "cur": "EUR",
-     "note": "6 Nächte"
-    },
-    {
-     "cat": "food",
-     "amount": 210,
-     "cur": "EUR"
-    },
-    {
-     "cat": "food",
-     "amount": 9.5,
-     "cur": "EUR",
-     "note": "Pastéis",
-     "stop": 2
-    },
-    {
-     "cat": "activities",
-     "amount": 45,
-     "cur": "EUR",
-     "note": "Fado",
-     "stop": 1
-    },
-    {
-     "cat": "activities",
-     "amount": 20,
-     "cur": "EUR",
-     "note": "Palácio da Pena",
-     "stop": 3
-    },
-    {
-     "cat": "other",
-     "amount": 25,
-     "cur": "EUR"
     }
    ]
   },
@@ -322,7 +327,38 @@
      ],
      "time": "2025-10-10T13:30",
      "md": "Los geht's. 13 Stunden Flug, drei Filme, kein Schlaf.",
-     "photos": []
+     "photos": [],
+     "costs": [
+      {
+       "cat": "transport",
+       "amount": 920,
+       "cur": "EUR",
+       "note": "Flug FRA–HND / KIX–FRA"
+      },
+      {
+       "cat": "transport",
+       "amount": 50000,
+       "cur": "JPY",
+       "note": "JR Pass 7 Tage"
+      },
+      {
+       "cat": "lodging",
+       "amount": 180000,
+       "cur": "JPY",
+       "note": "14 Nächte"
+      },
+      {
+       "cat": "food",
+       "amount": 85000,
+       "cur": "JPY"
+      },
+      {
+       "cat": "other",
+       "amount": 40,
+       "cur": "USD",
+       "note": "eSIM"
+      }
+     ]
     },
     {
      "name": "Tokio – Shinjuku",
@@ -400,6 +436,14 @@
        ],
        "time": null
       }
+     ],
+     "costs": [
+      {
+       "cat": "lodging",
+       "amount": 32000,
+       "cur": "JPY",
+       "note": "Ryokan"
+      }
      ]
     },
     {
@@ -435,7 +479,16 @@
        ],
        "time": null
       }
-     ]
+     ],
+     "costs": [
+      {
+       "cat": "activities",
+       "amount": 22000,
+       "cur": "JPY",
+       "note": "Tempel & Museen"
+      }
+     ],
+     "rating": 5
     },
     {
      "name": "Nara",
@@ -502,51 +555,6 @@
     },
     {
      "mode": "train"
-    }
-   ],
-   "costs": [
-    {
-     "cat": "transport",
-     "amount": 920,
-     "cur": "EUR",
-     "note": "Flug FRA–HND / KIX–FRA"
-    },
-    {
-     "cat": "transport",
-     "amount": 50000,
-     "cur": "JPY",
-     "note": "JR Pass 7 Tage"
-    },
-    {
-     "cat": "lodging",
-     "amount": 180000,
-     "cur": "JPY",
-     "note": "14 Nächte"
-    },
-    {
-     "cat": "lodging",
-     "amount": 32000,
-     "cur": "JPY",
-     "note": "Ryokan",
-     "stop": 3
-    },
-    {
-     "cat": "food",
-     "amount": 85000,
-     "cur": "JPY"
-    },
-    {
-     "cat": "activities",
-     "amount": 22000,
-     "cur": "JPY",
-     "note": "Tempel & Museen",
-     "stop": 4
-    },
-    {
-     "cat": "other",
-     "amount": 40,
-     "cur": "USD",
-     "note": "eSIM"
     }
    ]
   }

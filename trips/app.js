@@ -1,4 +1,5 @@
-import { MODES, CATS, STYLES, esc, resolveLegs, toEUR, tripDays, fmtRange, fmtTime, fmtEUR, countryName, parseVideo } from "./lib.js";
+import { MODES, CATS, STYLES, RATES, esc, resolveLegs, toEUR, tripDays, fmtRange, fmtTime, fmtEUR, countryName, parseVideo, allCosts } from "./lib.js";
+import { sb, TRIP_SELECT, fromRow, profileLink } from "./db.js";
 
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (s, el = document) => el.querySelector(s);
@@ -6,14 +7,31 @@ const theme = () => document.documentElement.dataset.theme === "dark" ? "dark" :
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const isMobile = () => matchMedia("(max-width: 760px)").matches;
 
-const { trips, rates } = await fetch("data/trips.json").then(r => r.json());
-trips.sort((a, b) => b.start.localeCompare(a.start));
+// RLS returns published trips plus, when signed in, your own drafts.
+async function loadTrips() {
+  const { data, error } = await sb.from("trips").select(TRIP_SELECT).order("start_date", { ascending: false });
+  if (error) { console.error(error); return []; }
+  return data.map(fromRow).filter(t => t.stops.length);
+}
+// The session is shared with the editor (same origin), so signing in there counts here too.
+const session = (await sb.auth.getSession()).data.session;
+let [trips, following] = await Promise.all([loadTrips(), loadFollowing()]);
+let tab = "trips", feedMode = "all", profile = null;
+
+async function loadFollowing() {
+  if (!session) return new Set();
+  const { data } = await sb.from("follows").select("followee").eq("follower", session.user.id);
+  return new Set((data || []).map(f => f.followee));
+}
 
 const panel = $("#panel"), scroller = $("#panelScroll"), body = $("#panelBody");
 let current = null, stopIdx = -1, routeData = empty(), drawRaf = 0;
 let stopMarkers = [], photoMarkers = [], vehicle = null;
 const overviewMarkers = new Map();
-const filter = { q: "", year: "", tag: "", country: "" };
+const filter = { q: "", year: "", tag: "", country: "", owner: "" };
+const initial = p => (p?.name || p?.handle || "?").trim()[0].toUpperCase();
+// Without a handle there's no profile page yet, so the name is plain text
+const byLine = p => !p ? "" : `<${p.handle ? `a href="${profileLink(p)}"` : "span"} class="by"><span class="avatar" aria-hidden="true">${esc(initial(p))}</span>${esc(p.name || p.handle)}</${p.handle ? "a" : "span"}>`;
 
 function empty() { return { type: "FeatureCollection", features: [] }; }
 
@@ -114,6 +132,7 @@ function clearOverviewMarkers() { overviewMarkers.forEach(m => m.remove()); over
 function visibleTrips() {
   const q = filter.q.toLowerCase();
   return trips.filter(t =>
+    (!filter.owner || t.owner?.handle === filter.owner) &&
     (!filter.year || t.start.startsWith(filter.year)) &&
     (!filter.tag || t.tags?.includes(filter.tag)) &&
     (!filter.country || t.countries?.includes(filter.country)) &&
@@ -125,19 +144,44 @@ function options(values, label, sel, fmt = v => v) {
   return `<option value="">${label}</option>` + [...new Set(values)].sort().map(v => `<option value="${esc(v)}"${v === sel ? " selected" : ""}>${esc(fmt(v))}</option>`).join("");
 }
 
+function profileHead() {
+  const own = profile.id === session?.user.id, n = visibleTrips().length;
+  const btn = own ? `<a class="btn ghost" href="editor.html">Profil bearbeiten</a>`
+    : session ? `<button class="btn ${following.has(profile.id) ? "ghost" : "primary"}" id="followBtn">${following.has(profile.id) ? "Entfolgen" : "Folgen"}</button>`
+    : `<a class="btn ghost" href="editor.html">Anmelden zum Folgen</a>`;
+  return `
+    <a class="back-link" href="#">← Alle Reisen</a>
+    <div class="panel-head profile-head">
+      <span class="avatar big" aria-hidden="true">${esc(initial(profile))}</span>
+      <div><h1 class="title">${esc(profile.name || profile.handle)}</h1><p class="kicker">@${esc(profile.handle)} · ${n} Reise${n === 1 ? "" : "n"}</p></div>
+    </div>
+    ${profile.bio ? `<p class="summary">${esc(profile.bio)}</p>` : ""}
+    <div class="profile-actions">${btn}</div>`;
+}
+
 function renderOverview() {
   setPanel(`
-    <div class="panel-head">
+    ${profile ? profileHead() : `<div class="panel-head">
       <p class="kicker">Reise­tagebuch · ${trips.length} Reisen</p>
-      <h1 class="title">Wo ich <em>war</em></h1>
+      <h1 class="title">Wo wir <em>waren</em></h1>
+    </div>`}
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="trips" aria-selected="${tab === "trips"}">Reisen</button>
+      <button role="tab" data-tab="feed" aria-selected="${tab === "feed"}">Feed</button>
     </div>
+    <div id="feedBox" ${tab === "feed" ? "" : "hidden"}></div>
+    <div id="tripsBox" ${tab === "trips" ? "" : "hidden"}>
     <div class="filters" role="group" aria-label="Filter">
       <select id="fYear" aria-label="Jahr">${options(trips.map(t => t.start.slice(0, 4)), "Alle Jahre", filter.year)}</select>
       <select id="fTag" aria-label="Tag">${options(trips.flatMap(t => t.tags || []), "Alle Tags", filter.tag)}</select>
       <select id="fCountry" aria-label="Land">${options(trips.flatMap(t => t.countries || []), "Alle Länder", filter.country, countryName)}</select>
     </div>
-    <ul class="trip-list" id="tripList"></ul>`);
+    <ul class="trip-list" id="tripList"></ul>
+    </div>`);
   $("#editLink").href = "editor.html";
+  body.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { tab = b.dataset.tab; renderOverview(); });
+  $("#followBtn")?.addEventListener("click", toggleFollow);
+  if (tab === "feed") renderFeed();
   for (const [id, key] of [["fYear", "year"], ["fTag", "tag"], ["fCountry", "country"]])
     $("#" + id).onchange = e => { filter[key] = e.target.value; applyFilter(); };
   renderList();
@@ -182,12 +226,88 @@ async function showOverview() {
   const wasTrip = current;
   clearTrip();
   current = null;
-  if (wasTrip || !$("#tripList")) renderOverview();
+  if (wasTrip || !$("#tripList") || (profile?.handle || "") !== filter.owner) {
+    profile = filter.owner ? await loadProfile(filter.owner) : null;
+    renderOverview();
+  }
   map.getSource("trips")?.setData(tripsGeo());
   const pts = visibleTrips().map(t => t.stops[Math.floor(t.stops.length / 2)].lngLat);
   if (pts.length) await fitCoords(pts, { maxZoom: 5 });
   syncOverview();
 }
+
+/* ————————————— FEED, PROFILES, FOLLOWS ————————————— */
+async function loadProfile(handle) {
+  const known = trips.find(t => t.owner?.handle === handle)?.owner;
+  if (known) return known;
+  const { data } = await sb.from("profiles").select("id, handle, name, bio").eq("handle", handle).maybeSingle();
+  return data;
+}
+
+async function toggleFollow() {
+  const on = following.has(profile.id);
+  const { error } = on
+    ? await sb.from("follows").delete().eq("follower", session.user.id).eq("followee", profile.id)
+    : await sb.from("follows").insert({ followee: profile.id });
+  if (error) return console.error(error);
+  on ? following.delete(profile.id) : following.add(profile.id);
+  renderOverview();
+}
+
+const ago = d => {
+  const s = (new Date(d) - Date.now()) / 1000, rtf = new Intl.RelativeTimeFormat("de", { numeric: "auto" });
+  for (const [unit, sec] of [["year", 31536e3], ["month", 2592e3], ["week", 604800], ["day", 86400], ["hour", 3600], ["minute", 60]])
+    if (Math.abs(s) >= sec) return rtf.format(Math.round(s / sec), unit);
+  return "gerade eben";
+};
+
+async function renderFeed() {
+  const box = $("#feedBox");
+  if (!box) return;
+  const { data, error } = await sb.from("stops")
+    .select("id, name, position, created_at, photos, videos, rating, md, trip:trips!inner(slug, title, owner:profiles(id, handle, name))")
+    .order("created_at", { ascending: false }).limit(40);
+  if (!$("#feedBox")) return; // panel changed while loading
+  const items = (data || []).filter(s =>
+    (!filter.owner || s.trip.owner?.handle === filter.owner) &&
+    (feedMode === "all" || following.has(s.trip.owner?.id) || s.trip.owner?.id === session?.user.id));
+  box.innerHTML = `
+    ${session && !filter.owner ? `<div class="seg" role="group" aria-label="Feed-Filter">
+      <button data-mode="all" aria-pressed="${feedMode === "all"}">Alle</button>
+      <button data-mode="following" aria-pressed="${feedMode === "following"}">Folge ich</button></div>` : ""}
+    ${error ? `<p class="empty">Feed gerade nicht erreichbar.</p>` : !items.length ? `<p class="empty">${feedMode === "following" ? "Noch nichts von Leuten, denen du folgst." : "Noch keine Beiträge."}</p>` : ""}
+    <ul class="feed">${items.map(s => {
+      const p = s.photos?.[0], o = s.trip.owner, text = (s.md || "").replace(/[*_#>`\[\]()]/g, "").slice(0, 140);
+      return `<li class="card feed-item reveal-card">
+        <div class="feed-head">${byLine(o)}<span class="meta">${ago(s.created_at)}</span></div>
+        <a class="feed-body" href="#trip=${encodeURIComponent(s.trip.slug)}&stop=${s.position + 1}">
+          ${p ? `<img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy">` : ""}
+          <strong>${esc(s.name)}${s.rating ? ` <span class="rating">${"★".repeat(s.rating)}</span>` : ""}${s.videos?.length ? " ▶" : ""}</strong>
+          <span class="meta">${esc(s.trip.title)}</span>
+          ${text ? `<span class="feed-text">${esc(text)}${s.md.length > 140 ? " …" : ""}</span>` : ""}
+        </a></li>`;
+    }).join("")}</ul>`;
+  box.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { feedMode = b.dataset.mode; renderFeed(); });
+  observeCards();
+}
+
+// Live updates: someone adds or edits a stop → refresh lists; an open trip gets a reload button.
+let refreshTimer;
+sb.channel("stops-live").on("postgres_changes", { event: "*", schema: "public", table: "stops" }, () => {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => {
+    trips = await loadTrips();
+    if (!current) { renderList(); if (tab === "feed") renderFeed(); map.getSource("trips")?.setData(tripsGeo()); }
+    else $("#livePill").hidden = false;
+  }, 1500);
+}).subscribe();
+
+$("#livePill").onclick = () => {
+  $("#livePill").hidden = true;
+  const id = current?.id;
+  current = null;
+  if (id) openTrip(id);
+};
 
 /* ————————————— TRIP ————————————— */
 async function openTrip(id, stop) {
@@ -296,18 +416,22 @@ function addPhotoMarkers(trip) {
 function renderTrip(t) {
   const km = t._legs.reduce((s, l) => s + l.km, 0);
   const photos = t.stops.reduce((s, x) => s + (x.photos?.length || 0), 0);
-  const costs = (t.costs || []).map(c => ({ ...c, eur: toEUR(c.amount, c.cur, rates) }));
+  const costs = allCosts(t).filter(c => c.amount > 0).map(c => ({ ...c, eur: toEUR(c.amount, c.cur) }));
   const total = costs.reduce((s, c) => s + c.eur, 0);
-  const stopCost = i => costs.filter(c => c.stop === i).reduce((s, c) => s + c.eur, 0);
+  const stopCosts = i => costs.filter(c => c.stop === i);
+  const rated = t.stops.filter(s => s.rating), avg = rated.reduce((n, s) => n + s.rating, 0) / rated.length;
+  const starRow = n => `<span class="rating" role="img" aria-label="${n} von 5 Sternen">${"★".repeat(n)}<span class="dim">${"★".repeat(5 - n)}</span></span>`;
 
   setPanel(`
     <a class="back-link" href="#">← Alle Reisen</a>
     <img class="cover" src="${esc(t.cover)}" alt="${esc(t.title)}">
     <div class="panel-head">
-      <p class="kicker">${fmtRange(t)}</p>
+      <p class="kicker">${fmtRange(t)}${t.published ? "" : " · 🔒 privat"}</p>
       <h1 class="title">${esc(t.title)}</h1>
+      ${byLine(t.owner)}
       <p class="tags">${(t.tags || []).map(x => `<span class="chip">${esc(x)}</span>`).join("")}
-        ${(t.countries || []).map(c => `<span class="chip ghost">${esc(countryName(c))}</span>`).join("")}</p>
+        ${(t.countries || []).map(c => `<span class="chip ghost">${esc(countryName(c))}</span>`).join("")}
+        ${rated.length ? `<span class="chip ghost" title="Durchschnitt aus ${rated.length} Bewertungen">★ ${avg.toFixed(1).replace(".", ",")}</span>` : ""}</p>
       <p class="summary">${esc(t.summary)}</p>
     </div>
     <dl class="stats">
@@ -325,12 +449,14 @@ function renderTrip(t) {
         <button class="stop-head" data-go="${i}">
           <span class="num">${i + 1}</span>
           <span><strong>${esc(s.name)}</strong><span class="meta">${fmtTime(s.time)}</span></span>
+          ${s.rating ? starRow(s.rating) : ""}
         </button>
         <div class="md">${marked.parse(s.md || "")}</div>
         ${s.photos?.length ? `<div class="gallery">${s.photos.map((p, pi) =>
           `<button data-ph="${pi}" aria-label="Foto vergrößern: ${esc(p.alt)}"><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy"></button>`).join("")}</div>` : ""}
         ${(s.videos || []).map(vlogHTML).join("")}
-        ${stopCost(i) ? `<p class="meta">Ausgaben hier: ${fmtEUR(stopCost(i))}</p>` : ""}
+        ${stopCosts(i).length ? `<p class="stop-costs">${stopCosts(i).map(c =>
+          `<span title="${esc(CATS[c.cat]?.label)}">${CATS[c.cat]?.icon || ""} ${fmtEUR(c.eur, c.eur < 100 ? 2 : 0)}${c.note ? ` <span class="meta">${esc(c.note)}</span>` : ""}</span>`).join("")}</p>` : ""}
         ${i < t._legs.length ? `<p class="leg"><span style="--c:${MODES[t._legs[i].mode].color}">${MODES[t._legs[i].mode].icon}</span> ${MODES[t._legs[i].mode].label} · ${Math.round(t._legs[i].km)} km</p>` : ""}
       </li>`).join("")}
     </ol>`);
@@ -390,7 +516,7 @@ function costPanel(costs, total, days) {
         <ul class="cat-list">${by.map(x => `<li><i style="--c:${CATS[x.k].color}"></i>${CATS[x.k].label}<span>${fmtEUR(x.eur)}</span></li>`).join("")}</ul>
       </div>
     </div>
-    ${foreign ? `<p class="fine">Statische Kurse: ${Object.entries(rates).filter(([k]) => k !== "EUR").map(([k, v]) => `1 ${k} = ${v} €`).join(" · ")}</p>` : ""}`;
+    ${foreign ? `<p class="fine">Statische Kurse: ${Object.entries(RATES).filter(([k]) => k !== "EUR").map(([k, v]) => `1 ${k} = ${v} €`).join(" · ")}</p>` : ""}`;
 }
 
 function animateDonut() {
@@ -552,6 +678,7 @@ lbImg.addEventListener("pointerup", e => {
 function route() {
   const h = new URLSearchParams(location.hash.slice(1));
   const id = h.get("trip"), s = h.get("stop");
+  filter.owner = h.get("u") || "";
   if (id) openTrip(id, s ? +s - 1 : null);
   else showOverview();
 }

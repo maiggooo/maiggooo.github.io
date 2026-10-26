@@ -9,12 +9,15 @@ export const MODES = {
 };
 
 export const CATS = {
-  transport:  { label: "Transport",   color: "#2a6bc8" },
-  lodging:    { label: "Unterkunft",  color: "#c8442a" },
-  food:       { label: "Essen",       color: "#e0a030" },
-  activities: { label: "Aktivitäten", color: "#2f8a4a" },
-  other:      { label: "Sonstiges",   color: "#8a857a" },
+  food:       { label: "Essen",       icon: "🍽", color: "#e0a030" },
+  lodging:    { label: "Unterkunft",  icon: "🛏", color: "#c8442a" },
+  transport:  { label: "Transport",   icon: "🚆", color: "#2a6bc8" },
+  activities: { label: "Aktivitäten", icon: "🎟", color: "#2f8a4a" },
+  other:      { label: "Sonstiges",   icon: "📦", color: "#8a857a" },
 };
+
+// Costs live on the stop they belong to; trip.costs is the old format (still read).
+export const allCosts = t => [...(t.costs || []), ...t.stops.flatMap((s, i) => (s.costs || []).map(c => ({ ...c, stop: i })))];
 
 export const STYLES = {
   light: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
@@ -113,7 +116,9 @@ export function parseVideo(url) {
   return null;
 }
 
-export const toEUR =(amount, cur, rates) => amount * (rates[cur] ?? 1);
+// Static conversion to EUR (1 unit = x EUR). Edit here; currencies listed here show up in the editor.
+export const RATES = { EUR: 1, USD: 0.92, GBP: 1.17, CHF: 1.05, JPY: 0.0061 };
+export const toEUR = (amount, cur, rates = RATES) => amount * (rates[cur] ?? 1);
 
 export const tripDays = t => Math.round((new Date(t.end) - new Date(t.start)) / 864e5) + 1;
 
