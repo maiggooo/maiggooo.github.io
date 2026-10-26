@@ -415,3 +415,4 @@ iframe.vlog { cursor: auto; }
   background: var(--card-2); cursor: pointer; text-transform: none !important; letter-spacing: 0 !important; font: 500 13px var(--font-body) !important; color: var(--ink) !important; }
 .pub-toggle input { width: 18px !important; height: 18px; margin: 0 !important; accent-color: var(--accent); flex: none; }
 .ed-bar [hidden] { display: none !important; }
+body.home .brand-pill .arrow { display: none; }

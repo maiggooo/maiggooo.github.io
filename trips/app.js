@@ -679,6 +679,7 @@ function route() {
   const h = new URLSearchParams(location.hash.slice(1));
   const id = h.get("trip"), s = h.get("stop");
   filter.owner = h.get("u") || "";
+  document.body.classList.toggle("home", !id && !filter.owner); // the brand button's ← only shows when it leads somewhere
   if (id) openTrip(id, s ? +s - 1 : null);
   else showOverview();
 }
