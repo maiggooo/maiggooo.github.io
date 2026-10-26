@@ -321,14 +321,23 @@ async function openTrip(id, stop) {
     trip._legs ??= await resolveLegs(trip);
     if (current !== trip) return; // user navigated away while tracks loaded
     renderTrip(trip);
-    if (stop == null) await fitCoords(trip._legs.flatMap(l => l.coords).concat(trip.stops.map(s => s.lngLat)));
+    // Without a stop in the link: start framed on the first leg, then the camera rides along
+    const follow = stop == null && !RM && trip._legs.length > 0;
+    if (stop == null) await fitCoords(follow ? legView(trip, 0) : trip._legs.flatMap(l => l.coords).concat(trip.stops.map(s => s.lngLat)));
     if (current !== trip) return;
-    drawRoute(trip);
+    drawRoute(trip, follow);
   }
   if (stop != null) goStop(stop);
 }
 
+const legView = (trip, i) => [...trip._legs[i].coords, trip.stops[i].lngLat, trip.stops[i + 1].lngLat];
+
+// Camera follow during the route animation; any manual pan/zoom or stop click takes over.
+let riding = false;
+for (const ev of ["dragstart", "wheel", "touchstart"]) map.on(ev, () => { riding = false; });
+
 function clearTrip() {
+  riding = false;
   cancelAnimationFrame(drawRaf);
   [...stopMarkers, ...photoMarkers].forEach(m => m.remove());
   stopMarkers = []; photoMarkers = [];
@@ -351,7 +360,7 @@ function partial(leg, f) {
 
 const ease = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 
-function drawRoute(trip) {
+function drawRoute(trip, follow = false) {
   const legs = trip._legs, n = legs.length;
   const feature = (leg, coords) => ({ type: "Feature", properties: { mode: leg.mode }, geometry: { type: "LineString", coordinates: coords } });
   let popped = 0;
@@ -364,7 +373,10 @@ function drawRoute(trip) {
     return;
   }
   // Every leg gets the same time, so a 9000 km flight doesn't dwarf a city walk.
-  const perLeg = Math.max(700, Math.min(1400, 5200 / n)), t0 = performance.now();
+  // Following needs more time per leg so the camera move doesn't feel rushed.
+  const perLeg = follow ? 1800 : Math.max(700, Math.min(1400, 5200 / n)), t0 = performance.now();
+  riding = follow;
+  let camLeg = 0; // leg 0 is already framed by openTrip
   // MapLibre owns the wrapper's transform, so rotation goes on the inner element
   const wrap = document.createElement("div"), el = wrap.appendChild(document.createElement("span"));
   el.className = "vehicle";
@@ -375,6 +387,12 @@ function drawRoute(trip) {
     // rAF time can predate t0, hence the max(0)
     const p = Math.max(0, Math.min(n, (now - t0) / perLeg)), i = Math.min(n - 1, Math.floor(p)), f = p >= n ? 1 : ease(p - i);
     pop(Math.floor(p));
+    if (riding && i !== camLeg) {
+      camLeg = i;
+      const b = legView(trip, i).reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(trip.stops[i].lngLat, trip.stops[i].lngLat));
+      const cam = map.cameraForBounds(b, { padding: padding(), maxZoom: 14 });
+      if (cam) map.flyTo({ ...cam, duration: perLeg, essential: false });
+    }
     const part = partial(legs[i], f);
     routeData = { type: "FeatureCollection", features: [...legs.slice(0, i).map(l => feature(l, l.coords)), feature(legs[i], part.coords)] };
     map.getSource("route")?.setData(routeData);
@@ -386,7 +404,10 @@ function drawRoute(trip) {
       el.style.setProperty("--rot", Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + 45 + "deg"); // ✈️ points up-right
     } else el.style.setProperty("--rot", "0deg");
     if (p < n) drawRaf = requestAnimationFrame(frame);
-    else { pop(Infinity); vehicle.remove(); vehicle = null; addPhotoMarkers(trip); }
+    else {
+      pop(Infinity); vehicle.remove(); vehicle = null; addPhotoMarkers(trip);
+      if (riding) goStop(0); // ride's over: back to the start of the story
+    }
   };
   drawRaf = requestAnimationFrame(frame);
 }
@@ -546,6 +567,7 @@ function goStop(i, { scroll = true } = {}) {
   const t = current;
   if (!t) return;
   i = Math.max(0, Math.min(t.stops.length - 1, i));
+  riding = false;
   stopIdx = i;
   const s = t.stops[i];
   map.flyTo({ center: s.lngLat, zoom: s.zoom ?? 13.5, padding: padding(), duration: RM ? 0 : 2400, curve: 1.5, essential: false });
