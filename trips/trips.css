@@ -295,3 +295,31 @@ body.far .photo-pin { opacity: 0; pointer-events: none; }
 @media (max-width: 760px) {
   body.editor .panel { transform: none; height: 58dvh; animation: none; }
 }
+
+/* ————— Vlogs ————— */
+#editLink { text-decoration: none; font-size: 19px; }
+.stop-pin { position: relative; }
+.stop-pin .badge {
+  position: absolute; top: -8px; right: -10px; width: 18px; height: 18px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--ink); color: var(--paper); font-size: 8px; border: 2px solid var(--pin-ring);
+}
+.vlog {
+  position: relative; display: block; width: 100%; aspect-ratio: 16/9; margin-top: 12px; border: 0; padding: 0;
+  border-radius: var(--radius-sm); overflow: hidden; background: #1a1a1a; cursor: pointer; color: #fff;
+}
+.vlog img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s var(--ease), opacity .3s; opacity: .85; }
+.vlog:hover img { transform: scale(1.04); opacity: 1; }
+.vlog .play {
+  position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--accent); font-size: 20px; padding-left: 4px; box-shadow: var(--shadow-2);
+  transition: transform .25s var(--spring);
+}
+.vlog:hover .play { transform: scale(1.12); }
+.vlog-title {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 12px 10px; text-align: left; font: 600 14px var(--font-body);
+  background: linear-gradient(transparent, rgba(0,0,0,.7));
+}
+iframe.vlog { cursor: auto; }
+.ed-vlog { display: grid; grid-template-columns: 1.4fr 1fr auto; gap: 4px; margin-top: 8px; align-items: center; }
+.ed-vlog input { margin: 0; padding: 6px 8px; font-size: 12.5px; }
+.ed input.bad { border-color: var(--accent); background: var(--accent-soft); }

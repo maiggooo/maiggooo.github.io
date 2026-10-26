@@ -91,7 +91,29 @@ export async function resolveLegs(trip) {
   }));
 }
 
-export const toEUR = (amount, cur, rates) => amount * (rates[cur] ?? 1);
+// Vlogs are YouTube/Vimeo links. Returns null for anything else.
+// youtube-nocookie and Vimeo's dnt=1 keep tracking off until someone presses play.
+export function parseVideo(url) {
+  let u;
+  try { u = new URL(url); } catch { return null; }
+  const host = u.hostname.replace(/^(www|m)\./, "");
+  let id = host === "youtu.be" ? u.pathname.slice(1)
+    : /^(youtube\.com|youtube-nocookie\.com)$/.test(host) ? (u.searchParams.get("v") || u.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/)?.[1])
+    : null;
+  if (id && /^[\w-]{11}$/.test(id)) {
+    return { provider: "youtube", id, thumb: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+      embed: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0` };
+  }
+  const vm = host.endsWith("vimeo.com") && u.pathname.match(/(?:^|\/)(\d+)(?:\/([\da-f]+))?/);
+  if (vm) {
+    const h = vm[2] || u.searchParams.get("h"); // unlisted videos carry a hash
+    return { provider: "vimeo", id: vm[1], thumb: null,
+      embed: `https://player.vimeo.com/video/${vm[1]}?autoplay=1&dnt=1${h ? "&h=" + h : ""}` };
+  }
+  return null;
+}
+
+export const toEUR =(amount, cur, rates) => amount * (rates[cur] ?? 1);
 
 export const tripDays = t => Math.round((new Date(t.end) - new Date(t.start)) / 864e5) + 1;
 

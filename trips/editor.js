@@ -1,6 +1,6 @@
 // Local trip editor. Drafts live in localStorage, new photos in the Cache API
 // (keyed by their final URL), and "Exportieren" bundles both into one zip to commit.
-import { MODES, CATS, STYLES, esc, parseGPX, haversine, legCoords } from "./lib.js";
+import { MODES, CATS, STYLES, esc, parseGPX, haversine, legCoords, parseVideo } from "./lib.js";
 
 const KEY = "trips-editor-draft", CACHE = "trips-editor-images";
 const $ = s => document.querySelector(s);
@@ -38,7 +38,9 @@ async function load(fresh = false) {
     const src = req.url.replace(base, "");
     if (!urls.has(src)) urls.set(src, URL.createObjectURL(await (await cache.match(req)).blob()));
   }
-  sel = Math.min(sel, data.trips.length - 1);
+  // The viewer's ✎ button links here as editor.html#trip=<id>
+  const want = data.trips.findIndex(t => t.id === new URLSearchParams(location.hash.slice(1)).get("trip"));
+  sel = want >= 0 ? want : Math.min(sel, data.trips.length - 1);
   if (!data.trips.length) newTrip();
   data.trips.forEach(normalize);
   renderAll();
@@ -76,6 +78,8 @@ function renderSelect() {
 function render() {
   const t = trip(), photos = t.stops.flatMap(s => s.photos);
   if (t.cover && !photos.some(p => p.src === t.cover)) photos.unshift({ src: t.cover, alt: t.cover.split("/").pop() });
+  $("#backLink").href = "./#trip=" + encodeURIComponent(t.id);
+  history.replaceState(null, "", "#trip=" + encodeURIComponent(t.id));
   const opt = (v, cur, label = v) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(label)}</option>`;
   ed.innerHTML = `
     <label>Titel<input data-f="title" value="${esc(t.title)}"></label>
@@ -111,6 +115,13 @@ function render() {
             <button class="x" data-act="del-photo" data-i="${i}" data-k="${k}" aria-label="Foto entfernen">×</button>
             <input data-ph="${i}:${k}" value="${esc(p.alt)}" placeholder="Alt-Text" aria-label="Alt-Text"></figure>`).join("")}</div>` : ""}
         <div class="drop-zone" data-drop="${i}">+ Fotos für diesen Stopp</div>
+        ${(s.videos || []).map((v, k) => `
+          <div class="ed-vlog">
+            <input data-v="${i}:${k}" data-vf="url" value="${esc(v.url)}" placeholder="YouTube- oder Vimeo-Link" aria-label="Vlog-Link"${v.url && !parseVideo(v.url) ? ' class="bad"' : ""}>
+            <input data-v="${i}:${k}" data-vf="title" value="${esc(v.title || "")}" placeholder="Titel" aria-label="Vlog-Titel">
+            <button class="x" data-act="del-video" data-i="${i}" data-k="${k}" aria-label="Vlog entfernen">×</button>
+          </div>`).join("")}
+        <button class="btn ghost" data-act="add-video" data-i="${i}" style="margin-top:8px">▶ Vlog-Link</button>
         ${i < t.legs.length ? `<div class="ed-leg">weiter mit
           <select data-leg="${i}">${Object.entries(MODES).map(([k, m]) => opt(k, t.legs[i].mode, `${m.icon} ${m.label}`)).join("")}</select>
           <button class="btn ghost" data-act="gpx" data-i="${i}">GPX…</button>
@@ -339,6 +350,10 @@ ed.addEventListener("input", e => {
     else if (d.cf === "stop") { if (el.value === "") delete c.stop; else c.stop = +el.value; }
     else if (d.cf === "note") { if (el.value) c.note = el.value; else delete c.note; }
     else c[d.cf] = el.value;
+  } else if (d.v) {
+    const [i, k] = d.v.split(":").map(Number);
+    t.stops[i].videos[k][d.vf] = el.value.trim();
+    if (d.vf === "url") el.classList.toggle("bad", !!el.value && !parseVideo(el.value));
   } else if (d.ph) {
     const [i, k] = d.ph.split(":").map(Number);
     t.stops[i].photos[k].alt = el.value;
@@ -366,6 +381,16 @@ ed.addEventListener("click", async e => {
       changed();
       break;
     }
+    case "add-video":
+      (t.stops[i].videos ||= []).push({ url: "", title: "" });
+      changed();
+      ed.querySelector(`[data-v="${i}:${t.stops[i].videos.length - 1}"]`)?.focus();
+      break;
+    case "del-video":
+      t.stops[i].videos.splice(+b.dataset.k, 1);
+      if (!t.stops[i].videos.length) delete t.stops[i].videos;
+      changed();
+      break;
     case "gpx": gpxLeg = i; $("#gpxIn").click(); break;
     case "del-track": delete t.legs[i].coords; changed(); break;
     case "add-cost": t.costs.push({ cat: "food", amount: 0, cur: "EUR" }); changed(); break;

@@ -1,4 +1,4 @@
-import { MODES, CATS, STYLES, esc, resolveLegs, toEUR, tripDays, fmtRange, fmtTime, fmtEUR, countryName } from "./lib.js";
+import { MODES, CATS, STYLES, esc, resolveLegs, toEUR, tripDays, fmtRange, fmtTime, fmtEUR, countryName, parseVideo } from "./lib.js";
 
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (s, el = document) => el.querySelector(s);
@@ -137,6 +137,7 @@ function renderOverview() {
       <select id="fCountry" aria-label="Land">${options(trips.flatMap(t => t.countries || []), "Alle Länder", filter.country, countryName)}</select>
     </div>
     <ul class="trip-list" id="tripList"></ul>`);
+  $("#editLink").href = "editor.html";
   for (const [id, key] of [["fYear", "year"], ["fTag", "tag"], ["fCountry", "country"]])
     $("#" + id).onchange = e => { filter[key] = e.target.value; applyFilter(); };
   renderList();
@@ -151,7 +152,7 @@ function renderList() {
         <div>
           <h2>${esc(t.title)}</h2>
           <p class="meta">${fmtRange(t)} · ${tripDays(t)} Tage</p>
-          <p class="tags">${(t.tags || []).map(x => `<span class="chip">${esc(x)}</span>`).join("")}</p>
+          <p class="tags">${(t.tags || []).map(x => `<span class="chip">${esc(x)}</span>`).join("")}${vlogCount(t) ? `<span class="chip ghost">▶ ${vlogCount(t)} Vlog${vlogCount(t) > 1 ? "s" : ""}</span>` : ""}</p>
         </div>
       </a>
     </li>`).join("") : `<li class="empty">Keine Reise passt zum Filter.</li>`;
@@ -162,6 +163,8 @@ function renderList() {
   });
   observeCards();
 }
+
+const vlogCount = t => t.stops.reduce((n, s) => n + (s.videos?.length || 0), 0);
 
 function applyFilter() {
   if (current) return;
@@ -270,7 +273,8 @@ function drawRoute(trip) {
 
 function addStopMarker(trip, i) {
   const s = trip.stops[i], wrap = document.createElement("div");
-  wrap.innerHTML = `<button class="pin stop-pin drop" aria-label="Stopp ${i + 1}: ${esc(s.name)}">${i + 1}</button>`;
+  const vlog = s.videos?.length ? `<span class="badge" aria-hidden="true">▶</span>` : "";
+  wrap.innerHTML = `<button class="pin stop-pin drop" aria-label="Stopp ${i + 1}: ${esc(s.name)}${vlog ? " (mit Vlog)" : ""}">${i + 1}${vlog}</button>`;
   wrap.firstChild.onclick = () => goStop(i);
   if (i === stopIdx) wrap.firstChild.classList.add("active");
   wrap.style.zIndex = 2; // above photo pins
@@ -325,12 +329,15 @@ function renderTrip(t) {
         <div class="md">${marked.parse(s.md || "")}</div>
         ${s.photos?.length ? `<div class="gallery">${s.photos.map((p, pi) =>
           `<button data-ph="${pi}" aria-label="Foto vergrößern: ${esc(p.alt)}"><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy"></button>`).join("")}</div>` : ""}
+        ${(s.videos || []).map(vlogHTML).join("")}
         ${stopCost(i) ? `<p class="meta">Ausgaben hier: ${fmtEUR(stopCost(i))}</p>` : ""}
         ${i < t._legs.length ? `<p class="leg"><span style="--c:${MODES[t._legs[i].mode].color}">${MODES[t._legs[i].mode].icon}</span> ${MODES[t._legs[i].mode].label} · ${Math.round(t._legs[i].km)} km</p>` : ""}
       </li>`).join("")}
     </ol>`);
 
+  $("#editLink").href = "editor.html#trip=" + encodeURIComponent(t.id);
   $("#startStory").onclick = () => goStop(0);
+  body.querySelectorAll(".vlog").forEach(b => b.onclick = () => playVlog(b));
   body.querySelectorAll("[data-go]").forEach(b => b.onclick = () => goStop(+b.dataset.go));
   body.querySelectorAll(".stop-card").forEach(card => {
     const photos = t.stops[+card.dataset.stop].photos;
@@ -342,6 +349,25 @@ function renderTrip(t) {
   observeStops();
   $("#storyNav").hidden = false;
   updateStoryLabel();
+}
+
+// The player iframe only loads on click, so no YouTube/Vimeo requests before that.
+function vlogHTML(v) {
+  const p = parseVideo(v.url);
+  if (!p) return "";
+  const title = esc(v.title || "Vlog");
+  return `<button class="vlog" data-embed="${esc(p.embed)}" data-title="${title}" aria-label="Vlog abspielen: ${title}">
+    ${p.thumb ? `<img src="${esc(p.thumb)}" alt="" loading="lazy">` : ""}
+    <span class="play" aria-hidden="true">▶</span><span class="vlog-title">${title}</span></button>`;
+}
+
+function playVlog(b) {
+  const f = Object.assign(document.createElement("iframe"), {
+    className: "vlog", src: b.dataset.embed, title: b.dataset.title, allowFullscreen: true,
+    allow: "autoplay; fullscreen; picture-in-picture; encrypted-media",
+  });
+  b.replaceWith(f);
+  f.focus();
 }
 
 function costPanel(costs, total, days) {

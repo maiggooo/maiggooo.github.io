@@ -29,7 +29,7 @@ Then open http://localhost:8123/trips/ for the viewer, or http://localhost:8123/
 
 ## Adding a trip (editor workflow)
 
-1. Open `editor.html` on the local server. Pick **+ Neue Reise** from the dropdown.
+1. Open the editor: click **✎** in the map's top bar (it opens the trip you are viewing), or go to `editor.html`. Pick **+ Neue Reise** from the dropdown for a new trip.
 2. Fill in the title, dates, tags and countries. Countries are ISO codes such as `PT` or `JP`. **Set the ID first.** It becomes the image folder `images/<id>/`.
 3. **Click the map** to add stops in order.
    - Drag a card by its `⋮⋮` grip to reorder stops.
@@ -43,8 +43,9 @@ Then open http://localhost:8123/trips/ for the viewer, or http://localhost:8123/
    - When a photo has EXIF GPS, it gets a map position and goes to the nearest stop within 3 km. If no stop is that close, a new stop is created there.
    - Photos without GPS go to the stop with the closest timestamp, or else to the selected stop.
    - Convert iPhone HEIC photos to JPEG first unless you use Safari.
-7. Add costs. Each cost has a category, an amount and a currency, and can be linked to a stop. Exchange rates are under `rates` in `trips.json` (1 unit = x EUR). Edit them there.
-8. Drafts save automatically to this browser:
+7. **Vlogs:** click **▶ Vlog-Link** on a stop and paste a YouTube or Vimeo link (unlisted works; for unlisted Vimeo keep the hash part of the link). A link the editor doesn't recognize is marked red.
+8. Add costs. Each cost has a category, an amount and a currency, and can be linked to a stop. Exchange rates are under `rates` in `trips.json` (1 unit = x EUR). Edit them there.
+9. Drafts save automatically to this browser:
    - The JSON goes to localStorage.
    - New photos go to the Cache API.
    - You can close the tab and come back later.
@@ -77,7 +78,8 @@ You can also edit `data/trips.json` by hand. The editor and the viewer read the 
       "name": "Alfama", "lngLat": [-9.13, 38.71], // [longitude, latitude]
       "time": "2026-05-02T10:00", "zoom": 14,     // zoom optional (default 13.5)
       "md": "Markdown **text**",
-      "photos": [{ "src": "images/…/x.webp", "alt": "Describe the photo", "lngLat": [-9.13, 38.71] | null, "time": null }]
+      "photos": [{ "src": "images/…/x.webp", "alt": "Describe the photo", "lngLat": [-9.13, 38.71] | null, "time": null }],
+      "videos": [{ "url": "https://youtu.be/…", "title": "Vlog title" }]   // optional, YouTube or Vimeo
     }],
     "legs": [                                     // legs[i] = stop i → stop i+1
       { "mode": "walk", "track": "data/tracks/walk.geojson" },  // or .gpx
@@ -92,6 +94,7 @@ You can also edit `data/trips.json` by hand. The editor and the viewer read the 
 - **Modes:** `walk`, `car`, `train`, `plane`, `boat`. Their colors, dashes and icons are in `MODES` in `lib.js`.
 - **Cost categories:** `transport`, `lodging`, `food`, `activities`, `other`. They are defined in `CATS` in `lib.js`.
 - **Photo markers:** only photos with `lngLat` get a round thumbnail on the map. They show from zoom 11 upward.
+- **Vlogs:** a stop with a vlog gets a small ▶ badge on its map pin, and the stop card shows the video's thumbnail. The player (youtube-nocookie / Vimeo with `dnt=1`) loads only when someone presses play. The demo vlog on the Lisbon trip is someone else's public video used as a placeholder; replace it with your own.
 - **Overview pin:** the trip's pin on the world map sits on its middle stop.
 
 ## Deep links
