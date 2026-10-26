@@ -42,6 +42,18 @@
   </nav>
 </aside>
 
+<section id="feedView" class="feed-view" hidden aria-label="Feed">
+  <header class="feed-top">
+    <a class="round-btn" id="feedClose" href="#" aria-label="Zur Karte (Esc)">←</a>
+    <h1 id="feedTitle" class="title">Feed</h1>
+    <div class="seg" id="feedSeg" role="group" aria-label="Feed-Filter">
+      <button data-mode="all">Alle</button><button data-mode="following">Folge ich</button>
+    </div>
+  </header>
+  <ul id="feedList" class="feed-list"></ul>
+  <p id="feedMore" class="feed-more meta" role="status"></p>
+</section>
+
 <button class="live-pill" id="livePill" hidden>Neue Updates · aktualisieren</button>
 
 <dialog id="lightbox" class="lightbox" aria-label="Foto">

@@ -16,7 +16,7 @@ async function loadTrips() {
 // The session is shared with the editor (same origin), so signing in there counts here too.
 const session = (await sb.auth.getSession()).data.session;
 let [trips, following] = await Promise.all([loadTrips(), loadFollowing()]);
-let tab = "trips", feedMode = "all", profile = null;
+let feedMode = "all", profile = null;
 
 async function loadFollowing() {
   if (!session) return new Set();
@@ -165,23 +165,17 @@ function renderOverview() {
       <p class="kicker">Reise­tagebuch · ${trips.length} Reisen</p>
       <h1 class="title">Wo wir <em>waren</em></h1>
     </div>`}
-    <div class="tabs" role="tablist">
-      <button role="tab" data-tab="trips" aria-selected="${tab === "trips"}">Reisen</button>
-      <button role="tab" data-tab="feed" aria-selected="${tab === "feed"}">Feed</button>
-    </div>
-    <div id="feedBox" ${tab === "feed" ? "" : "hidden"}></div>
-    <div id="tripsBox" ${tab === "trips" ? "" : "hidden"}>
+    <a class="feed-link" href="#feed${profile ? "&u=" + encodeURIComponent(profile.handle) : ""}">
+      <span aria-hidden="true">▤</span><span><strong>Feed</strong><span class="meta">${profile ? "Alle Beiträge von " + esc(profile.name || profile.handle) : "Neueste Stopps, Fotos und Vlogs"}</span></span><span aria-hidden="true">→</span>
+    </a>
     <div class="filters" role="group" aria-label="Filter">
       <select id="fYear" aria-label="Jahr">${options(trips.map(t => t.start.slice(0, 4)), "Alle Jahre", filter.year)}</select>
       <select id="fTag" aria-label="Tag">${options(trips.flatMap(t => t.tags || []), "Alle Tags", filter.tag)}</select>
       <select id="fCountry" aria-label="Land">${options(trips.flatMap(t => t.countries || []), "Alle Länder", filter.country, countryName)}</select>
     </div>
-    <ul class="trip-list" id="tripList"></ul>
-    </div>`);
+    <ul class="trip-list" id="tripList"></ul>`);
   $("#editLink").href = "editor.html";
-  body.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { tab = b.dataset.tab; renderOverview(); });
   $("#followBtn")?.addEventListener("click", toggleFollow);
-  if (tab === "feed") renderFeed();
   for (const [id, key] of [["fYear", "year"], ["fTag", "tag"], ["fCountry", "country"]])
     $("#" + id).onchange = e => { filter[key] = e.target.value; applyFilter(); };
   renderList();
@@ -261,49 +255,110 @@ const ago = d => {
   return "gerade eben";
 };
 
-async function renderFeed() {
-  const box = $("#feedBox");
-  if (!box) return;
-  const { data, error } = await sb.from("stops")
-    .select("id, name, position, created_at, photos, videos, rating, md, trip:trips!inner(slug, title, owner:profiles(id, handle, name))")
-    .order("created_at", { ascending: false }).limit(40);
-  if (!$("#feedBox")) return; // panel changed while loading
-  const items = (data || []).filter(s =>
-    (!filter.owner || s.trip.owner?.handle === filter.owner) &&
-    (feedMode === "all" || following.has(s.trip.owner?.id) || s.trip.owner?.id === session?.user.id));
-  box.innerHTML = `
-    ${session && !filter.owner ? `<div class="seg" role="group" aria-label="Feed-Filter">
-      <button data-mode="all" aria-pressed="${feedMode === "all"}">Alle</button>
-      <button data-mode="following" aria-pressed="${feedMode === "following"}">Folge ich</button></div>` : ""}
-    ${error ? `<p class="empty">Feed gerade nicht erreichbar.</p>` : !items.length ? `<p class="empty">${feedMode === "following" ? "Noch nichts von Leuten, denen du folgst." : "Noch keine Beiträge."}</p>` : ""}
-    <ul class="feed">${items.map(s => {
-      const p = s.photos?.[0], o = s.trip.owner, text = (s.md || "").replace(/[*_#>`\[\]()]/g, "").slice(0, 140);
-      return `<li class="card feed-item reveal-card">
-        <div class="feed-head">${byLine(o)}<span class="meta">${ago(s.created_at)}</span></div>
-        <a class="feed-body" href="#trip=${encodeURIComponent(s.trip.slug)}&stop=${s.position + 1}">
-          ${p ? `<img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy">` : ""}
-          <strong>${esc(s.name)}${s.rating ? ` <span class="rating">${"★".repeat(s.rating)}</span>` : ""}${s.videos?.length ? " ▶" : ""}</strong>
-          <span class="meta">${esc(s.trip.title)}</span>
-          ${text ? `<span class="feed-text">${esc(text)}${s.md.length > 140 ? " …" : ""}</span>` : ""}
-        </a></li>`;
-    }).join("")}</ul>`;
-  box.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { feedMode = b.dataset.mode; renderFeed(); });
-  observeCards();
+/* ————————————— FULL-SCREEN FEED (#feed, #feed&u=handle) ————————————— */
+const feedView = $("#feedView"), feedList = $("#feedList"), feedPhotos = new Map(), PAGE = 10;
+let feedPage = 0, feedDone = false, feedLoading = false, feedToken = 0;
+
+async function openFeed() {
+  clearTrip();
+  current = null;
+  profile = filter.owner ? await loadProfile(filter.owner) : null;
+  feedView.hidden = false;
+  $("#feedTitle").textContent = profile ? profile.name || profile.handle : "Feed";
+  $("#feedClose").href = profile ? "#u=" + encodeURIComponent(profile.handle) : "#";
+  $("#feedSeg").hidden = !session || !!profile;
+  resetFeed();
 }
 
-// Live updates: someone adds or edits a stop → refresh lists; an open trip gets a reload button.
+function closeFeed() { feedView.hidden = true; }
+
+function resetFeed() {
+  feedPage = 0; feedDone = false; feedToken++;
+  feedList.innerHTML = "";
+  feedView.scrollTop = 0;
+  $("#feedSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === feedMode));
+  loadFeedPage();
+}
+
+async function loadFeedPage() {
+  if (feedLoading || feedDone) return;
+  feedLoading = true;
+  const token = feedToken;
+  $("#feedMore").textContent = "Lädt …";
+  // RLS only returns stops of published trips (plus your own drafts)
+  let q = sb.from("stops")
+    .select("id, name, cc, position, created_at, visited_at, photos, videos, rating, md, trips!inner(slug, title, owner:profiles(id, handle, name))")
+    .order("created_at", { ascending: false })
+    .range(feedPage * PAGE, feedPage * PAGE + PAGE - 1);
+  if (profile) q = q.eq("trips.owner", profile.id);
+  else if (feedMode === "following") q = q.in("trips.owner", [...following, session.user.id]);
+  const { data, error } = await q;
+  feedLoading = false;
+  if (token !== feedToken) return loadFeedPage(); // filter changed while loading
+  feedPage++;
+  feedDone = !!error || data.length < PAGE;
+  if (error) console.error(error);
+  feedList.insertAdjacentHTML("beforeend", (data || []).map(postHTML).join(""));
+  $("#feedMore").textContent = error ? "Feed gerade nicht erreichbar."
+    : !feedList.children.length ? (feedMode === "following" && !profile ? "Noch nichts von Leuten, denen du folgst." : "Noch keine Beiträge.")
+    : feedDone ? "Das war alles ✈" : "";
+}
+
+function postHTML(s) {
+  const t = s.trips, photos = s.photos || [];
+  feedPhotos.set(s.id, photos);
+  const media = photos.length ? `
+    <div class="post-media">
+      <div class="post-strip">${photos.map((p, i) => `<button data-post="${s.id}" data-ph="${i}" aria-label="Foto vergrößern: ${esc(p.alt)}"><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy"></button>`).join("")}</div>
+      ${photos.length > 1 ? `<span class="post-count" aria-hidden="true">1 / ${photos.length}</span>` : ""}
+    </div>`
+    : s.videos?.length ? "" // the vlog thumbnail below is the picture
+    : `<div class="post-media post-place"><span aria-hidden="true">📍</span><strong>${esc(s.name)}</strong>${s.cc ? `<span>${esc(countryName(s.cc))}</span>` : ""}</div>`;
+  return `
+    <li class="post">
+      <header class="post-head">${byLine(t.owner)}<span class="meta">${ago(s.created_at)}</span></header>
+      ${media}
+      <div class="post-body">
+        <h2>${esc(s.name)}${s.rating ? ` <span class="rating" role="img" aria-label="${s.rating} von 5 Sternen">${"★".repeat(s.rating)}</span>` : ""}</h2>
+        <p class="meta">${esc(t.title)}${s.visited_at ? " · " + fmtTime(s.visited_at) : ""}</p>
+        ${s.md ? `<div class="md clamp">${marked.parse(s.md)}</div>` : ""}
+        ${(s.videos || []).map(vlogHTML).join("")}
+        <a class="btn ghost" href="#trip=${encodeURIComponent(t.slug)}&stop=${s.position + 1}">📍 Auf der Karte</a>
+      </div>
+    </li>`;
+}
+
+feedList.addEventListener("click", e => {
+  const ph = e.target.closest("[data-ph]"), vlog = e.target.closest(".vlog"), md = e.target.closest(".md.clamp");
+  if (ph) openLightbox(feedPhotos.get(ph.dataset.post), +ph.dataset.ph, ph.firstChild);
+  else if (vlog) playVlog(vlog);
+  else if (md) md.classList.remove("clamp"); // tap to read the whole text
+});
+// Photo strips scroll sideways (CSS scroll-snap); keep the "2 / 5" counter in step
+feedList.addEventListener("scroll", e => {
+  const strip = e.target.closest?.(".post-strip"), count = strip?.parentElement.querySelector(".post-count");
+  if (count) count.textContent = `${Math.round(strip.scrollLeft / strip.clientWidth) + 1} / ${strip.children.length}`;
+}, true);
+$("#feedSeg").addEventListener("click", e => {
+  const b = e.target.closest("[data-mode]");
+  if (b && b.dataset.mode !== feedMode) { feedMode = b.dataset.mode; resetFeed(); }
+});
+new IntersectionObserver(es => { if (es[0].isIntersecting) loadFeedPage(); }, { root: feedView, rootMargin: "600px" }).observe($("#feedMore"));
+
+// Live updates: someone adds or edits a stop → refresh lists; feed and open trips get a reload button.
 let refreshTimer;
 sb.channel("stops-live").on("postgres_changes", { event: "*", schema: "public", table: "stops" }, () => {
   clearTimeout(refreshTimer);
   refreshTimer = setTimeout(async () => {
     trips = await loadTrips();
-    if (!current) { renderList(); if (tab === "feed") renderFeed(); map.getSource("trips")?.setData(tripsGeo()); }
+    if (!current && feedView.hidden) { renderList(); map.getSource("trips")?.setData(tripsGeo()); }
     else $("#livePill").hidden = false;
   }, 1500);
 }).subscribe();
 
 $("#livePill").onclick = () => {
   $("#livePill").hidden = true;
+  if (!feedView.hidden) return resetFeed();
   const id = current?.id;
   current = null;
   if (id) openTrip(id);
@@ -592,6 +647,7 @@ $("#prevStop").onclick = () => goStop(stopIdx - 1);
 $("#nextStop").onclick = () => goStop(stopIdx + 1);
 
 addEventListener("keydown", e => {
+  if (!feedView.hidden && e.key === "Escape" && !$("#lightbox").open) { location.hash = $("#feedClose").getAttribute("href").slice(1); return; }
   if (!current || $("#lightbox").open || e.target.closest("input, select, textarea")) return;
   if (e.key === "ArrowRight" || e.key === "j") { e.preventDefault(); goStop(stopIdx + 1); }
   else if (e.key === "ArrowLeft" || e.key === "k") { e.preventDefault(); goStop(stopIdx - 1); }
@@ -702,6 +758,8 @@ function route() {
   const id = h.get("trip"), s = h.get("stop");
   filter.owner = h.get("u") || "";
   document.body.classList.toggle("home", !id && !filter.owner); // the brand button's ← only shows when it leads somewhere
+  if (h.has("feed")) return openFeed();
+  closeFeed();
   if (id) openTrip(id, s ? +s - 1 : null);
   else showOverview();
 }
