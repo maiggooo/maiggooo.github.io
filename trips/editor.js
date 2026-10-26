@@ -16,9 +16,21 @@ const slug = s => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").repl
 const round = n => Math.round(n * 1e5) / 1e5;
 const localISO = d => new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
 
-function toast(msg) {
+function toast(msg, undo) {
   const t = document.body.appendChild(Object.assign(document.createElement("div"), { className: "toast", textContent: msg, role: "status" }));
-  setTimeout(() => t.remove(), 2600);
+  if (undo) {
+    const b = t.appendChild(Object.assign(document.createElement("button"), { className: "toast-undo", textContent: "Rückgängig" }));
+    b.onclick = () => { undo(); t.remove(); };
+  }
+  setTimeout(() => t.remove(), undo ? 6000 : 2600);
+}
+
+// Deletes happen at once with an undo toast instead of confirm(): some in-app
+// and mobile browsers block native dialogs, which made delete silently do nothing.
+function undoable(msg, fn) {
+  const before = JSON.stringify(data), selBefore = sel;
+  fn();
+  toast(msg, () => { data = JSON.parse(before); sel = selBefore; selStop = -1; save(); renderAll(); });
 }
 
 let saveTimer;
@@ -374,32 +386,35 @@ ed.addEventListener("click", async e => {
   if (!b) return;
   const t = trip(), i = +b.dataset.i;
   switch (b.dataset.act) {
-    case "del-stop": if (confirm(`Stopp „${t.stops[i].name}“ löschen?`)) deleteStop(i); break;
-    case "del-photo": {
+    case "del-stop": undoable(`„${t.stops[i].name}“ gelöscht`, () => deleteStop(i)); break;
+    case "del-photo": undoable("Foto entfernt", () => {
       const [p] = t.stops[i].photos.splice(+b.dataset.k, 1);
       if (t.cover === p.src) t.cover = t.stops.flatMap(s => s.photos)[0]?.src || "";
       changed();
-      break;
-    }
+    }); break;
     case "add-video":
       (t.stops[i].videos ||= []).push({ url: "", title: "" });
       changed();
       ed.querySelector(`[data-v="${i}:${t.stops[i].videos.length - 1}"]`)?.focus();
       break;
-    case "del-video":
+    case "del-video": undoable("Vlog entfernt", () => {
       t.stops[i].videos.splice(+b.dataset.k, 1);
       if (!t.stops[i].videos.length) delete t.stops[i].videos;
       changed();
-      break;
+    }); break;
     case "gpx": gpxLeg = i; $("#gpxIn").click(); break;
     case "del-track": delete t.legs[i].coords; changed(); break;
     case "add-cost": t.costs.push({ cat: "food", amount: 0, cur: "EUR" }); changed(); break;
-    case "del-cost": t.costs.splice(i, 1); changed(); break;
+    case "del-cost": undoable("Kosten gelöscht", () => { t.costs.splice(i, 1); changed(); }); break;
     case "export-json": download(json(), "trips.json"); break;
     case "export-zip": exportZip(); break;
-    case "del-trip":
-      if (confirm(`Reise „${t.title}“ aus dem Entwurf löschen?`)) { data.trips.splice(sel, 1); sel = 0; selStop = -1; save(); await load(); }
-      break;
+    case "del-trip": undoable(`Reise „${t.title}“ gelöscht`, () => {
+      // No load() here: the debounced save hasn't hit localStorage yet and the trip would come back
+      data.trips.splice(sel, 1);
+      if (!data.trips.length) newTrip();
+      sel = 0; selStop = -1;
+      save(); renderAll();
+    }); break;
     case "reset":
       if (confirm("Alle Entwürfe verwerfen und trips.json neu laden?")) { localStorage.removeItem(KEY); await load(true); toast("Entwurf verworfen"); }
       break;
