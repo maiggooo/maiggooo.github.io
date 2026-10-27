@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zündschnur — Vol. I · Nº 10</title>
+<meta name="description" content="Das Trinkspiel für ein Handy — weitergeben, bevor es knallt.">
+<meta name="theme-color" content="#f4efe6">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Maiko&#39;s Spiele &amp; Tools">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Zündschnur — Maiko&#x27;s Spiele &amp; Tools">
+<meta property="og:description" content="Das Trinkspiel für ein Handy — weitergeben, bevor es knallt.">
+<meta property="og:url" content="https://maiggooo.github.io/zuendschnur.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<style>
+  .mini-hero { padding: 40px 0 22px; text-align: center; }
+  .mini-hero h1 {
+    font-family: 'Fraunces', serif; font-weight: 400; font-style: italic;
+    font-size: clamp(36px, 6vw, 60px); letter-spacing: -.03em; line-height: .95;
+    color: var(--ink);
+  }
+  .mini-hero h1 em { color: var(--accent); }
+  .mini-hero p { margin-top: 12px; color: var(--muted); }
+
+  .kicker {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: .22em; color: var(--muted);
+  }
+  .screen { display: none; padding: 26px 0 34px; border-top: 1px solid var(--rule-soft); text-align: center; }
+  .screen.on { display: block; }
+
+  .btn {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .14em;
+    padding: 13px 22px; border: 1px solid var(--rule);
+    background: transparent; color: var(--ink); cursor: pointer;
+    transition: background .15s ease, transform .05s ease;
+  }
+  .btn:hover { background: var(--paper-2); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .cta-row { margin-top: 24px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+  /* Setup */
+  .add-row { display: flex; gap: 8px; max-width: 420px; margin: 16px auto 0; }
+  .add-row input {
+    flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 12px 14px;
+    border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+  .chip {
+    font-family: 'Fraunces', serif; font-size: 18px; padding: 8px 14px;
+    border: 1px solid var(--rule-soft); background: var(--paper-2); color: var(--ink); cursor: pointer;
+  }
+  .chip .x { color: var(--accent); margin-left: 6px; }
+  .chip.sel { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .note { margin-top: 18px; font-size: 13px; color: var(--muted); }
+
+  /* Pass + card */
+  .big-name {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(44px, 12vw, 84px);
+    line-height: 1; color: var(--accent); letter-spacing: -.03em; margin: 14px 0 8px;
+  }
+  .card {
+    max-width: 520px; margin: 14px auto 0; padding: 26px 22px;
+    background: var(--paper-2); border-left: 3px solid var(--accent); text-align: left;
+  }
+  .card .type { color: var(--accent); }
+  .card .text { font-family: 'Fraunces', serif; font-size: clamp(22px, 5vw, 28px); line-height: 1.25; margin-top: 10px; color: var(--ink); }
+  .card .sub { margin-top: 12px; color: var(--muted); font-size: 14px; }
+
+  /* Bomb */
+  .bomb {
+    font-size: clamp(110px, 32vw, 180px); line-height: 1; margin: 18px 0;
+    display: inline-block; user-select: none;
+  }
+  .bomb.tick { animation: wob .5s ease-in-out infinite; }
+  .bomb.boom { animation: boom .6s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes wob { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) scale(1.04); } }
+  @keyframes boom { 0% { transform: scale(.4); } 100% { transform: scale(1); } }
+
+  /* Hold */
+  .hold-pad {
+    width: min(260px, 70vw); aspect-ratio: 1; border-radius: 50%; margin: 20px auto 0;
+    border: 2px solid var(--ink); background: var(--paper-2); color: var(--ink);
+    display: grid; place-items: center; font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: .14em; font-size: 12px;
+    user-select: none; -webkit-user-select: none; touch-action: none; cursor: pointer;
+  }
+  .hold-pad.down { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+  .result {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 44px; color: var(--accent);
+    margin-top: 16px; min-height: 52px; font-variant-numeric: tabular-nums;
+  }
+
+  /* Duel: full-screen split, top half rotated for the player across */
+  .duel {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    grid-template-rows: 1fr 1fr; background: var(--paper);
+    user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  }
+  .duel.on { display: grid; }
+  .duel .half {
+    display: grid; place-items: center; text-align: center; padding: 20px;
+    font-family: 'Fraunces', serif; font-size: 28px; color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+  }
+  .duel .half.top { transform: rotate(180deg); border-bottom: none; border-top: 1px solid var(--rule); }
+  .duel.go .half { background: var(--accent); color: var(--paper); }
+  .duel .half small { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; margin-top: 8px; opacity: .7; }
+
+  /* Rules + tally */
+  .rules { max-width: 520px; margin: 22px auto 0; text-align: left; }
+  .rules li { list-style: none; padding: 8px 0; border-top: 1px dashed var(--rule-soft); font-size: 14px; }
+  .rules li b { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--accent); margin-right: 8px; }
+  .tally { max-width: 420px; margin: 18px auto 0; text-align: left; }
+  .tally div { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--rule-soft); font-family: 'Fraunces', serif; font-size: 20px; }
+  .tally span:last-child { color: var(--accent); font-variant-numeric: tabular-nums; }
+  @media (max-width:560px) { .cta-row .btn { flex: 1 1 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="edition left">Vol. I · SS 2026 · Nº 10</div>
+    <div class="brand">Zünd<em>schnur</em></div>
+    <div class="edition right">
+      <button class="toggle" id="adsToggle" aria-label="Werbung ein/aus" title="Werbung ein/aus">
+        <span class="dot" id="adsDot"></span>
+        <span id="adsLabel">Ads</span>
+      </button>
+      <button class="toggle" id="themeToggle" aria-label="Theme wechseln">
+        <span class="dot" id="themeDot"></span>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="subhead">
+    <a class="back" href="index.html" aria-label="Zurück zur Startseite">
+      <span class="arrow">&larr;</span>
+      <span>Zurück zur Startseite</span>
+    </a>
+    <span class="meta">Ein Handy · Eine Runde · Viele Schlücke</span>
+  </div>
+
+  <main>
+    <section class="mini-hero">
+      <h1>Weitergeben, <em>bevor</em> es knallt.</h1>
+      <p>Ein Handy wandert im Kreis. Jede Karte ist anders.</p>
+    </section>
+
+    <!-- SETUP -->
+    <section class="screen on" id="sSetup">
+      <div class="kicker">Wer spielt mit? (mind. 2)</div>
+      <form class="add-row" id="addForm">
+        <input id="nameIn" placeholder="Name" maxlength="16" autocomplete="off" aria-label="Spielername">
+        <button class="btn" type="submit">+ Dazu</button>
+      </form>
+      <div class="chips" id="setupChips"></div>
+      <div class="cta-row"><button class="btn primary" id="startBtn" disabled>Los geht's →</button></div>
+      <p class="note">Sitzt im Kreis, gebt das Handy reihum weiter.<br>Wasser zählt auch als Schluck. Trinkt verantwortungsvoll.</p>
+    </section>
+
+    <!-- PASS -->
+    <section class="screen" id="sPass">
+      <div class="kicker">Gib das Handy an</div>
+      <div class="big-name" id="passName"></div>
+      <div class="cta-row"><button class="btn primary" id="revealBtn">Ich hab's — Karte zeigen</button></div>
+      <ul class="rules" id="rulesList"></ul>
+      <div class="cta-row"><button class="btn" id="tallyBtn">Strichliste</button></div>
+    </section>
+
+    <!-- CARD (task / vote / rule) -->
+    <section class="screen" id="sCard">
+      <div class="card">
+        <div class="kicker type" id="cardType"></div>
+        <div class="text" id="cardText"></div>
+        <div class="sub" id="cardSub"></div>
+      </div>
+      <div id="pickWrap" style="display:none">
+        <div class="kicker" style="margin-top:22px" id="pickLabel">Wer trinkt?</div>
+        <div class="chips" id="pickChips"></div>
+      </div>
+      <div class="cta-row" id="cardBtns"></div>
+    </section>
+
+    <!-- BOMB -->
+    <section class="screen" id="sBomb">
+      <div class="kicker">Zündschnur · Kategorie</div>
+      <div class="big-name" id="bombCat" style="font-size:clamp(30px,8vw,52px)"></div>
+      <div class="bomb" id="bombGlyph">💣</div>
+      <p class="note" id="bombHint">Nenne einen Begriff, gib das Handy nach links weiter. Keine Wiederholungen!</p>
+      <div class="cta-row" id="bombBtns"></div>
+    </section>
+
+    <!-- HOLD -->
+    <section class="screen" id="sHold">
+      <div class="kicker">Ruhige Hand</div>
+      <div class="card" style="text-align:center">
+        <div class="text">Halte den Kreis gedrückt — genau <em>5 Sekunden</em>. Ohne Uhr, ohne Zählen laut.</div>
+        <div class="sub">±0,5 s: verteile 2 Schlücke. Sonst trinkst du 2.</div>
+      </div>
+      <div class="hold-pad" id="holdPad">Gedrückt halten</div>
+      <div class="result" id="holdResult"></div>
+      <div class="cta-row" id="holdBtns"></div>
+    </section>
+
+    <!-- TALLY -->
+    <section class="screen" id="sTally">
+      <div class="kicker">Strichliste</div>
+      <div class="tally" id="tallyList"></div>
+      <div class="cta-row">
+        <button class="btn primary" id="backBtn">Weiterspielen</button>
+        <button class="btn" id="resetBtn">Neues Spiel ↺</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Strauss · Biebergemünd</span>
+    <span id="footYear">© SS 2026 — Editorial edition</span>
+  </footer>
+</div>
+
+<div class="duel" id="duel">
+  <div class="half top" id="duelTop"></div>
+  <div class="half" id="duelBot"></div>
+</div>
+
+<aside class="ads-side left"  aria-hidden="true"><div class="ad-slot" id="adSlotLeft"></div></aside>
+<aside class="ads-side right" aria-hidden="true"><div class="ad-slot" id="adSlotRight"></div></aside>
+<script src="site.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const rnd = a => a[Math.floor(Math.random() * a.length)];
+  const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* ---------- Karten ---------- */
+  // {p} = aktuelle Person, {o} = zufällige andere Person
+  const TASKS = [
+    "{p}, trink so viele Schlücke, wie du heute schon Nachrichten ignoriert hast (max. 4).",
+    "{p} und {o} tauschen für eine Runde die Plätze — wer sich weigert, trinkt 3.",
+    "{p}, mach {o} ein ehrliches Kompliment. Gefällt es nicht, trinkst du 2.",
+    "Alle, die gerade ein Getränk in der Hand halten, trinken 1. Ja, auch du, {p}.",
+    "{p}, erzähl in 20 Sekunden eine peinliche Geschichte — oder trink 3.",
+    "{p}, ahme jemanden in der Runde nach. Wer zuerst errät, wer es ist, verteilt 2.",
+    "{p} verteilt 3 Schlücke — beliebig aufgeteilt.",
+    "{p} und {o} trinken gleichzeitig. Wer zuerst absetzt, trinkt 1 extra.",
+    "Wer zuletzt im Urlaub war, trinkt 2. {p} entscheidet bei Streit.",
+    "{p}, nenne 3 Biermarken in 5 Sekunden. Geschafft: verteile 2. Sonst trink 2.",
+    "{p}, wer in der Runde hat zuletzt Geburtstag gehabt? Falsch geraten: trink 2.",
+    "Der jüngste Mensch in der Runde trinkt 2. Der älteste verteilt 2.",
+    "{p}, sing eine Zeile aus deinem Lieblingslied — oder trink 3.",
+    "{p}, rede bis zu deiner nächsten Karte nur in Fragen. Jeder Fehler: 1 Schluck.",
+    "Alle mit Brille trinken 1. Keine Brille in der Runde? Dann trinkt {p} 2.",
+    "{p}, zeig das letzte Foto in deiner Galerie — oder trink 3.",
+    "{o} darf {p} eine Frage stellen. Antwort verweigert: 3 Schlücke.",
+    "{p} und {o}: Schnick-Schnack-Schnuck. Verlierer trinkt 2.",
+    "Wasserpause! Alle trinken einen Schluck Wasser. Ja, wirklich.",
+    "{p}, mach 10 Kniebeugen oder trink 2.",
+    "Alle zeigen auf den Ort, an dem {p} am ehesten einschläft. {p} trinkt 1.",
+    "{p}, wähle eine Person als Trinkbuddy: Bis zum Spielende trinkt sie immer mit dir.",
+    "Kategorie-Reim: {p} sagt ein Wort, reihum wird gereimt. Wer hängt, trinkt 2.",
+    "{p}, buchstabiere deinen Namen rückwärts — schnell! Gestolpert: 2 Schlücke.",
+    "Wer heute am längsten gearbeitet hat, verteilt 3."
+  ];
+  const VOTES = [
+    "Wer würde am ehesten auf einer Party einschlafen?",
+    "Wer würde am ehesten seinen Ex zurücknehmen?",
+    "Wer hat die meisten ungelesenen Nachrichten?",
+    "Wer würde eine Zombie-Apokalypse am längsten überleben?",
+    "Wer kommt am ehesten zu spät zur eigenen Hochzeit?",
+    "Wer würde am ehesten in einer Reality-Show landen?",
+    "Wer gibt am meisten Geld für Essen aus?",
+    "Wer würde am ehesten heimlich ein Tattoo machen?",
+    "Wer ist am wahrscheinlichsten morgen verkatert?",
+    "Wer würde für 100 € am meisten Peinliches tun?",
+    "Wer hat den schlechtesten Musikgeschmack?",
+    "Wer würde sich im eigenen Ort verlaufen?",
+    "Wer schreibt um 3 Uhr nachts die dümmsten Nachrichten?",
+    "Wer wäre der schlechteste Mitbewohner?",
+    "Wer würde am ehesten auswandern?",
+    "Wer lacht über die eigenen Witze am lautesten?",
+    "Wer hat am ehesten schon mal gelogen, um früher zu gehen?",
+    "Wer würde bei Wer-wird-Millionär am weitesten kommen?",
+    "Wer tanzt heute als Erstes auf dem Tisch?",
+    "Wer würde am ehesten ein Haustier nach Essen benennen?"
+  ];
+  const RULES = [
+    "Niemand darf das Wort „trinken“ sagen. 1 Schluck pro Verstoß.",
+    "Vor jedem Schluck „Prost, {p}!“ sagen. Vergessen: 1 extra.",
+    "Nur mit der linken Hand trinken.",
+    "Keine Vornamen benutzen — nur Spitznamen.",
+    "Wer lacht, trinkt 1.",
+    "{p} ist Fragenmeister: Wer eine Frage von {p} beantwortet, trinkt 1.",
+    "Daumen auf den Tisch: {p} darf das jederzeit tun. Wer zuletzt folgt, trinkt 1.",
+    "Kein Handy außer diesem hier. Wer aufs eigene schaut, trinkt 2.",
+    "Jeder Satz endet mit „…im Bett“. Vergessen: 1 Schluck.",
+    "Fluchen verboten. Pro Schimpfwort 1 Schluck.",
+    "Bevor man trinkt, muss man auf seinen Becher zeigen.",
+    "Wer auf die Toilette geht, verteilt bei Rückkehr 1 — wer fragt, wohin man geht, trinkt."
+  ];
+  const CATS = [
+    "Automarken", "Dinge im Kühlschrank", "Fußballvereine", "Länder in Europa", "Disney-Figuren",
+    "Biersorten", "Berufe", "Tiere mit vier Beinen", "Dinge in einer Handtasche", "Städte in Deutschland",
+    "Getränke", "Sportarten", "Gemüse", "Rapper", "Dinge, die man im Urlaub vergisst",
+    "Schimpfwörter, die jugendfrei sind", "Serien", "Kleidungsstücke", "Werkzeuge", "Pizzabeläge"
+  ];
+
+  /* ---------- Zustand ---------- */
+  let players = [];          // {name, sips}
+  let turn = 0;
+  let rules = [];            // {text, left}
+  let bag = [];
+
+  const fill = (s, p, o) => s.replaceAll('{p}', p.name).replaceAll('{o}', o ? o.name : 'jemand');
+  const other = p => rnd(players.filter(x => x !== p));
+  const cur = () => players[turn % players.length];
+
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ---------- Setup ---------- */
+  function renderSetup() {
+    $('setupChips').innerHTML = players.map((p, i) =>
+      `<button class="chip" data-i="${i}" aria-label="${esc(p.name)} entfernen">${esc(p.name)}<span class="x">×</span></button>`).join('');
+    $('startBtn').disabled = players.length < 2;
+  }
+  $('addForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const n = $('nameIn').value.trim();
+    if (n && !players.some(p => p.name === n)) players.push({ name: n, sips: 0 });
+    $('nameIn').value = '';
+    $('nameIn').focus();
+    renderSetup();
+  });
+  $('setupChips').addEventListener('click', e => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    players.splice(+c.dataset.i, 1);
+    renderSetup();
+  });
+  $('startBtn').addEventListener('click', () => { turn = Math.floor(Math.random() * players.length); nextTurn(true); });
+
+  /* ---------- Rundenablauf ---------- */
+  function nextTurn(first) {
+    if (!first) {
+      turn++;
+      rules.forEach(r => r.left--);
+      rules = rules.filter(r => r.left > 0);
+    }
+    $('passName').textContent = cur().name;
+    $('rulesList').innerHTML = rules.map(r => `<li><b>REGEL · ${r.left}</b>${esc(r.text)}</li>`).join('');
+    show('sPass');
+  }
+
+  // Gewichtete Kartenauswahl, Beutel verhindert zu viele Wiederholungen derselben Sorte
+  function drawType() {
+    if (!bag.length) bag = ['task','task','task','task','vote','vote','vote','rule','bomb','bomb','hold','duel'].sort(() => Math.random() - .5);
+    return bag.pop();
+  }
+
+  $('revealBtn').addEventListener('click', () => {
+    const t = drawType();
+    ({ task: showTask, vote: showVote, rule: showRule, bomb: showBomb, hold: showHold, duel: showDuel })[t]();
+  });
+
+  function card(type, text, sub) {
+    $('cardType').textContent = type;
+    $('cardText').innerHTML = esc(text);
+    $('cardSub').textContent = sub || '';
+    $('pickWrap').style.display = 'none';
+    show('sCard');
+  }
+  function buttons(el, defs) {
+    $(el).innerHTML = '';
+    defs.forEach(([label, fn, primary]) => {
+      const b = document.createElement('button');
+      b.className = 'btn' + (primary ? ' primary' : '');
+      b.textContent = label;
+      b.onclick = fn;
+      $(el).appendChild(b);
+    });
+  }
+  // Namens-Chips, um Schlücke in die Strichliste einzutragen
+  function picker(label, sips) {
+    $('pickLabel').textContent = label;
+    $('pickWrap').style.display = '';
+    $('pickChips').innerHTML = players.map((p, i) => `<button class="chip" data-i="${i}">${esc(p.name)}</button>`).join('');
+    $('pickChips').onclick = e => {
+      const c = e.target.closest('.chip');
+      if (!c) return;
+      c.classList.toggle('sel');
+    };
+    return () => $('pickChips').querySelectorAll('.chip.sel').forEach(c => players[+c.dataset.i].sips += sips);
+  }
+
+  function showTask() {
+    const p = cur();
+    card('Aufgabe', fill(rnd(TASKS), p, other(p)));
+    const commit = picker('Wer hat getrunken? (für die Strichliste)', 1);
+    buttons('cardBtns', [['Weiter →', () => { commit(); nextTurn(); }, true]]);
+  }
+  function showVote() {
+    card('Abstimmung', rnd(VOTES), 'Auf 3 zeigen alle gleichzeitig auf eine Person. Wer die meisten Finger abbekommt, trinkt 2.');
+    const commit = picker('Wer hat verloren?', 2);
+    buttons('cardBtns', [['Weiter →', () => { commit(); nextTurn(); }, true]]);
+  }
+  function showRule() {
+    const p = cur();
+    const text = fill(rnd(RULES), p, other(p));
+    card('Neue Regel', text, 'Gilt für die nächsten ' + players.length * 2 + ' Karten.');
+    buttons('cardBtns', [['Regel aktiv →', () => { rules.push({ text, left: players.length * 2 }); nextTurn(); }, true]]);
+  }
+
+  /* ---------- Zündschnur (versteckter Timer) ---------- */
+  let audio, bombTimer, tickTimer;
+  function beep(freq, dur) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = freq; o.connect(g); g.connect(audio.destination);
+      g.gain.setValueAtTime(.15, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + dur);
+      o.start(); o.stop(audio.currentTime + dur);
+    } catch (_) {}
+  }
+  function showBomb() {
+    $('bombCat').textContent = rnd(CATS);
+    $('bombGlyph').textContent = '💣';
+    $('bombGlyph').className = 'bomb';
+    $('bombHint').textContent = cur().name + ' fängt an. Begriff nennen, Handy nach links weitergeben. Keine Wiederholungen!';
+    $('pickWrap').style.display = 'none';
+    buttons('bombBtns', [['Zünden 🔥', lightFuse, true]]);
+    show('sBomb');
+  }
+  function lightFuse() {
+    buttons('bombBtns', []);
+    $('bombGlyph').className = 'bomb tick';
+    const total = 12000 + Math.random() * 28000;   // 12–40 s, niemand weiß wie lang
+    const start = Date.now();
+    (function tick() {
+      const left = total - (Date.now() - start);
+      if (left <= 0) return explode();
+      beep(880, .05);
+      tickTimer = setTimeout(tick, Math.max(120, Math.min(900, left / 12)));
+    })();
+  }
+  function explode() {
+    clearTimeout(tickTimer);
+    beep(90, .8);
+    navigator.vibrate && navigator.vibrate([400, 100, 400]);
+    $('bombGlyph').textContent = '💥';
+    $('bombGlyph').className = 'bomb boom';
+    $('bombHint').innerHTML = '<b>BOOM!</b> Wer das Handy jetzt hält, trinkt 3.';
+    const box = document.createElement('div');
+    box.className = 'chips';
+    box.innerHTML = players.map((p, i) => `<button class="chip" data-i="${i}">${esc(p.name)}</button>`).join('');
+    box.onclick = e => {
+      const c = e.target.closest('.chip');
+      if (!c) return;
+      players[+c.dataset.i].sips += 3;
+      turn = +c.dataset.i - 1;   // wer explodiert ist, ist als Nächstes dran
+      nextTurn();
+    };
+    $('bombBtns').replaceChildren(box);
+  }
+
+  /* ---------- Ruhige Hand (5 s blind halten) ---------- */
+  let holdStart = 0;
+  function showHold() {
+    $('holdResult').textContent = '';
+    $('holdPad').textContent = 'Gedrückt halten';
+    $('holdPad').classList.remove('down');
+    holdStart = 0;
+    buttons('holdBtns', []);
+    show('sHold');
+  }
+  $('holdPad').addEventListener('pointerdown', e => {
+    if ($('holdBtns').children.length) return;  // schon gespielt
+    e.preventDefault();
+    holdStart = performance.now();
+    $('holdPad').classList.add('down');
+    $('holdPad').textContent = '…';
+  });
+  function release() {
+    if (!holdStart) return;
+    const t = (performance.now() - holdStart) / 1000;
+    holdStart = 0;
+    $('holdPad').classList.remove('down');
+    $('holdPad').textContent = 'Fertig';
+    const ok = Math.abs(t - 5) <= .5;
+    $('holdResult').textContent = t.toFixed(2).replace('.', ',') + ' s';
+    if (!ok) cur().sips += 2;
+    buttons('holdBtns', [[ok ? 'Treffer! Verteile 2 →' : 'Daneben — trink 2 →', () => nextTurn(), true]]);
+  }
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => $('holdPad').addEventListener(ev, release));
+  $('holdPad').addEventListener('contextmenu', e => e.preventDefault());
+
+  /* ---------- Reaktionsduell (Handy zwischen zwei Leuten) ---------- */
+  let duelState, duelTimer;
+  function showDuel() {
+    const a = cur(), b = other(a);
+    card('Duell', a.name + ' gegen ' + b.name,
+      'Legt das Handy flach zwischen euch. Jede Person tippt auf ihre Hälfte, sobald der Bildschirm rot wird. Zu früh oder zu langsam: 2 Schlücke.');
+    buttons('cardBtns', [['Duell starten', () => startDuel(a, b), true]]);
+  }
+  function startDuel(a, b) {
+    const d = $('duel');
+    d.className = 'duel on';
+    $('duelBot').innerHTML = esc(a.name) + '<small>Warte auf Rot…</small>';
+    $('duelTop').innerHTML = esc(b.name) + '<small>Warte auf Rot…</small>';
+    duelState = 'wait';
+    duelTimer = setTimeout(() => { duelState = 'go'; d.classList.add('go'); beep(660, .15); }, 2000 + Math.random() * 4000);
+    $('duelBot').onpointerdown = () => duelHit(a, b);
+    $('duelTop').onpointerdown = () => duelHit(b, a);
+  }
+  function duelHit(me, them) {
+    if (duelState !== 'wait' && duelState !== 'go') return;
+    clearTimeout(duelTimer);
+    const loser = duelState === 'wait' ? me : them;
+    const why = duelState === 'wait' ? ' hat zu früh getippt' : ' war zu langsam';
+    duelState = 'done';
+    loser.sips += 2;
+    $('duel').className = 'duel';
+    card('Duell · Ergebnis', loser.name + why + ' und trinkt 2.');
+    buttons('cardBtns', [['Weiter →', () => nextTurn(), true]]);
+  }
+
+  /* ---------- Strichliste ---------- */
+  $('tallyBtn').addEventListener('click', () => {
+    $('tallyList').innerHTML = [...players].sort((x, y) => y.sips - x.sips)
+      .map(p => `<div><span>${esc(p.name)}</span><span>${p.sips}</span></div>`).join('');
+    show('sTally');
+  });
+  $('backBtn').addEventListener('click', () => show('sPass'));
+  $('resetBtn').addEventListener('click', () => {
+    players.forEach(p => p.sips = 0);
+    rules = [];
+    show('sSetup');
+    renderSetup();
+  });
+})();
+</script>
+</body>
+</html>
