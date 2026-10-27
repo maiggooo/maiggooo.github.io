@@ -4,10 +4,16 @@
 // Load order on a page:
 //   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 //   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+//   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 //   <script src="multiplayer.js"></script>
 //
+// Every tab signs in anonymously (no account needed); the player id is that sign-in's uid,
+// which the database rules in database.rules.json use to decide who may write what.
+// The id survives a reload of the tab. Bots/extra seats pass their own appName to get
+// a separate sign-in and therefore their own id.
+//
 // Usage:
-//   const mp = Multiplayer.create("wizard", { maxPlayers: 6 });
+//   const mp = Multiplayer.create("wizard", { maxPlayers: 6 });   // mp.me is set once host()/join() resolved
 //   const code = await mp.host("Maiko", { phase: "lobby" });  // open a room, you are the host
 //   await mp.join("K7QXM", "Lina");                           // or join one by its code
 //   mp.onChange(room => render(room));  // { code, hostId, state, players: { id: { name, joinedAt, data } } }
@@ -52,15 +58,28 @@ const Multiplayer = {
     return Object.entries(players).sort((a, b) => (a[1].joinedAt || 0) - (b[1].joinedAt || 0))[0]?.[0] || null;
   },
 
-  create(game, { maxPlayers = 20, playerId } = {}) {
-    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-    const db = firebase.database();
-    // Same id after a reload, so a player can come back into their room
-    let me = playerId;
-    if (!me) {
-      try { me = sessionStorage.getItem("mp-id"); } catch {}
-      if (!me) { me = "p" + Math.random().toString(36).slice(2, 10); try { sessionStorage.setItem("mp-id", me); } catch {} }
-    }
+  create(game, { maxPlayers = 20, appName } = {}) {
+    const appKey = appName || "[DEFAULT]";
+    const app = firebase.apps.find(a => a.name === appKey) || firebase.initializeApp(FIREBASE_CONFIG, ...(appName ? [appName] : []));
+    const db = app.database();
+    let me = null;
+    // Anonymous sign-in, kept per tab so a reload keeps the same id. If sign-in isn't
+    // available (auth not enabled yet), fall back to a random per-tab id.
+    const ready = (async () => {
+      try {
+        const auth = app.auth();
+        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+        const user = await new Promise(res => { const un = auth.onAuthStateChanged(u => { un(); res(u); }); });
+        return (user || (await auth.signInAnonymously()).user).uid;
+      } catch (e) {
+        console.warn("Anonyme Anmeldung nicht möglich, nutze Ersatz-ID:", e?.code || e);
+        const key = "mp-id-" + appKey;
+        let id = null;
+        try { id = sessionStorage.getItem(key); } catch {}
+        if (!id) { id = "p" + Math.random().toString(36).slice(2, 10); try { sessionStorage.setItem(key, id); } catch {} }
+        return id;
+      }
+    })().then(id => (me = api.me = id));
     const roomsRef = db.ref(`games/${game}/rooms`);
     const roomRef = code => roomsRef.child(code);
     let ref = null, off = null, myName = "", connOff = null;
@@ -80,9 +99,10 @@ const Multiplayer = {
     }
 
     const api = {
-      me, code: null, isHost: false,
+      me: null, code: null, isHost: false, ready,
 
       async host(name, state = {}) {
+        await ready;
         sweep();
         let code;
         do { code = Multiplayer.makeCode(); } while ((await roomRef(code).get()).exists());
@@ -96,6 +116,7 @@ const Multiplayer = {
       },
 
       async join(code, name) {
+        await ready;
         sweep();
         code = String(code).trim().toUpperCase();
         const snap = await roomRef(code).get();

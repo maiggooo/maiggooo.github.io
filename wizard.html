@@ -364,6 +364,7 @@
 <script src="site.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="multiplayer.js"></script>
 <script>
 /* =========================================================
@@ -1146,14 +1147,15 @@ async function addBot() {
   if (players.length >= 6) return;
   const used = new Set(Object.values(room.players).map(p => p.name));
   const name = "Bot " + (BOT_NAMES.find(n => !used.has("Bot " + n)) || bots.length + 1);
-  const id = "bot-" + Math.random().toString(36).slice(2, 8);
-  await spawnBot(getMp().code, id, name);
+  const app = "bot-" + Math.random().toString(36).slice(2, 8);
+  await spawnBot(getMp().code, app, name);
   saveBots();
 }
-async function spawnBot(code, id, name) {
-  const bmp = Multiplayer.create("wizard", { maxPlayers: 6, playerId: id });
+// Each bot has its own Firebase app, so it signs in separately and gets its own player id
+async function spawnBot(code, app, name) {
+  const bmp = Multiplayer.create("wizard", { maxPlayers: 6, appName: app });
   await bmp.join(code, name);
-  const bot = { id, name, mp: bmp, key: "" };
+  const bot = { id: bmp.me, app, name, mp: bmp, key: "" };
   bmp.onChange(r => r && botThink(bot, r));
   bots.push(bot);
 }
@@ -1162,9 +1164,9 @@ async function removeBots() {
   saveBots();
   await Promise.all(list.map(b => b.mp.leave()));
 }
-function saveBots() { store.set("wz-bots", bots.map(b => ({ id: b.id, name: b.name }))); }
+function saveBots() { store.set("wz-bots", bots.map(b => ({ app: b.app, name: b.name }))); }
 async function restoreBots(code) {
-  for (const b of store.get("wz-bots") || []) { try { await spawnBot(code, b.id, b.name); } catch {} }
+  for (const b of store.get("wz-bots") || []) { if (b.app) try { await spawnBot(code, b.app, b.name); } catch {} }
 }
 $("#addBotBtn").addEventListener("click", addBot);
 $("#removeBotsBtn").addEventListener("click", removeBots);
